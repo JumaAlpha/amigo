@@ -1,0 +1,205 @@
+/* ========== SIDEBAR SPECIFIC STYLES ========== */
+.sidebar {
+    width: var(--sidebar-width);
+    height: 100vh;
+    background-color: var(--deep-charcoal);
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 0;
+    transition: width 0.3s ease;
+    overflow: visible; /* Changed from hidden to visible to allow drawer to be seen */
+    box-shadow: 2px 0 20px rgba(0,0,0,0.5);
+}
+
+.sidebar.expanded {
+    width: 250px;
+}
+
+/* ===== Hamburger Menu (Two Strips) ===== */
+.hamburger-menu {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    margin-bottom: 3rem;
+    position: relative;
+}
+
+.hamburger-strip {
+    width: 100%;
+    height: 3px;
+    background-color: var(--metallic-gold);
+    transition: all 0.3s ease;
+    border-radius: 3px;
+}
+
+/* Hamburger animation when open */
+.sidebar.expanded .hamburger-strip:first-child {
+    transform: rotate(45deg) translate(8px, 8px);
+}
+
+.sidebar.expanded .hamburger-strip:last-child {
+    transform: rotate(-45deg) translate(8px, -8px);
+}
+
+/* ===== Navigation Menu ===== */
+.nav-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.2rem;
+    letter-spacing: 1.5px;
+    list-style: none;
+    width: 100%;
+    text-align: left;
+    padding-left: 2rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    pointer-events: none;
+}
+
+.sidebar.expanded .nav-menu {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: all;
+}
+
+.nav-menu li {
+    width: 100%;
+}
+
+.nav-menu li a {
+    text-decoration: none;
+    color: var(--off-white);
+    transition: all 0.2s ease;
+    display: inline-block;
+    padding: 0.3rem 0;
+    border-bottom: 1px solid transparent;
+    cursor: pointer;
+    font-size: 1.4rem;
+}
+
+.nav-menu li a.active,
+.nav-menu li a:hover {
+    color: var(--metallic-gold);
+    border-bottom-color: var(--metallic-gold);
+    transform: translateX(10px);
+}
+
+/* ===== Social Drawer (Opens to Right - ON TOP OF EVERYTHING) ===== */
+.social-drawer-container {
+    margin-top: auto;
+    width: 100%;
+    position: relative;
+    z-index: 200; /* Higher than sidebar */
+}
+
+.social-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    padding: 1rem 0;
+    transition: all 0.3s ease;
+    color: var(--metallic-gold);
+    position: relative;
+    z-index: 201;
+}
+
+.social-toggle i {
+    font-size: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.social-toggle .fa-globe {
+    font-size: 1.6rem;
+}
+
+.social-toggle .arrow-symbol {
+    font-size: 1.2rem; /* Reduced from 1.8rem */
+    font-weight: bold;
+    font-family: monospace;
+    transition: transform 0.3s ease;
+    display: inline-block;
+    transform: translateX(5px); /* Push slightly outside */
+    color: var(--metallic-gold);
+}
+
+/* Arrow positioned outside the sidebar */
+.sidebar:not(.expanded) .social-toggle .arrow-symbol {
+    transform: translateX(8px); /* Push more outside when sidebar is collapsed */
+}
+
+.social-toggle.active .arrow-symbol {
+    transform: translateX(5px) rotate(180deg); /* Keep outside position when rotated */
+}
+
+.sidebar:not(.expanded) .social-toggle.active .arrow-symbol {
+    transform: translateX(8px) rotate(180deg);
+}
+
+/* Drawer that opens to the right - ON TOP OF EVERYTHING */
+.social-drawer {
+    position: fixed; /* Changed from absolute to fixed */
+    left: var(--sidebar-width);
+    bottom: 2rem;
+    background-color: var(--deep-charcoal);
+    border-radius: 0 12px 12px 0;
+    padding: 1.2rem 2rem;
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    box-shadow: 5px 5px 30px rgba(0,0,0,0.8);
+    border-left: 3px solid var(--metallic-gold);
+    transform: translateX(-20px);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    pointer-events: none;
+    z-index: 1000; /* Very high z-index to be on top of everything */
+    min-width: 200px;
+    backdrop-filter: blur(5px); /* Adds a slight blur effect behind */
+}
+
+/* Adjust position when sidebar is expanded */
+.sidebar.expanded + .main-content .social-drawer,
+.sidebar.expanded ~ * .social-drawer {
+    left: 250px;
+}
+
+.social-drawer.open {
+    transform: translateX(0);
+    opacity: 1;
+    visibility: visible;
+    pointer-events: all;
+}
+
+.social-drawer a {
+    color: var(--off-white);
+    font-size: 2rem;
+    transition: all 0.2s ease;
+    transform: scale(1);
+    text-decoration: none;
+}
+
+.social-drawer a:hover {
+    color: var(--metallic-gold);
+    transform: scale(1.3);
+}
+
+/* Staggered animation for social icons */
+.social-drawer a {
+    animation: none;
+}

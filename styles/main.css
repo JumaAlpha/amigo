@@ -1,0 +1,156 @@
+/* ========== RESET & BASE ========== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    color: #F5F5F5;
+    background-color: #000000;
+    line-height: 1.5;
+    overflow: hidden;
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+}
+
+/* ========== GOLD ACCENT VARIABLE ========== */
+:root {
+    --metallic-gold: #D4AF37;
+    --deep-charcoal: #121212;
+    --pure-black: #000000;
+    --off-white: #F5F5F5;
+    --sidebar-width: 80px; /* Collapsed sidebar width */
+}
+
+/* ========== LAYOUT STRUCTURE ========== */
+.app {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+    z-index: 10; /* Above fog */
+}
+
+.main-content {
+    width: calc(100% - var(--sidebar-width));
+    margin-left: var(--sidebar-width);
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    background-color: var(--pure-black);
+    flex: 1;
+    transition: margin-left 0.3s ease;
+    
+    /* Hide scrollbar for main content - cross-browser solution */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.main-content::-webkit-scrollbar {
+    display: none;
+}
+
+.main-content.sidebar-expanded {
+    margin-left: 250px; /* Expanded sidebar width */
+}
+
+.section {
+    flex: 0 0 100%;
+    height: 100vh;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    z-index: 15; /* Above fog */
+}
+
+.section-header {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3rem;
+    color: var(--metallic-gold);
+    letter-spacing: 4px;
+    margin-bottom: 2rem;
+    padding-left: 1rem;
+}
+
+/* ========== HANDWRITING LOGO (Fixed Top Right) ========== */
+.site-logo {
+    position: fixed;
+    top: 2rem;
+    right: 3rem;
+    z-index: 1000;
+    font-family: 'Caveat', 'Brush Script MT', cursive;
+    text-align: right;
+    line-height: 1;
+    pointer-events: none; /* Allows clicking through to sidebar */
+    opacity: 0.8;
+}
+
+.site-logo .amigo {
+    font-size: 5rem;
+    /* color: var(--metallic-gold); */
+    display: block;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    letter-spacing: 2px;
+}
+
+.site-logo .johnson {
+    font-size: 3.5rem;
+    color: var(--off-white);
+    display: block;
+    margin-top: -0.5rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    letter-spacing: 1px;
+}
+
+/* ========== UTILITIES ========== */
+.hint-text {
+    color: #777;
+    margin-top: 1rem;
+    padding-left: 1rem;
+}
+
+/* ========== GLOBAL CUSTOM SCROLLBAR STYLES ========== */
+/* This will affect all scrollable elements except the main content */
+
+/* For Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--metallic-gold) #1e1e1e;
+}
+
+/* For Chrome, Safari, Edge, and Opera */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1e1e1e;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--metallic-gold);
+    border-radius: 10px;
+    border: 2px solid #1e1e1e;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #e5c158; /* Lighter gold on hover */
+}
+
+::-webkit-scrollbar-corner {
+    background: #1e1e1e;
+}

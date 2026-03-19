@@ -1,0 +1,222 @@
+/* ========== BTS SLIDER - AUTO-SCROLLING SWIPER ========== */
+.bts-section {
+    background: var(--pure-black);
+    flex-direction: column;
+    justify-content: center;
+    padding: 2rem 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.section-header {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.5rem;
+    color: var(--metallic-gold);
+    letter-spacing: 6px;
+    margin-bottom: 2.5rem;
+    padding-left: 3rem;
+    font-weight: 400;
+    opacity: 0.9;
+    z-index: 10;
+}
+
+/* Swiper Container */
+.bts-swiper {
+    width: 100%;
+    height: auto;
+    padding: 1rem 0;
+    overflow: visible;
+}
+
+/* Swiper Wrapper - Continuous animation */
+.swiper-wrapper {
+    transition-timing-function: linear !important; /* Force linear timing for constant speed */
+}
+
+/* Swiper Slides */
+.swiper-slide {
+    width: auto;
+    height: auto;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+}
+
+/* Slider Items */
+.slider-item {
+    width: 500px;
+    height: 350px;
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 20px 30px rgba(0, 0, 0, 0.5);
+    border: 1px solid #2a2a2a;
+    transition: all 0.3s ease;
+}
+
+.slider-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(0.4) contrast(1.1) brightness(0.9);
+    transition: all 0.5s ease;
+}
+
+/* Subtle hover effect that doesn't interrupt scroll */
+.slider-item:hover {
+    border-color: var(--metallic-gold);
+    transform: scale(1.02);
+    box-shadow: 0 25px 35px rgba(212, 175, 55, 0.15);
+}
+
+.slider-item:hover img {
+    filter: grayscale(0) contrast(1.2) brightness(1);
+    transform: scale(1.05);
+}
+
+/* Slide Overlay (appears on hover) */
+.slide-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, 
+        rgba(0, 0, 0, 0.9) 0%,
+        rgba(0, 0, 0, 0.5) 50%,
+        transparent 100%);
+    padding: 2rem 1.5rem 1.5rem 1.5rem;
+    transform: translateY(100%);
+    transition: transform 0.4s ease;
+    pointer-events: none;
+}
+
+.slider-item:hover .slide-overlay {
+    transform: translateY(0);
+}
+
+.slide-caption {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    color: var(--off-white);
+    letter-spacing: 1px;
+    font-weight: 300;
+    text-transform: uppercase;
+    border-left: 2px solid var(--metallic-gold);
+    padding-left: 1rem;
+}
+
+/* Navigation Buttons (optional - can be removed if you want pure auto-scroll) */
+.bts-nav {
+    color: var(--metallic-gold);
+    background: rgba(0, 0, 0, 0.5);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    transition: all 0.3s ease;
+}
+
+.bts-nav:after {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.bts-nav:hover {
+    background: rgba(212, 175, 55, 0.2);
+    border-color: var(--metallic-gold);
+}
+
+/* Edge fade effect for seamless appearance */
+.bts-swiper {
+    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    .slider-item {
+        width: 400px;
+        height: 280px;
+    }
+    
+    .section-header {
+        font-size: 2.2rem;
+        padding-left: 2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .bts-section {
+        padding: 1.5rem 0;
+    }
+    
+    .section-header {
+        font-size: 2rem;
+        letter-spacing: 4px;
+        padding-left: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .slider-item {
+        width: 300px;
+        height: 210px;
+    }
+    
+    .bts-nav {
+        display: none; /* Hide navigation on mobile */
+    }
+    
+    .slide-caption {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .slider-item {
+        width: 250px;
+        height: 175px;
+    }
+    
+    .section-header {
+        font-size: 1.8rem;
+        padding-left: 1rem;
+    }
+}
+
+/* Optional: Add a subtle gradient overlay on images */
+.slider-item::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(115deg, 
+        rgba(212, 175, 55, 0.1) 0%,
+        transparent 30%,
+        transparent 70%,
+        rgba(212, 175, 55, 0.1) 100%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+}
+
+.slider-item:hover::after {
+    opacity: 1;
+}
+
+/* Smooth loading animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.swiper-slide {
+    animation: fadeIn 0.5s ease forwards;
+}

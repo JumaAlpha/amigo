@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amijoji · Amigo Johnson — cinematic gospel director</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:opsz@14..32&family=Caveat:wght@400;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Swiper CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <!-- Fog Overlay Container - This will be populated by JavaScript -->
+    <div id="fog-marquee-container"></div>
+    
+    <div class="site-logo">
+        <span class="amigo">Amigo</span>
+        <span class="johnson">Johnson</span>
+    </div>
+    
+    <div class="app">
+        <!-- Sidebar Component -->
+        <div id="sidebar-container"></div>
+        
+        <!-- Main Content with Horizontal Scroll -->
+        <main class="main-content" id="main-content"></main>
+    </div>
+
+    <!-- Component Scripts -->
+    <script src="components/Sidebar.js"></script>
+    <script src="components/HeroSection.js"></script>
+    <script src="components/WorkGallery.js"></script>
+    <script src="components/BTSSlider.js"></script>
+    <script src="components/AboutGear.js"></script>
+    <script src="components/BookingForm.js"></script>
+    <script src="components/FogMarquee.js"></script>
+
+    <!-- Swiper JS -->
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    
+    <!-- Main Initialization Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM loaded, starting initialization...');
+            
+            // Load component CSS dynamically
+            function loadComponentCSS(href) {
+                return new Promise((resolve, reject) => {
+                    const link = document.createElement('link');
+                    link.rel = 'stylesheet';
+                    link.href = href;
+                    link.onload = () => {
+                        console.log(`CSS loaded: ${href}`);
+                        resolve();
+                    };
+                    link.onerror = (error) => {
+                        console.error(`Error loading CSS: ${href}`, error);
+                        reject(error);
+                    };
+                    document.head.appendChild(link);
+                });
+            }
+
+            // Load all component CSS files
+            Promise.all([
+                loadComponentCSS('styles/sidebar.css'),
+                loadComponentCSS('styles/hero.css'),
+                loadComponentCSS('styles/work-gallery.css'),
+                loadComponentCSS('styles/bts-slider.css'),
+                loadComponentCSS('styles/about-gear.css'),
+                loadComponentCSS('styles/booking-form.css'),
+                loadComponentCSS('styles/fog-marquee.css')
+            ]).then(() => {
+                console.log('All CSS loaded successfully');
+                
+                // Check if FogMarquee component exists
+                if (typeof FogMarquee === 'undefined') {
+                    console.error('FogMarquee component not found!');
+                    return;
+                }
+                
+                // Render Fog Marquee first
+                const fogContainer = document.getElementById('fog-marquee-container');
+                if (fogContainer) {
+                    console.log('Rendering fog overlay...');
+                    fogContainer.innerHTML = FogMarquee.render();
+                } else {
+                    console.error('Fog container not found!');
+                }
+                
+                // Check if Sidebar component exists
+                if (typeof Sidebar === 'undefined') {
+                    console.error('Sidebar component not found!');
+                    return;
+                }
+                
+                // Load Sidebar
+                const sidebarContainer = document.getElementById('sidebar-container');
+                if (sidebarContainer) {
+                    console.log('Rendering sidebar...');
+                    sidebarContainer.innerHTML = Sidebar.render();
+                } else {
+                    console.error('Sidebar container not found!');
+                }
+                
+                // Check if all section components exist
+                const components = {
+                    HeroSection, WorkGallery, BTSSlider, AboutGear, BookingForm
+                };
+                
+                for (const [name, component] of Object.entries(components)) {
+                    if (typeof component === 'undefined') {
+                        console.error(`${name} component not found!`);
+                        return;
+                    }
+                }
+                
+                // Load Main Content Sections
+                const mainContent = document.getElementById('main-content');
+                if (mainContent) {
+                    console.log('Rendering main content sections...');
+                    mainContent.innerHTML = `
+                        ${HeroSection.render()}
+                        ${WorkGallery.render()}
+                        ${BTSSlider.render()}
+                        ${AboutGear.render()}
+                        ${BookingForm.render()}
+                    `;
+                } else {
+                    console.error('Main content container not found!');
+                }
+                
+                // Initialize all components
+                console.log('Initializing components...');
+                
+                try {
+                    if (typeof FogMarquee.init === 'function') {
+                        FogMarquee.init();
+                        console.log('FogMarquee initialized');
+                    }
+                    
+                    if (typeof Sidebar.init === 'function') {
+                        Sidebar.init();
+                        console.log('Sidebar initialized');
+                    }
+                    
+                    if (typeof HeroSection.init === 'function') {
+                        HeroSection.init();
+                        console.log('HeroSection initialized');
+                    }
+                    
+                    if (typeof WorkGallery.init === 'function') {
+                        WorkGallery.init();
+                        console.log('WorkGallery initialized');
+                    }
+                    
+                    if (typeof BTSSlider.init === 'function') {
+                        BTSSlider.init();
+                        console.log('BTSSlider initialized');
+                    }
+                    
+                    if (typeof AboutGear.init === 'function') {
+                        AboutGear.init();
+                        console.log('AboutGear initialized');
+                    }
+                    
+                    if (typeof BookingForm.init === 'function') {
+                        BookingForm.init();
+                        console.log('BookingForm initialized');
+                    }
+                    
+                    console.log('All components initialized successfully!');
+                } catch (error) {
+                    console.error('Error initializing components:', error);
+                }
+                
+            }).catch(error => {
+                console.error('Error loading component CSS:', error);
+                
+                // Fallback: try to render without CSS
+                console.log('Attempting to render without CSS...');
+                
+                // Still try to render components even if CSS fails
+                const fogContainer = document.getElementById('fog-marquee-container');
+                if (fogContainer && typeof FogMarquee !== 'undefined') {
+                    fogContainer.innerHTML = FogMarquee.render();
+                }
+                
+                const sidebarContainer = document.getElementById('sidebar-container');
+                if (sidebarContainer && typeof Sidebar !== 'undefined') {
+                    sidebarContainer.innerHTML = Sidebar.render();
+                }
+                
+                const mainContent = document.getElementById('main-content');
+                if (mainContent) {
+                    mainContent.innerHTML = `
+                        ${HeroSection?.render() || ''}
+                        ${WorkGallery?.render() || ''}
+                        ${BTSSlider?.render() || ''}
+                        ${AboutGear?.render() || ''}
+                        ${BookingForm?.render() || ''}
+                    `;
+                }
+                
+                // Try to initialize
+                if (typeof FogMarquee?.init === 'function') FogMarquee.init();
+                if (typeof Sidebar?.init === 'function') Sidebar.init();
+                if (typeof HeroSection?.init === 'function') HeroSection.init();
+                if (typeof WorkGallery?.init === 'function') WorkGallery.init();
+                if (typeof BTSSlider?.init === 'function') BTSSlider.init();
+                if (typeof AboutGear?.init === 'function') AboutGear.init();
+                if (typeof BookingForm?.init === 'function') BookingForm.init();
+            });
+            
+            // Check if fog image exists
+            setTimeout(() => {
+                const img = new Image();
+                img.onload = () => console.log('✅ Fog image loaded successfully from assets/images/fog2.ecb15114.webp');
+                img.onerror = () => console.warn('⚠️ Fog image not found at: assets/images/fog2.ecb15114.webp. Please make sure the file exists in the assets/images/ folder.');
+                img.src = 'assets/images/fog2.ecb15114.webp';
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

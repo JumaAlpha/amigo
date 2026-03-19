@@ -1,0 +1,105 @@
+/* ========== FOG OVERLAY MARQUEE STYLES ========== */
+.fog-overlay-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1; /* Very low - just above body background */
+    overflow: hidden;
+    mix-blend-mode: overlay; /* Changed from screen to overlay for better blending */
+    opacity: 0.2; /* More subtle */
+}
+
+.fog-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-wrap: nowrap;
+    will-change: transform;
+}
+
+.fog-layer img {
+    width: auto;
+    height: 100%;
+    min-width: 100vw;
+    object-fit: cover;
+    opacity: 0.6;
+    filter: blur(5px) brightness(1.2);
+    transform: scale(1.2);
+    animation: fogDrift 180s linear infinite;
+}
+
+.fog-layer-1 img {
+    animation-name: fogDriftLeft;
+    animation-duration: 200s;
+}
+
+.fog-layer-2 img {
+    animation-name: fogDriftRight;
+    animation-duration: 240s;
+    opacity: 0.5;
+    filter: blur(7px) brightness(1.3);
+}
+
+.fog-layer-3 {
+    display: flex;
+    flex-direction: column;
+}
+
+.fog-layer-3 img {
+    width: 100%;
+    height: auto;
+    min-height: 100vh;
+    animation-name: fogDriftVertical;
+    animation-duration: 300s;
+    opacity: 0.3;
+    filter: blur(10px) brightness(1.4);
+    transform: scale(1.5);
+}
+
+@keyframes fogDriftLeft {
+    0% {
+        transform: translateX(0) scale(1.2);
+    }
+    100% {
+        transform: translateX(-50%) scale(1.2);
+    }
+}
+
+@keyframes fogDriftRight {
+    0% {
+        transform: translateX(-50%) scale(1.2);
+    }
+    100% {
+        transform: translateX(0) scale(1.2);
+    }
+}
+
+@keyframes fogDriftVertical {
+    0% {
+        transform: translateY(0) scale(1.5);
+    }
+    100% {
+        transform: translateY(-50%) scale(1.5);
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .fog-overlay-container {
+        opacity: 0.15;
+    }
+}
+
+/* Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+    .fog-layer img {
+        animation: none;
+        opacity: 0.1;
+    }
+}

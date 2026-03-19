@@ -1,0 +1,257 @@
+/* ========== HERO SECTION SPECIFIC STYLES ========== */
+.hero-section {
+    position: relative;
+    justify-content: flex-start;
+    background-color: var(--pure-black);
+}
+
+/* High Quality Video Settings */
+.hero-video-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    /* High quality rendering */
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+    /* Better performance */
+    will-change: transform;
+}
+
+/* Overlay Layers */
+.hero-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Gradient Overlay - Darkens edges */
+.gradient-overlay {
+    background: radial-gradient(
+        circle at center,
+        transparent 0%,
+        rgba(0, 0, 0, 0.3) 70%,
+        rgba(0, 0, 0, 0.7) 100%
+    );
+}
+
+/* Vignette Overlay - Adds depth */
+.vignette-overlay {
+    background: radial-gradient(
+        circle at 50% 50%,
+        transparent 50%,
+        rgba(0, 0, 0, 0.4) 100%
+    );
+    mix-blend-mode: multiply;
+}
+
+/* Film Texture Overlay - Adds cinematic grain */
+.texture-overlay {
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(255, 255, 255, 0.02) 0px,
+        rgba(0, 0, 0, 0.02) 2px,
+        transparent 3px,
+        transparent 5px
+    );
+    opacity: 0.15;
+    mix-blend-mode: overlay;
+    animation: filmGrain 8s steps(10) infinite;
+}
+
+/* Light Leak Effect - Optional cinematic flare */
+.light-leak {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    pointer-events: none;
+    background: linear-gradient(
+        115deg,
+        transparent 30%,
+        rgba(212, 175, 55, 0.08) 50%,
+        transparent 70%
+    );
+    animation: lightLeak 12s ease-in-out infinite;
+    opacity: 0.3;
+}
+
+.hero-title {
+    position: relative;
+    z-index: 3;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 10vw, 90px);
+    letter-spacing: 8px;
+    color: var(--metallic-gold);
+    text-align: left;
+    padding: 2rem 4rem;
+    max-width: 1200px;
+    text-shadow: 
+        0 0 30px rgba(0,0,0,0.8),
+        2px 2px 4px rgba(0,0,0,0.5),
+        4px 4px 8px rgba(0,0,0,0.3);
+    line-height: 1.1;
+    animation: titleReveal 2s ease-out;
+}
+
+.hero-title small {
+    display: block;
+    font-size: 1.6rem;
+    letter-spacing: 10px;
+    color: var(--off-white);
+    font-family: 'Inter', sans-serif;
+    font-weight: 300;
+    margin-top: 1rem;
+    text-shadow: 0 0 20px rgba(0,0,0,0.8);
+    opacity: 0.9;
+}
+
+/* ===== HORIZONTAL SCROLL INDICATOR ===== */
+.scroll-indicator {
+    position: absolute;
+    bottom: 3rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--metallic-gold);
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    opacity: 0.7;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(5px);
+    padding: 0.8rem 1.5rem;
+    border-radius: 50px;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.scroll-indicator:hover {
+    opacity: 1;
+    background: rgba(0, 0, 0, 0.5);
+    border-color: var(--metallic-gold);
+    transform: translateX(-50%) scale(1.05);
+}
+
+.scroll-arrow {
+    font-size: 2rem;
+    font-weight: bold;
+    font-family: monospace;
+    animation: horizontalPulse 1.5s infinite;
+}
+
+.scroll-arrow:first-child {
+    animation-delay: 0s;
+}
+
+.scroll-arrow:last-child {
+    animation-delay: 0.3s;
+}
+
+.scroll-text {
+    font-size: 0.9rem;
+    letter-spacing: 3px;
+    font-weight: 500;
+    margin: 0 0.5rem;
+    color: var(--off-white);
+}
+
+/* Animations */
+@keyframes titleReveal {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes filmGrain {
+    0%, 100% { transform: translate(0, 0); }
+    10% { transform: translate(-1%, -1%); }
+    20% { transform: translate(1%, 1%); }
+    30% { transform: translate(-2%, 0); }
+    40% { transform: translate(2%, 2%); }
+    50% { transform: translate(-1%, 1%); }
+    60% { transform: translate(1%, -1%); }
+    70% { transform: translate(-1%, -2%); }
+    80% { transform: translate(1%, 1%); }
+    90% { transform: translate(-1%, 0); }
+}
+
+@keyframes lightLeak {
+    0%, 100% { 
+        opacity: 0.2;
+        transform: translateX(-10%) rotate(5deg);
+    }
+    50% { 
+        opacity: 0.4;
+        transform: translateX(10%) rotate(-5deg);
+    }
+}
+
+@keyframes horizontalPulse {
+    0%, 100% { 
+        transform: translateX(0);
+        opacity: 0.7;
+    }
+    50% { 
+        transform: translateX(5px);
+        opacity: 1;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 3.5rem;
+        letter-spacing: 4px;
+        padding: 1.5rem;
+    }
+    
+    .hero-title small {
+        font-size: 1.2rem;
+        letter-spacing: 5px;
+    }
+    
+    .scroll-indicator {
+        bottom: 2rem;
+        padding: 0.6rem 1.2rem;
+    }
+    
+    .scroll-arrow {
+        font-size: 1.5rem;
+    }
+    
+    .scroll-text {
+        font-size: 0.8rem;
+        letter-spacing: 2px;
+    }
+}
+
+/* High resolution screens */
+@media (min-width: 2560px) {
+    .hero-title {
+        font-size: 120px;
+    }
+    
+    .hero-title small {
+        font-size: 2rem;
+    }
+}

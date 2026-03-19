@@ -1,0 +1,279 @@
+/* ========== WORK GALLERY - SWIPER CAROUSEL ========== */
+.work-section {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: var(--pure-black);
+    padding: 3rem 2rem;
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+}
+
+/* Section Header */
+.section-header {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.5rem;
+    color: var(--metallic-gold);
+    letter-spacing: 6px;
+    margin-bottom: 2.5rem;
+    padding-left: 1rem;
+    font-weight: 400;
+    opacity: 0.9;
+    z-index: 10;
+}
+
+/* Swiper Container */
+.work-swiper {
+    width: 100%;
+    height: auto;
+    padding: 1rem 0.5rem 3rem 0.5rem;
+    overflow: visible;
+}
+
+/* Swiper Slides */
+.swiper-slide {
+    width: auto;
+    height: auto;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+.swiper-slide-active {
+    opacity: 1;
+}
+
+/* Thumbnail Cards */
+.thumb-card {
+    width: 320px;
+    height: 420px;
+    background: #111;
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    border: 1px solid #222;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+}
+
+.thumb-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    border-color: var(--metallic-gold);
+    box-shadow: 0 20px 30px rgba(212, 175, 55, 0.2);
+}
+
+/* Video */
+.thumb-video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.9);
+    transition: filter 0.4s ease, transform 0.6s ease;
+}
+
+.thumb-card:hover .thumb-video {
+    filter: brightness(1.1);
+    transform: scale(1.05);
+}
+
+/* Label */
+.thumb-label {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, 
+        rgba(0, 0, 0, 0.95) 0%,
+        rgba(0, 0, 0, 0.7) 50%,
+        transparent 100%);
+    color: white;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.8rem;
+    padding: 2rem 1.5rem 1.5rem 1.5rem;
+    transform: translateY(100%);
+    transition: transform 0.4s ease;
+    letter-spacing: 1px;
+}
+
+.thumb-card:hover .thumb-label {
+    transform: translateY(0);
+}
+
+/* Song Title */
+.thumb-artist {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    color: var(--metallic-gold);
+    display: block;
+    margin-top: 0.3rem;
+    letter-spacing: 0.5px;
+    font-weight: 400;
+}
+
+/* Hint Text */
+.hint-text {
+    color: #666;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    margin-top: 1.5rem;
+    padding-left: 1rem;
+    font-style: italic;
+    z-index: 10;
+}
+
+/* Swiper Navigation Buttons */
+.swiper-button-next,
+.swiper-button-prev {
+    color: var(--metallic-gold);
+    background: rgba(0, 0, 0, 0.5);
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    transition: all 0.3s ease;
+}
+
+.swiper-button-next:after,
+.swiper-button-prev:after {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+    background: rgba(212, 175, 55, 0.2);
+    border-color: var(--metallic-gold);
+    transform: scale(1.1);
+}
+
+.swiper-button-next {
+    right: 20px;
+}
+
+.swiper-button-prev {
+    left: 20px;
+}
+
+/* Swiper Pagination */
+.swiper-pagination {
+    bottom: 0 !important;
+}
+
+.swiper-pagination-bullet {
+    width: 30px;
+    height: 3px;
+    border-radius: 0;
+    background: #444;
+    opacity: 0.5;
+    transition: all 0.3s ease;
+}
+
+.swiper-pagination-bullet-active {
+    background: var(--metallic-gold);
+    width: 40px;
+    opacity: 1;
+}
+
+.swiper-pagination-bullet:hover {
+    opacity: 0.8;
+}
+
+/* Dynamic bullets */
+.swiper-pagination-bullet.swiper-pagination-bullet-active-main {
+    transform: scale(1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+    .thumb-card {
+        width: 280px;
+        height: 380px;
+    }
+    
+    .swiper-button-next,
+    .swiper-button-prev {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .swiper-button-next:after,
+    .swiper-button-prev:after {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .work-section {
+        padding: 2rem 1rem;
+    }
+    
+    .section-header {
+        font-size: 2rem;
+        letter-spacing: 4px;
+        padding-left: 0.5rem;
+    }
+    
+    .thumb-card {
+        width: 240px;
+        height: 320px;
+    }
+    
+    .thumb-label {
+        font-size: 1.5rem;
+        padding: 1.5rem 1rem 1rem 1rem;
+    }
+    
+    .swiper-button-next,
+    .swiper-button-prev {
+        display: none; /* Hide on mobile, use swipe instead */
+    }
+    
+    .swiper-pagination-bullet {
+        width: 20px;
+        height: 2px;
+    }
+    
+    .swiper-pagination-bullet-active {
+        width: 30px;
+    }
+}
+
+@media (max-width: 480px) {
+    .thumb-card {
+        width: 200px;
+        height: 280px;
+    }
+    
+    .thumb-label {
+        font-size: 1.3rem;
+        padding: 1rem 0.8rem 0.8rem 0.8rem;
+    }
+    
+    .thumb-artist {
+        font-size: 0.8rem;
+    }
+    
+    .hint-text {
+        font-size: 0.8rem;
+        text-align: center;
+        padding-left: 0;
+    }
+}
+
+/* Optional: Add edge fade for better UX */
+.work-swiper {
+    mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+}
+
+/* Optional: Loading state */
+.thumb-card.loading {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
