@@ -19,7 +19,7 @@ const HeroSection = {
                 
                 <div class="hero-title">
                     <span class="title-pre">GOSPEL MUSIC VIDEO DIRECTOR</span>
-                    <h1>VISUAL STORYTELLER<br>FOR WORSHIP</h1>
+                    <h1>VISUAL STORYTELLER</h1>
                     <div class="title-stats">
                         <div class="stat-item">
                             <span class="stat-number">100+</span>
