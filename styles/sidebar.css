@@ -1,23 +1,30 @@
 /* ========== SIDEBAR SPECIFIC STYLES ========== */
+:root {
+    --sidebar-width-collapsed: 80px;
+    --sidebar-width-expanded: 250px;
+    --sidebar-width-mobile: 60px;
+    --sidebar-width-mobile-expanded: 200px;
+}
+
 .sidebar {
-    width: var(--sidebar-width);
+    width: var(--sidebar-width-collapsed);
     height: 100vh;
     background-color: var(--deep-charcoal);
     position: fixed;
     left: 0;
     top: 0;
-    z-index: 100;
+    z-index: 1000;
     display: flex;
     flex-direction: column;
     align-items: center;
     padding: 2rem 0;
-    transition: width 0.3s ease;
-    overflow: visible; /* Changed from hidden to visible to allow drawer to be seen */
+    transition: transform 0.3s ease, width 0.3s ease, visibility 0.3s ease, opacity 0.3s ease;
+    overflow: hidden; /* Prevents content from spilling when collapsed */
     box-shadow: 2px 0 20px rgba(0,0,0,0.5);
 }
 
 .sidebar.expanded {
-    width: 250px;
+    width: var(--sidebar-width-expanded);
 }
 
 /* ===== Hamburger Menu (Two Strips) ===== */
@@ -31,6 +38,7 @@
     cursor: pointer;
     margin-bottom: 3rem;
     position: relative;
+    z-index: 1001;
 }
 
 .hamburger-strip {
@@ -41,7 +49,6 @@
     border-radius: 3px;
 }
 
-/* Hamburger animation when open */
 .sidebar.expanded .hamburger-strip:first-child {
     transform: rotate(45deg) translate(8px, 8px);
 }
@@ -76,7 +83,19 @@
 
 .nav-menu li {
     width: 100%;
+    transform: translateX(-20px);
+    transition: transform 0.3s ease;
 }
+
+.sidebar.expanded .nav-menu li {
+    transform: translateX(0);
+}
+
+.nav-menu li:nth-child(1) { transition-delay: 0.1s; }
+.nav-menu li:nth-child(2) { transition-delay: 0.15s; }
+.nav-menu li:nth-child(3) { transition-delay: 0.2s; }
+.nav-menu li:nth-child(4) { transition-delay: 0.25s; }
+.nav-menu li:nth-child(5) { transition-delay: 0.3s; }
 
 .nav-menu li a {
     text-decoration: none;
@@ -87,6 +106,7 @@
     border-bottom: 1px solid transparent;
     cursor: pointer;
     font-size: 1.4rem;
+    white-space: nowrap;
 }
 
 .nav-menu li a.active,
@@ -96,12 +116,12 @@
     transform: translateX(10px);
 }
 
-/* ===== Social Drawer (Opens to Right - ON TOP OF EVERYTHING) ===== */
+/* ===== Social Drawer ===== */
 .social-drawer-container {
     margin-top: auto;
     width: 100%;
     position: relative;
-    z-index: 200; /* Higher than sidebar */
+    z-index: 1002;
 }
 
 .social-toggle {
@@ -115,7 +135,7 @@
     transition: all 0.3s ease;
     color: var(--metallic-gold);
     position: relative;
-    z-index: 201;
+    z-index: 1003;
 }
 
 .social-toggle i {
@@ -128,32 +148,30 @@
 }
 
 .social-toggle .arrow-symbol {
-    font-size: 1.2rem; /* Reduced from 1.8rem */
+    font-size: 1.2rem;
     font-weight: bold;
     font-family: monospace;
     transition: transform 0.3s ease;
     display: inline-block;
-    transform: translateX(5px); /* Push slightly outside */
+    transform: translateX(5px);
     color: var(--metallic-gold);
 }
 
-/* Arrow positioned outside the sidebar */
 .sidebar:not(.expanded) .social-toggle .arrow-symbol {
-    transform: translateX(8px); /* Push more outside when sidebar is collapsed */
+    transform: translateX(8px);
 }
 
 .social-toggle.active .arrow-symbol {
-    transform: translateX(5px) rotate(180deg); /* Keep outside position when rotated */
+    transform: translateX(5px) rotate(180deg);
 }
 
 .sidebar:not(.expanded) .social-toggle.active .arrow-symbol {
     transform: translateX(8px) rotate(180deg);
 }
 
-/* Drawer that opens to the right - ON TOP OF EVERYTHING */
 .social-drawer {
-    position: fixed; /* Changed from absolute to fixed */
-    left: var(--sidebar-width);
+    position: fixed;
+    left: var(--sidebar-width-collapsed);
     bottom: 2rem;
     background-color: var(--deep-charcoal);
     border-radius: 0 12px 12px 0;
@@ -168,15 +186,13 @@
     visibility: hidden;
     transition: all 0.3s ease;
     pointer-events: none;
-    z-index: 1000; /* Very high z-index to be on top of everything */
+    z-index: 2000;
     min-width: 200px;
-    backdrop-filter: blur(5px); /* Adds a slight blur effect behind */
+    backdrop-filter: blur(5px);
 }
 
-/* Adjust position when sidebar is expanded */
-.sidebar.expanded + .main-content .social-drawer,
-.sidebar.expanded ~ * .social-drawer {
-    left: 250px;
+.sidebar.expanded .social-drawer {
+    left: var(--sidebar-width-expanded);
 }
 
 .social-drawer.open {
@@ -199,7 +215,274 @@
     transform: scale(1.3);
 }
 
-/* Staggered animation for social icons */
-.social-drawer a {
-    animation: none;
+/* ===== MOBILE OFF-CANVAS STYLES ===== */
+@media (max-width: 768px) {
+    .sidebar {
+        width: var(--sidebar-width-mobile); /* Keep a consistent width for transition */
+        transform: translateX(-100%); /* Move completely off-screen */
+        visibility: hidden; /* Hide from screen readers and interactions */
+        opacity: 0;
+        pointer-events: none;
+        transition: transform 0.3s ease, visibility 0.3s ease, opacity 0.3s ease;
+        padding: 1.5rem 0;
+    }
+    
+    .sidebar.mobile-visible {
+        transform: translateX(0);
+        visibility: visible;
+        opacity: 1;
+        pointer-events: all;
+        width: var(--sidebar-width-mobile-expanded);
+        box-shadow: 2px 0 20px rgba(0,0,0,0.5);
+    }
+    
+    /* Adjust internal elements for mobile expanded */
+    .sidebar.mobile-visible .hamburger-menu {
+        margin-bottom: 2rem;
+    }
+    
+    .sidebar.mobile-visible .nav-menu {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: all;
+    }
+    
+    .sidebar.mobile-visible .nav-menu li {
+        transform: translateX(0);
+    }
+    
+    .sidebar.mobile-visible .nav-menu li a {
+        font-size: 1.2rem;
+    }
+    
+    /* Social drawer positioning when mobile sidebar is visible */
+    .sidebar.mobile-visible .social-drawer {
+        left: var(--sidebar-width-mobile-expanded);
+    }
+    
+    /* Adjust arrow for mobile */
+    .sidebar.mobile-visible .social-toggle .arrow-symbol {
+        transform: translateX(5px);
+    }
+    
+    .sidebar.mobile-visible .social-toggle.active .arrow-symbol {
+        transform: translateX(5px) rotate(180deg);
+    }
+}
+
+/* ===== FLOATING MOBILE TOGGLE ===== */
+.mobile-menu-toggle {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 1002;
+    width: 40px;
+    height: 40px;
+    background: var(--deep-charcoal);
+    border: 1px solid var(--metallic-gold);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.mobile-menu-toggle.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.mobile-menu-toggle .strip {
+    width: 24px;
+    height: 2px;
+    background-color: var(--metallic-gold);
+    border-radius: 2px;
+    transition: 0.3s;
+}
+
+/* Overlay when sidebar is open on mobile */
+body.sidebar-open::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+    pointer-events: none;
+}
+
+body.sidebar-open .mobile-menu-toggle {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* ===== RESPONSIVE ADJUSTMENTS ===== */
+
+/* Small phones (up to 480px) */
+@media (max-width: 480px) {
+    :root {
+        --sidebar-width-mobile-expanded: 180px;
+    }
+    
+    .sidebar.mobile-visible {
+        width: 180px;
+    }
+    
+    .hamburger-menu {
+        width: 30px;
+        height: 30px;
+        gap: 6px;
+    }
+    
+    .hamburger-strip {
+        height: 2px;
+    }
+    
+    .nav-menu {
+        padding-left: 1rem;
+        gap: 1.5rem;
+    }
+    
+    .nav-menu li a {
+        font-size: 1rem;
+    }
+    
+    .social-toggle i {
+        font-size: 1.2rem;
+    }
+    
+    .social-toggle .fa-globe {
+        font-size: 1.3rem;
+    }
+    
+    .social-toggle .arrow-symbol {
+        font-size: 1rem;
+        transform: translateX(3px);
+    }
+    
+    .sidebar:not(.expanded):not(.mobile-visible) .social-toggle .arrow-symbol {
+        transform: translateX(5px);
+    }
+    
+    .social-drawer {
+        left: 0;
+        bottom: 1.5rem;
+        padding: 0.8rem 1.2rem;
+        gap: 1.2rem;
+        min-width: 150px;
+    }
+    
+    .sidebar.mobile-visible .social-drawer {
+        left: 180px;
+    }
+    
+    .social-drawer a {
+        font-size: 1.5rem;
+    }
+    
+    .mobile-menu-toggle {
+        width: 35px;
+        height: 35px;
+    }
+}
+
+/* Landscape mode for phones */
+@media (max-height: 500px) and (orientation: landscape) {
+    .sidebar {
+        padding: 1rem 0;
+    }
+    
+    .hamburger-menu {
+        margin-bottom: 1rem;
+    }
+    
+    .nav-menu {
+        gap: 0.8rem;
+    }
+    
+    .nav-menu li a {
+        font-size: 1rem;
+        padding: 0.2rem 0;
+    }
+    
+    .social-toggle {
+        padding: 0.5rem 0;
+    }
+    
+    .social-drawer {
+        bottom: 1rem;
+    }
+}
+
+/* Tablet adjustments */
+@media (min-width: 481px) and (max-width: 768px) {
+    .sidebar.mobile-visible {
+        width: 220px;
+    }
+    
+    .nav-menu li a {
+        font-size: 1.2rem;
+    }
+    
+    .social-drawer {
+        left: 70px;
+    }
+    
+    .sidebar.mobile-visible .social-drawer {
+        left: 220px;
+    }
+}
+
+/* ===== ACCESSIBILITY ===== */
+@media (prefers-reduced-motion: reduce) {
+    .sidebar,
+    .hamburger-strip,
+    .nav-menu,
+    .nav-menu li,
+    .social-toggle,
+    .social-toggle .arrow-symbol,
+    .social-drawer,
+    .mobile-menu-toggle {
+        transition: none !important;
+    }
+}
+
+@media (prefers-contrast: high) {
+    .sidebar {
+        border-right: 2px solid var(--metallic-gold);
+    }
+    
+    .nav-menu li a.active {
+        border-bottom: 2px solid var(--metallic-gold);
+    }
+    
+    .social-drawer {
+        border: 2px solid var(--metallic-gold);
+    }
+    
+    .mobile-menu-toggle {
+        border: 2px solid var(--metallic-gold);
+    }
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+    .sidebar,
+    .mobile-menu-toggle,
+    body.sidebar-open::after {
+        display: none !important;
+    }
+    
+    .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
 }

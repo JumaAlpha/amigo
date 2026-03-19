@@ -23,7 +23,10 @@ body {
     --deep-charcoal: #121212;
     --pure-black: #000000;
     --off-white: #F5F5F5;
-    --sidebar-width: 80px; /* Collapsed sidebar width */
+    
+    /* Sidebar width variables - default for desktop */
+    --sidebar-width-collapsed: 80px;
+    --sidebar-width-expanded: 250px;
 }
 
 /* ========== LAYOUT STRUCTURE ========== */
@@ -36,8 +39,8 @@ body {
 }
 
 .main-content {
-    width: calc(100% - var(--sidebar-width));
-    margin-left: var(--sidebar-width);
+    width: calc(100% - var(--sidebar-width-collapsed));
+    margin-left: var(--sidebar-width-collapsed);
     display: flex;
     overflow-x: auto;
     overflow-y: hidden;
@@ -59,7 +62,7 @@ body {
 }
 
 .main-content.sidebar-expanded {
-    margin-left: 250px; /* Expanded sidebar width */
+    margin-left: var(--sidebar-width-expanded);
 }
 
 .section {
@@ -93,13 +96,14 @@ body {
     font-family: 'Caveat', 'Brush Script MT', cursive;
     text-align: right;
     line-height: 1;
-    pointer-events: none; /* Allows clicking through to sidebar */
+    pointer-events: none;
     opacity: 0.8;
+    transition: all 0.3s ease;
 }
 
 .site-logo .amigo {
     font-size: 5rem;
-    /* color: var(--metallic-gold); */
+    /* color: var(--metallic-gold); */ /* Uncomment if you want gold */
     display: block;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
     letter-spacing: 2px;
@@ -122,15 +126,11 @@ body {
 }
 
 /* ========== GLOBAL CUSTOM SCROLLBAR STYLES ========== */
-/* This will affect all scrollable elements except the main content */
-
-/* For Firefox */
 * {
     scrollbar-width: thin;
     scrollbar-color: var(--metallic-gold) #1e1e1e;
 }
 
-/* For Chrome, Safari, Edge, and Opera */
 ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -148,9 +148,216 @@ body {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #e5c158; /* Lighter gold on hover */
+    background: #e5c158;
 }
 
 ::-webkit-scrollbar-corner {
     background: #1e1e1e;
+}
+
+/* ========== RESPONSIVE BREAKPOINTS ========== */
+
+/* Small phones (up to 480px) */
+@media (max-width: 480px) {
+    :root {
+        --sidebar-width-collapsed: 60px;
+        --sidebar-width-expanded: 200px;
+    }
+
+    .site-logo {
+        top: 1rem;
+        right: 1rem;
+    }
+
+    .site-logo .amigo {
+        font-size: 2.8rem;
+    }
+
+    .site-logo .johnson {
+        font-size: 2rem;
+        margin-top: -0.3rem;
+    }
+
+    .section-header {
+        font-size: 2.2rem;
+        letter-spacing: 3px;
+        margin-bottom: 1.5rem;
+        padding-left: 0.8rem;
+    }
+}
+
+/* Large phones (481px to 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+    :root {
+        --sidebar-width-collapsed: 70px;
+        --sidebar-width-expanded: 220px;
+    }
+
+    .site-logo {
+        top: 1.5rem;
+        right: 1.5rem;
+    }
+
+    .site-logo .amigo {
+        font-size: 3.5rem;
+    }
+
+    .site-logo .johnson {
+        font-size: 2.5rem;
+        margin-top: -0.4rem;
+    }
+
+    .section-header {
+        font-size: 2.5rem;
+        letter-spacing: 3px;
+    }
+}
+
+/* Tablets (769px to 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    :root {
+        --sidebar-width-collapsed: 80px;
+        --sidebar-width-expanded: 230px;
+    }
+
+    .site-logo .amigo {
+        font-size: 4rem;
+    }
+
+    .site-logo .johnson {
+        font-size: 3rem;
+    }
+}
+
+/* Landscape mode for phones */
+@media (max-height: 500px) and (orientation: landscape) {
+    .site-logo {
+        top: 0.8rem;
+        right: 0.8rem;
+    }
+
+    .site-logo .amigo {
+        font-size: 2.5rem;
+    }
+
+    .site-logo .johnson {
+        font-size: 1.8rem;
+        margin-top: -0.2rem;
+    }
+}
+
+/* High resolution screens (2560px and up) */
+@media (min-width: 2560px) {
+    :root {
+        --sidebar-width-collapsed: 100px;
+        --sidebar-width-expanded: 300px;
+    }
+
+    .site-logo .amigo {
+        font-size: 6rem;
+    }
+
+    .site-logo .johnson {
+        font-size: 4.5rem;
+    }
+
+    .section-header {
+        font-size: 4rem;
+        letter-spacing: 5px;
+    }
+}
+
+/* ===== ACCESSIBILITY ===== */
+@media (prefers-reduced-motion: reduce) {
+    .main-content,
+    .site-logo {
+        transition: none;
+    }
+}
+
+/* ========== OFF-CANVAS SIDEBAR ON MOBILE ========== */
+@media (max-width: 768px) {
+    /* Override default sidebar width to 0 when hidden */
+    .sidebar {
+        width: 0;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease, width 0.3s ease;
+    }
+    
+    .sidebar.mobile-visible {
+        width: var(--sidebar-width-mobile-expanded, 200px);
+        transform: translateX(0);
+    }
+    
+    /* Main content takes full width */
+    .main-content {
+        width: 100%;
+        margin-left: 0;
+    }
+    
+    /* Floating hamburger for when sidebar is hidden */
+    .mobile-menu-toggle {
+        position: fixed;
+        top: 1rem;
+        left: 1rem;
+        z-index: 1002;
+        width: 40px;
+        height: 40px;
+        background: var(--deep-charcoal);
+        border: 1px solid var(--metallic-gold);
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        transition: opacity 0.3s ease;
+    }
+    
+    .mobile-menu-toggle.hidden {
+        opacity: 0;
+        pointer-events: none;
+    }
+    
+    .mobile-menu-toggle .strip {
+        width: 24px;
+        height: 2px;
+        background-color: var(--metallic-gold);
+        border-radius: 2px;
+        transition: 0.3s;
+    }
+    
+    /* Adjust when sidebar is open */
+    body.sidebar-open .mobile-menu-toggle {
+        opacity: 0;
+        pointer-events: none;
+    }
+    
+    /* Overlay when sidebar is open */
+    body.sidebar-open::after {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 998;
+    }
+}
+/* ===== PRINT STYLES ===== */
+@media print {
+    .sidebar,
+    .site-logo,
+    .main-content {
+        display: none;
+    }
+    
+    body {
+        overflow: visible;
+        background: white;
+        color: black;
+    }
 }
