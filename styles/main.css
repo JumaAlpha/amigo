@@ -27,6 +27,7 @@ body {
     /* Sidebar width variables - default for desktop */
     --sidebar-width-collapsed: 80px;
     --sidebar-width-expanded: 250px;
+    --sidebar-width-mobile-expanded: 200px;
 }
 
 /* ========== LAYOUT STRUCTURE ========== */
@@ -36,6 +37,7 @@ body {
     height: 100vh;
     position: relative;
     z-index: 10; /* Above fog */
+    overflow: hidden;
 }
 
 .main-content {
@@ -50,6 +52,7 @@ body {
     background-color: var(--pure-black);
     flex: 1;
     transition: margin-left 0.3s ease;
+    height: 100vh;
     
     /* Hide scrollbar for main content - cross-browser solution */
     scrollbar-width: none; /* Firefox */
@@ -73,7 +76,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
+    overflow: visible;
     position: relative;
     z-index: 15; /* Above fog */
 }
@@ -160,7 +163,7 @@ body {
 /* Small phones (up to 480px) */
 @media (max-width: 480px) {
     :root {
-        --sidebar-width-collapsed: 60px;
+        --sidebar-width-collapsed: 0px; /* Hidden by default */
         --sidebar-width-expanded: 200px;
     }
 
@@ -189,7 +192,7 @@ body {
 /* Large phones (481px to 768px) */
 @media (min-width: 481px) and (max-width: 768px) {
     :root {
-        --sidebar-width-collapsed: 70px;
+        --sidebar-width-collapsed: 0px; /* Hidden by default */
         --sidebar-width-expanded: 220px;
     }
 
@@ -277,19 +280,6 @@ body {
 
 /* ========== OFF-CANVAS SIDEBAR ON MOBILE ========== */
 @media (max-width: 768px) {
-    /* Override default sidebar width to 0 when hidden */
-    .sidebar {
-        width: 0;
-        transform: translateX(-100%);
-        transition: transform 0.3s ease, width 0.3s ease;
-    }
-    
-    .sidebar.mobile-visible {
-        width: var(--sidebar-width-mobile-expanded, 200px);
-        transform: translateX(0);
-    }
-    
-    /* Main content takes full width */
     .main-content {
         width: 100%;
         margin-left: 0;
@@ -345,8 +335,10 @@ body {
         height: 100%;
         background: rgba(0,0,0,0.5);
         z-index: 998;
+        pointer-events: none;
     }
 }
+
 /* ===== PRINT STYLES ===== */
 @media print {
     .sidebar,
