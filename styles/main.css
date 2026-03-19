@@ -3,7 +3,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent; /* Remove tap highlight on mobile */
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
@@ -13,10 +13,9 @@ body {
     background-color: #000000;
     line-height: 1.5;
     overflow: hidden;
-    position: fixed; /* Better for mobile */
+    position: fixed;
     width: 100%;
     height: 100%;
-    /* Use custom property for dynamic viewport height */
     height: calc(var(--vh, 1vh) * 100);
 }
 
@@ -40,7 +39,7 @@ body {
     height: 100%;
     height: calc(var(--vh, 1vh) * 100);
     position: relative;
-    z-index: 10; /* Above fog */
+    z-index: 10;
     overflow: hidden;
 }
 
@@ -60,11 +59,10 @@ body {
     height: calc(var(--vh, 1vh) * 100);
     
     /* Hide scrollbar for main content */
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
 
-/* Hide scrollbar for Chrome, Safari and Opera */
 .main-content::-webkit-scrollbar {
     display: none;
 }
@@ -82,15 +80,32 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: visible;
+    overflow: hidden;
     position: relative;
-    z-index: 15; /* Above fog */
+    z-index: 15;
 }
 
-/* Ensure content within sections doesn't overflow */
+/* Content container for each section */
 .section > * {
     max-width: 100%;
     max-height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0;
+}
+
+/* Custom scrollbar for content areas */
+.section > *::-webkit-scrollbar {
+    width: 4px;
+}
+
+.section > *::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.section > *::-webkit-scrollbar-thumb {
+    background: var(--metallic-gold);
+    border-radius: 4px;
 }
 
 .section-header {
@@ -102,7 +117,7 @@ body {
     padding-left: 1rem;
 }
 
-/* ========== HANDWRITING LOGO (Fixed Top Right) ========== */
+/* ========== HANDWRITING LOGO ========== */
 .site-logo {
     position: fixed;
     top: 2rem;
@@ -114,13 +129,14 @@ body {
     pointer-events: none;
     opacity: 0.8;
     transition: all 0.3s ease;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
 }
 
 .site-logo .amigo {
     font-size: 5rem;
     display: block;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
     letter-spacing: 2px;
+    color: var(--metallic-gold); /* Make it gold */
 }
 
 .site-logo .johnson {
@@ -128,7 +144,6 @@ body {
     color: var(--off-white);
     display: block;
     margin-top: -0.5rem;
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
     letter-spacing: 1px;
 }
 
@@ -137,9 +152,11 @@ body {
     color: #777;
     margin-top: 1rem;
     padding-left: 1rem;
+    font-size: 0.9rem;
+    font-style: italic;
 }
 
-/* ========== GLOBAL CUSTOM SCROLLBAR STYLES ========== */
+/* ========== GLOBAL SCROLLBAR ========== */
 * {
     scrollbar-width: thin;
     scrollbar-color: var(--metallic-gold) #1e1e1e;
@@ -174,8 +191,9 @@ body {
 /* Small phones (up to 480px) */
 @media (max-width: 480px) {
     :root {
-        --sidebar-width-collapsed: 0px; /* Hidden by default */
+        --sidebar-width-collapsed: 0px;
         --sidebar-width-expanded: 200px;
+        --sidebar-width-mobile-expanded: 220px; /* Wider for better readability */
     }
 
     .site-logo {
@@ -193,18 +211,24 @@ body {
     }
 
     .section-header {
-        font-size: 2.2rem;
+        font-size: 2rem;
         letter-spacing: 3px;
-        margin-bottom: 1.5rem;
-        padding-left: 0.8rem;
+        margin-bottom: 1rem;
+        padding-left: 0.5rem;
+    }
+    
+    .hint-text {
+        font-size: 0.8rem;
+        margin-top: 0.5rem;
     }
 }
 
 /* Large phones (481px to 768px) */
 @media (min-width: 481px) and (max-width: 768px) {
     :root {
-        --sidebar-width-collapsed: 0px; /* Hidden by default */
+        --sidebar-width-collapsed: 0px;
         --sidebar-width-expanded: 220px;
+        --sidebar-width-mobile-expanded: 240px;
     }
 
     .site-logo {
@@ -222,7 +246,7 @@ body {
     }
 
     .section-header {
-        font-size: 2.5rem;
+        font-size: 2.2rem;
         letter-spacing: 3px;
     }
 }
@@ -247,7 +271,7 @@ body {
 @media (max-height: 600px) and (orientation: landscape) {
     .site-logo {
         top: 0.8rem;
-        right: 0.8rem;
+        right: 1rem;
     }
 
     .site-logo .amigo {
@@ -260,12 +284,16 @@ body {
     }
     
     .section-header {
-        font-size: 2rem;
-        margin-bottom: 1rem;
+        font-size: 1.8rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .section > * {
+        padding: 0;
     }
 }
 
-/* High resolution screens (2560px and up) */
+/* High resolution screens (1920px and up) */
 @media (min-width: 1920px) {
     :root {
         --sidebar-width-collapsed: 100px;
@@ -286,101 +314,21 @@ body {
     }
 }
 
-/* ===== ACCESSIBILITY ===== */
-@media (prefers-reduced-motion: reduce) {
-    .main-content,
-    .site-logo,
-    .sidebar,
-    .hamburger-strip,
-    .nav-menu,
-    .nav-menu li,
-    .social-toggle,
-    .social-toggle .arrow-symbol,
-    .social-drawer,
-    .mobile-menu-toggle,
-    .hero-title,
-    .texture-overlay,
-    .light-leak,
-    .scroll-arrow,
-    .rotating-artist.fade-out,
-    .rotating-artist.fade-in {
-        transition: none !important;
-        animation: none !important;
-    }
-}
-
-@media (prefers-contrast: high) {
-    .site-logo .amigo {
-        color: #FFD700;
-    }
-}
-
-/* ========== OFF-CANVAS SIDEBAR ON MOBILE ========== */
+/* ===== MOBILE SIDEBAR OVERRIDES ===== */
 @media (max-width: 768px) {
     .main-content {
         width: 100%;
         margin-left: 0;
     }
     
-    /* Floating hamburger for when sidebar is hidden */
-    .mobile-menu-toggle {
-        position: fixed;
-        top: 1rem;
-        left: 1rem;
-        z-index: 1002;
-        width: 44px; /* Slightly larger for better touch target */
-        height: 44px;
-        background: var(--deep-charcoal);
-        border: 1px solid var(--metallic-gold);
-        border-radius: 8px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        gap: 6px;
-        cursor: pointer;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-        transition: opacity 0.3s ease, visibility 0.3s ease;
-    }
-    
-    .mobile-menu-toggle.hidden {
-        opacity: 0;
-        visibility: hidden;
-        pointer-events: none;
-    }
-    
-    .mobile-menu-toggle .strip {
-        width: 24px;
-        height: 2px;
-        background-color: var(--metallic-gold);
-        border-radius: 2px;
-        transition: 0.3s;
-    }
-    
-    /* Adjust when sidebar is open */
-    body.sidebar-open .mobile-menu-toggle {
-        opacity: 0;
-        visibility: hidden;
-        pointer-events: none;
-    }
-    
-    /* Overlay when sidebar is open */
-    body.sidebar-open::after {
-        content: '';
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        height: calc(var(--vh, 1vh) * 100);
-        background: rgba(0,0,0,0.5);
-        z-index: 998;
-        pointer-events: none;
-        backdrop-filter: blur(2px);
+    /* Ensure content doesn't get hidden behind floating toggle */
+    .section > * {
+        padding-top: 0;
+        padding-bottom: 0;
     }
 }
 
-/* Touch device optimizations */
+/* ===== TOUCH DEVICE OPTIMIZATIONS ===== */
 @media (hover: none) and (pointer: coarse) {
     /* Increase touch targets */
     .nav-menu li a,
@@ -402,11 +350,63 @@ body {
     }
 }
 
+/* ===== SAFE AREA INSETS ===== */
+@supports (padding: max(0px)) {
+    .site-logo {
+        top: max(1rem, env(safe-area-inset-top));
+        right: max(1rem, env(safe-area-inset-right));
+    }
+    
+    .mobile-menu-toggle {
+        top: max(1rem, env(safe-area-inset-top));
+        left: max(1rem, env(safe-area-inset-left));
+    }
+    
+    .sidebar {
+        padding-top: max(1rem, env(safe-area-inset-top));
+        padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    }
+}
+
+/* ===== ACCESSIBILITY ===== */
+@media (prefers-reduced-motion: reduce) {
+    .main-content,
+    .site-logo,
+    .sidebar,
+    .hamburger-strip,
+    .nav-menu,
+    .nav-menu li,
+    .nav-menu li a,
+    .social-toggle,
+    .social-toggle .arrow-symbol,
+    .social-drawer,
+    .mobile-menu-toggle,
+    .hero-title,
+    .texture-overlay,
+    .light-leak,
+    .scroll-arrow,
+    .rotating-artist.fade-out,
+    .rotating-artist.fade-in,
+    body.sidebar-open::after {
+        transition: none !important;
+        animation: none !important;
+    }
+}
+
+@media (prefers-contrast: high) {
+    .site-logo .amigo {
+        color: #FFD700;
+    }
+    
+    .site-logo .johnson {
+        color: #FFFFFF;
+    }
+}
+
 /* ===== PRINT STYLES ===== */
 @media print {
     .sidebar,
     .site-logo,
-    .main-content,
     .mobile-menu-toggle,
     .fog-overlay-container,
     body.sidebar-open::after {
@@ -420,36 +420,25 @@ body {
         color: black;
     }
     
+    .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+        overflow: visible;
+    }
+    
     .section {
         page-break-inside: avoid;
         height: auto;
         min-height: auto;
+        overflow: visible;
+    }
+    
+    .section > * {
+        overflow: visible;
     }
 }
 
-/* ===== SAFE AREA INSETS FOR NOTCHED DEVICES ===== */
-@supports (padding: max(0px)) {
-    .site-logo {
-        top: max(2rem, env(safe-area-inset-top));
-        right: max(3rem, env(safe-area-inset-right));
-    }
-    
-    .mobile-menu-toggle {
-        top: max(1rem, env(safe-area-inset-top));
-        left: max(1rem, env(safe-area-inset-left));
-    }
-    
-    .sidebar {
-        padding-top: max(2rem, env(safe-area-inset-top));
-        padding-bottom: max(2rem, env(safe-area-inset-bottom));
-    }
-    
-    .social-drawer {
-        bottom: max(2rem, env(safe-area-inset-bottom));
-    }
-}
-
-/* ===== PREVENT TEXT SIZE ADJUSTMENT ON MOBILE ===== */
+/* ===== PREVENT TEXT SIZE ADJUSTMENT ===== */
 html {
     -webkit-text-size-adjust: 100%;
     -moz-text-size-adjust: 100%;
@@ -476,4 +465,30 @@ iframe {
 *::before,
 *::after {
     box-sizing: border-box;
+}
+
+/* ===== LOADING STATE ===== */
+.loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+/* ===== FOCUS STATES FOR ACCESSIBILITY ===== */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid var(--metallic-gold);
+    outline-offset: 2px;
+}
+
+/* ===== SELECTION STYLES ===== */
+::selection {
+    background: var(--metallic-gold);
+    color: var(--pure-black);
+}
+
+::-moz-selection {
+    background: var(--metallic-gold);
+    color: var(--pure-black);
 }

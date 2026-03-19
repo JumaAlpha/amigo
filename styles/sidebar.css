@@ -28,14 +28,14 @@
     width: var(--sidebar-width-expanded);
 }
 
-/* ===== REDESIGNED HAMBURGER MENU - Three Strips with Increased Spacing ===== */
+/* ===== HAMBURGER MENU - Three Strips ===== */
 .hamburger-menu {
     width: 40px;
     height: 40px;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 8px; /* Increased from 6px to 8px for more spacing */
+    gap: 8px;
     cursor: pointer;
     margin-bottom: 3rem;
     position: relative;
@@ -58,7 +58,7 @@
 
 /* Three strips - middle strip fades out when expanded */
 .sidebar.expanded .hamburger-strip:nth-child(1) {
-    transform: rotate(45deg) translate(8px, 8px); /* Adjusted for more spacing */
+    transform: rotate(45deg) translate(8px, 8px);
     background-color: var(--metallic-gold);
     width: 70%;
 }
@@ -69,7 +69,7 @@
 }
 
 .sidebar.expanded .hamburger-strip:nth-child(3) {
-    transform: rotate(-45deg) translate(8px, -8px); /* Adjusted for more spacing */
+    transform: rotate(-45deg) translate(8px, -8px);
     background-color: var(--metallic-gold);
     width: 70%;
 }
@@ -135,7 +135,7 @@
     opacity: 1;
 }
 
-/* ===== REDESIGNED SOCIAL DRAWER - Clean & Minimal ===== */
+/* ===== SOCIAL DRAWER ===== */
 .social-drawer-container {
     margin-top: auto;
     width: 100%;
@@ -168,7 +168,7 @@
     transition: all 0.3s ease;
 }
 
-.social-toggle .fa-globe {
+.social-toggle .fa-share-alt {
     font-size: 1.4rem;
 }
 
@@ -245,24 +245,48 @@
     opacity: 1;
 }
 
-/* ===== MOBILE OFF-CANVAS STYLES ===== */
+/* ===== MOBILE OFF-CANVAS STYLES - IMPROVED VISIBILITY ===== */
 @media (max-width: 768px) {
     .sidebar {
         width: var(--sidebar-width-mobile);
         transform: translateX(-100%);
         transition: transform 0.3s ease;
         padding: 1.5rem 0;
+        background-color: #1a1a1a;
+        box-shadow: none;
     }
     
     .sidebar.mobile-visible {
         transform: translateX(0);
         width: var(--sidebar-width-mobile-expanded);
-        box-shadow: 2px 0 20px rgba(0,0,0,0.5);
+        box-shadow: 5px 0 30px rgba(0, 0, 0, 0.8);
+        background-color: #1e1e1e;
+        border-right: 2px solid var(--metallic-gold);
+    }
+    
+    /* Gold accent border */
+    .sidebar.mobile-visible::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 2px;
+        height: 100%;
+        background: linear-gradient(to bottom, 
+            transparent, 
+            var(--metallic-gold), 
+            transparent);
+        opacity: 0.5;
     }
     
     .sidebar.mobile-visible .hamburger-menu {
         margin-bottom: 2rem;
-        gap: 8px; /* Increased spacing on mobile too */
+        gap: 8px;
+        opacity: 1;
+    }
+    
+    .sidebar.mobile-visible .hamburger-strip {
+        background-color: var(--off-white);
     }
     
     .sidebar.mobile-visible .nav-menu {
@@ -277,22 +301,45 @@
     
     .sidebar.mobile-visible .nav-menu li a {
         font-size: 1.2rem;
+        color: var(--off-white);
+        font-weight: 500;
+        text-shadow: 0 0 5px rgba(0,0,0,0.5);
+    }
+    
+    .sidebar.mobile-visible .nav-menu li a.active {
+        color: var(--metallic-gold);
+        border-bottom-color: var(--metallic-gold);
+    }
+    
+    .sidebar.mobile-visible .social-toggle {
+        opacity: 1;
+        color: var(--off-white);
+    }
+    
+    .sidebar.mobile-visible .social-toggle i,
+    .sidebar.mobile-visible .social-toggle .arrow-symbol {
+        color: var(--off-white);
+        opacity: 1;
     }
     
     .sidebar.mobile-visible .social-drawer {
         left: var(--sidebar-width-mobile-expanded);
+        background-color: #1e1e1e;
+        border: 1px solid var(--metallic-gold);
+        box-shadow: 5px 5px 20px rgba(0,0,0,0.8);
     }
     
-    .sidebar.mobile-visible .social-toggle .arrow-symbol {
-        transform: translateX(3px);
+    .sidebar.mobile-visible .social-drawer a {
+        color: var(--off-white);
+        opacity: 1;
     }
     
-    .sidebar.mobile-visible .social-toggle.active .arrow-symbol {
-        transform: translateX(3px) rotate(180deg);
+    .sidebar.mobile-visible .social-drawer a:hover {
+        color: var(--metallic-gold);
     }
 }
 
-/* ===== REDESIGNED FLOATING MOBILE TOGGLE - Three Strips with Increased Spacing ===== */
+/* ===== FLOATING MOBILE TOGGLE ===== */
 .mobile-menu-toggle {
     position: fixed;
     top: 1rem;
@@ -300,20 +347,23 @@
     z-index: 1002;
     width: 44px;
     height: 44px;
-    background: transparent;
-    border: none;
+    background: var(--deep-charcoal);
+    border: 1px solid var(--metallic-gold);
+    border-radius: 8px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 8px; /* Increased from 5px to 8px for more spacing */
+    gap: 8px;
     cursor: pointer;
-    transition: opacity 0.3s ease, visibility 0.3s ease;
-    opacity: 0.7;
+    transition: opacity 0.3s ease, visibility 0.3s ease, background 0.3s ease;
+    opacity: 0.9;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
 }
 
 .mobile-menu-toggle:hover {
     opacity: 1;
+    background: #2a2a2a;
 }
 
 .mobile-menu-toggle.hidden {
@@ -323,40 +373,18 @@
 }
 
 .mobile-menu-toggle .strip {
-    width: 30px;
+    width: 24px;
     height: 2px;
-    background-color: var(--off-white);
+    background-color: var(--metallic-gold);
     border-radius: 4px;
     transition: 0.3s;
 }
 
-/* Three strips for mobile toggle - all visible */
+/* Three strips for mobile toggle */
 .mobile-menu-toggle .strip:nth-child(1),
 .mobile-menu-toggle .strip:nth-child(2),
 .mobile-menu-toggle .strip:nth-child(3) {
     display: block;
-}
-
-/* Overlay when sidebar is open on mobile */
-body.sidebar-open::after {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    height: calc(var(--vh, 1vh) * 100);
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 998;
-    pointer-events: none;
-    backdrop-filter: blur(3px);
-    animation: fadeIn 0.3s ease;
-}
-
-body.sidebar-open .mobile-menu-toggle {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
 }
 
 /* ===== RESPONSIVE ADJUSTMENTS ===== */
@@ -364,17 +392,26 @@ body.sidebar-open .mobile-menu-toggle {
 /* Small phones (up to 480px) */
 @media (max-width: 480px) {
     :root {
-        --sidebar-width-mobile-expanded: 180px;
+        --sidebar-width-mobile-expanded: 220px;
     }
     
     .sidebar.mobile-visible {
-        width: 180px;
+        width: 220px;
+        padding: 1.5rem 0;
+    }
+    
+    .sidebar.mobile-visible .nav-menu {
+        padding-left: 1.5rem;
+    }
+    
+    .sidebar.mobile-visible .nav-menu li a {
+        font-size: 1.1rem;
     }
     
     .hamburger-menu {
         width: 30px;
         height: 30px;
-        gap: 7px; /* Slightly reduced but still more than before */
+        gap: 7px;
         margin-bottom: 2rem;
     }
     
@@ -385,11 +422,11 @@ body.sidebar-open .mobile-menu-toggle {
     .sidebar.expanded .hamburger-strip:nth-child(1),
     .sidebar.expanded .hamburger-strip:nth-child(3) {
         width: 65%;
-        transform: rotate(45deg) translate(6px, 6px); /* Adjusted for smaller size */
+        transform: rotate(45deg) translate(6px, 6px);
     }
     
     .sidebar.expanded .hamburger-strip:nth-child(3) {
-        transform: rotate(-45deg) translate(6px, -6px); /* Adjusted for smaller size */
+        transform: rotate(-45deg) translate(6px, -6px);
     }
     
     .nav-menu {
@@ -402,10 +439,6 @@ body.sidebar-open .mobile-menu-toggle {
     }
     
     .social-toggle i {
-        font-size: 1.1rem;
-    }
-    
-    .social-toggle .fa-globe {
         font-size: 1.1rem;
     }
     
@@ -427,7 +460,7 @@ body.sidebar-open .mobile-menu-toggle {
     }
     
     .sidebar.mobile-visible .social-drawer {
-        left: 180px;
+        left: 220px;
     }
     
     .social-drawer a {
@@ -435,18 +468,24 @@ body.sidebar-open .mobile-menu-toggle {
     }
     
     .mobile-menu-toggle {
-        gap: 7px; /* Increased spacing for mobile toggle */
+        gap: 7px;
+        width: 40px;
+        height: 40px;
     }
     
     .mobile-menu-toggle .strip {
-        width: 28px;
+        width: 22px;
     }
 }
 
-/* Tablet adjustments */
+/* Tablet adjustments (481px - 768px) */
 @media (min-width: 481px) and (max-width: 768px) {
+    :root {
+        --sidebar-width-mobile-expanded: 240px;
+    }
+    
     .sidebar.mobile-visible {
-        width: 220px;
+        width: 240px;
     }
     
     .nav-menu li a {
@@ -458,7 +497,7 @@ body.sidebar-open .mobile-menu-toggle {
     }
     
     .sidebar.mobile-visible .social-drawer {
-        left: 220px;
+        left: 240px;
     }
 }
 
@@ -470,7 +509,7 @@ body.sidebar-open .mobile-menu-toggle {
     
     .hamburger-menu {
         margin-bottom: 2rem;
-        gap: 8px; /* Keep increased spacing */
+        gap: 8px;
     }
     
     .nav-menu {
@@ -496,7 +535,7 @@ body.sidebar-open .mobile-menu-toggle {
         margin-bottom: 1.5rem;
         width: 35px;
         height: 35px;
-        gap: 7px; /* Slightly reduced but still good spacing */
+        gap: 7px;
     }
     
     .nav-menu {
@@ -530,7 +569,7 @@ body.sidebar-open .mobile-menu-toggle {
         margin-bottom: 1rem;
         width: 30px;
         height: 30px;
-        gap: 6px; /* Still increased from original */
+        gap: 6px;
     }
     
     .nav-menu {
@@ -578,7 +617,7 @@ body.sidebar-open .mobile-menu-toggle {
     .social-toggle .arrow-symbol,
     .social-drawer,
     .mobile-menu-toggle,
-    body.sidebar-open::after {
+    .sidebar.mobile-visible::before {
         transition: none !important;
         animation: none !important;
     }
@@ -594,15 +633,22 @@ body.sidebar-open .mobile-menu-toggle {
     }
     
     .social-drawer {
-        border: 1px solid var(--metallic-gold);
+        border: 2px solid var(--metallic-gold);
+    }
+    
+    .mobile-menu-toggle {
+        border: 2px solid var(--metallic-gold);
+    }
+    
+    .sidebar.mobile-visible {
+        border-right: 2px solid var(--metallic-gold);
     }
 }
 
 /* ===== PRINT STYLES ===== */
 @media print {
     .sidebar,
-    .mobile-menu-toggle,
-    body.sidebar-open::after {
+    .mobile-menu-toggle {
         display: none !important;
     }
     

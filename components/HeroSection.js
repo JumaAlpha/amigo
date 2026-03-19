@@ -118,7 +118,7 @@ const HeroSection = {
                     'Essence of Worship',
                     'Rehema Simfunkwe',
                     'Joel Maangi',
-                    'Victoria Orenze',
+                    'Nyasha Ngoloma',
                     'Psalmist Kay'
                 ],
                 intervalTime: 5000,
@@ -234,9 +234,9 @@ const HeroSection = {
             currentViews = Math.min(currentViews + incrementViews, viewsTarget);
             currentExp = Math.min(currentExp + incrementExp, expTarget);
             
-            // Format numbers (whole numbers for videos and experience, maybe one decimal for views if needed)
+            // Format numbers
             const videosDisplay = Math.floor(currentVideos);
-            const viewsDisplay = currentViews.toFixed(0); // whole number for 50M
+            const viewsDisplay = currentViews.toFixed(0);
             const expDisplay = Math.floor(currentExp);
             
             statVideos.textContent = videosDisplay + videosSuffix;

@@ -21,7 +21,7 @@ const Sidebar = {
                 <!-- Social Drawer - Opens to Right with > symbol -->
                 <div class="social-drawer-container">
                     <div class="social-toggle" id="socialToggle">
-                        <i class="fas fa-ellipsis-h"></i>
+                        <i class="fas fa-share-alt"></i>
                         <span class="arrow-symbol">></span>
                     </div>
                     
@@ -54,7 +54,7 @@ const Sidebar = {
             if (isMobile()) {
                 // When mobile and sidebar is visible, it's expanded width, otherwise 0
                 return sidebar.classList.contains('mobile-visible') ? 
-                    (isSmallMobile() ? 200 : 220) : 0;
+                    (isSmallMobile() ? 220 : 240) : 0;
             } else {
                 return sidebar.classList.contains('expanded') ? 
                     (isSmallMobile() ? 200 : 250) : (isSmallMobile() ? 60 : 80);
@@ -87,7 +87,7 @@ const Sidebar = {
         // Open sidebar on mobile (show it)
         const openMobileSidebar = () => {
             sidebar.classList.add('mobile-visible');
-            document.body.classList.add('sidebar-open');
+            mainContent.classList.add('sidebar-open'); // Add overlay class to main content
             // Hide floating toggle
             const mobileToggle = document.querySelector('.mobile-menu-toggle');
             if (mobileToggle) mobileToggle.classList.add('hidden');
@@ -97,7 +97,7 @@ const Sidebar = {
         // Close sidebar on mobile (hide it)
         const closeMobileSidebar = () => {
             sidebar.classList.remove('mobile-visible');
-            document.body.classList.remove('sidebar-open');
+            mainContent.classList.remove('sidebar-open'); // Remove overlay class from main content
             // Show floating toggle
             const mobileToggle = document.querySelector('.mobile-menu-toggle');
             if (mobileToggle) mobileToggle.classList.remove('hidden');
@@ -184,9 +184,9 @@ const Sidebar = {
         // Prevent closing when clicking inside drawer
         socialDrawer.addEventListener('click', (e) => e.stopPropagation());
         
-        // Close mobile sidebar when clicking on overlay (the body::after)
+        // Close mobile sidebar when clicking on overlay (now attached to main content)
         document.addEventListener('click', (e) => {
-            if (isMobile() && document.body.classList.contains('sidebar-open') && 
+            if (isMobile() && mainContent.classList.contains('sidebar-open') && 
                 !sidebar.contains(e.target) && !e.target.classList.contains('mobile-menu-toggle')) {
                 closeMobileSidebar();
             }
@@ -246,13 +246,14 @@ const Sidebar = {
             if (window.innerWidth > 768) {
                 // Switch to desktop mode
                 sidebar.classList.remove('mobile-visible');
-                document.body.classList.remove('sidebar-open');
+                mainContent.classList.remove('sidebar-open'); // Remove overlay class
+                mainContent.classList.remove('sidebar-expanded');
                 const mobileToggle = document.querySelector('.mobile-menu-toggle');
                 if (mobileToggle) mobileToggle.remove(); // Remove floating toggle on desktop
             } else {
                 // Switch to mobile mode: ensure sidebar is hidden initially, and create toggle if needed
                 sidebar.classList.remove('mobile-visible', 'expanded');
-                document.body.classList.remove('sidebar-open');
+                mainContent.classList.remove('sidebar-open'); // Remove overlay class
                 mainContent.classList.remove('sidebar-expanded');
                 if (!document.querySelector('.mobile-menu-toggle')) {
                     const toggle = document.createElement('div');
@@ -284,15 +285,21 @@ const Sidebar = {
         // Swipe to open sidebar on mobile (from left edge)
         if (isMobile()) {
             let touchStartX = 0;
+            let touchStartY = 0;
+            
             document.addEventListener('touchstart', (e) => {
                 touchStartX = e.changedTouches[0].screenX;
+                touchStartY = e.changedTouches[0].screenY;
             }, { passive: true });
             
             document.addEventListener('touchend', (e) => {
                 const touchEndX = e.changedTouches[0].screenX;
-                const swipeDistance = touchEndX - touchStartX;
-                // If swiped from left edge (touchStartX near 0) and distance > 50px, open sidebar
-                if (touchStartX < 50 && swipeDistance > 50 && !sidebar.classList.contains('mobile-visible')) {
+                const touchEndY = e.changedTouches[0].screenY;
+                const swipeDistanceX = touchEndX - touchStartX;
+                const swipeDistanceY = Math.abs(touchEndY - touchStartY);
+                
+                // If swiped from left edge (touchStartX near 0) and distance > 50px, and not scrolling vertically, open sidebar
+                if (touchStartX < 50 && swipeDistanceX > 50 && swipeDistanceY < 30 && !sidebar.classList.contains('mobile-visible')) {
                     openMobileSidebar();
                 }
             }, { passive: true });
@@ -302,7 +309,7 @@ const Sidebar = {
         if (isMobile()) {
             // Ensure sidebar is hidden on mobile start
             sidebar.classList.remove('mobile-visible', 'expanded');
-            document.body.classList.remove('sidebar-open');
+            mainContent.classList.remove('sidebar-open'); // Remove overlay class
             mainContent.classList.remove('sidebar-expanded');
             // Create toggle if not exists
             if (!document.querySelector('.mobile-menu-toggle')) {
@@ -318,6 +325,7 @@ const Sidebar = {
         } else {
             // Desktop: initial collapsed state
             sidebar.classList.remove('mobile-visible', 'expanded');
+            mainContent.classList.remove('sidebar-open'); // Remove overlay class
             mainContent.classList.remove('sidebar-expanded');
         }
         
