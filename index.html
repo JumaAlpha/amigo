@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Amijoji · Amigo Johnson — cinematic gospel director</title>
     
     <!-- Fonts -->
@@ -10,20 +10,71 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:opsz@14..32&family=Caveat:wght@400;700&display=swap" rel="stylesheet">
     
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
     <!-- Swiper CSS -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    
+    <!-- Main CSS -->
     <link rel="stylesheet" href="styles/main.css">
 </head>
 <body>
-    <!-- Fog Overlay Container - This will be populated by JavaScript -->
+    <!-- Viewport height fix for mobile browsers -->
+    <script>
+        // Fix for 100vh on mobile browsers (address bar issue)
+        (function() {
+            function setVH() {
+                let vh = window.innerHeight * 0.01;
+                document.documentElement.style.setProperty('--vh', `${vh}px`);
+                
+                // Also set a custom property for the full height
+                document.documentElement.style.setProperty('--full-vh', `${window.innerHeight}px`);
+            }
+            
+            // Initial set
+            setVH();
+            
+            // Update on resize and orientation change
+            window.addEventListener('resize', setVH);
+            window.addEventListener('orientationchange', function() {
+                setTimeout(setVH, 100); // Slight delay for orientation change
+            });
+            
+            // Additional fix for iOS Safari
+            if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+                window.addEventListener('load', setVH);
+                window.addEventListener('pageshow', setVH);
+                
+                // Fix for iOS home screen apps
+                if (window.navigator.standalone) {
+                    document.addEventListener('scroll', setVH);
+                }
+            }
+            
+            // Listen for keyboard open/close on mobile
+            if ('visualViewport' in window) {
+                window.visualViewport.addEventListener('resize', function() {
+                    // Don't update when keyboard opens (height decreases)
+                    // Only update when visual viewport height is close to window inner height
+                    if (window.visualViewport.height > window.innerHeight * 0.7) {
+                        setVH();
+                    }
+                });
+            }
+        })();
+    </script>
+    
+    <!-- Fog Overlay Container -->
     <div id="fog-marquee-container"></div>
     
+    <!-- Handwriting Logo -->
     <div class="site-logo">
         <span class="amigo">Amigo</span>
         <span class="johnson">Johnson</span>
     </div>
     
+    <!-- Main App Container -->
     <div class="app">
         <!-- Sidebar Component -->
         <div id="sidebar-container"></div>
@@ -42,7 +93,7 @@
     <script src="components/FogMarquee.js"></script>
 
     <!-- Swiper JS -->
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     
     <!-- Main Initialization Script -->
     <script>
