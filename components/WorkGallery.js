@@ -25,10 +25,10 @@ const WorkGallery = {
     
     renderThumbnails() {
         const thumbnails = [
-            { artist: 'Alice Kimanzi', song: 'Milele', video: 'https://assets.mixkit.co/videos/38824/38824-720.mp4' },
+            { artist: 'Jackline Medza', song: 'Only You', video: 'assets/work/OnlyYou.mp4' },
             { artist: 'Essence of Worship', song: 'Wimbo wa sifa', video: 'assets/work/Essence_Of_worship_Wimbo_wa_sifa.mp4' },
-            { artist: 'Rhema Feast 2025', song: 'live recording', video: 'https://assets.mixkit.co/videos/38586/38586-720.mp4' },
-            { artist: 'Mercy Chinwo', song: 'Excess Love', video: 'https://assets.mixkit.co/videos/39970/39970-720.mp4' },
+            { artist: 'Rhema Feast 2025', song: 'live recording', video: 'assets/work/rf.mp4' },
+            { artist: 'Neema Gospel Choir', song: 'Umenipendelea', video: 'assets/work/umenipendelea_launch.mp4' },
             { artist: 'Jackline Medza', song: 'Only You', video: 'assets/work/OnlyYou.mp4' }
         ];
         
