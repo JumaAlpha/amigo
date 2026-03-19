@@ -9,6 +9,7 @@
 .sidebar {
     width: var(--sidebar-width-collapsed);
     height: 100vh;
+    height: calc(var(--vh, 1vh) * 100);
     background-color: var(--deep-charcoal);
     position: fixed;
     left: 0;
@@ -19,7 +20,7 @@
     align-items: center;
     padding: 2rem 0;
     transition: transform 0.3s ease, width 0.3s ease;
-    overflow: hidden; /* Prevents content from spilling when collapsed */
+    overflow: hidden;
     box-shadow: 2px 0 20px rgba(0,0,0,0.5);
 }
 
@@ -27,34 +28,50 @@
     width: var(--sidebar-width-expanded);
 }
 
-/* ===== Hamburger Menu (Two Strips) ===== */
+/* ===== REDESIGNED HAMBURGER MENU - Three Strips with Increased Spacing ===== */
 .hamburger-menu {
     width: 40px;
     height: 40px;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    gap: 8px;
+    gap: 8px; /* Increased from 6px to 8px for more spacing */
     cursor: pointer;
     margin-bottom: 3rem;
     position: relative;
     z-index: 1001;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+}
+
+.hamburger-menu:hover {
+    opacity: 1;
 }
 
 .hamburger-strip {
     width: 100%;
-    height: 3px;
-    background-color: var(--metallic-gold);
+    height: 2px;
+    background-color: var(--off-white);
     transition: all 0.3s ease;
-    border-radius: 3px;
+    border-radius: 4px;
 }
 
-.sidebar.expanded .hamburger-strip:first-child {
-    transform: rotate(45deg) translate(8px, 8px);
+/* Three strips - middle strip fades out when expanded */
+.sidebar.expanded .hamburger-strip:nth-child(1) {
+    transform: rotate(45deg) translate(8px, 8px); /* Adjusted for more spacing */
+    background-color: var(--metallic-gold);
+    width: 70%;
 }
 
-.sidebar.expanded .hamburger-strip:last-child {
-    transform: rotate(-45deg) translate(8px, -8px);
+.sidebar.expanded .hamburger-strip:nth-child(2) {
+    opacity: 0;
+    transform: scale(0);
+}
+
+.sidebar.expanded .hamburger-strip:nth-child(3) {
+    transform: rotate(-45deg) translate(8px, -8px); /* Adjusted for more spacing */
+    background-color: var(--metallic-gold);
+    width: 70%;
 }
 
 /* ===== Navigation Menu ===== */
@@ -107,6 +124,7 @@
     cursor: pointer;
     font-size: 1.4rem;
     white-space: nowrap;
+    opacity: 0.8;
 }
 
 .nav-menu li a.active,
@@ -114,9 +132,10 @@
     color: var(--metallic-gold);
     border-bottom-color: var(--metallic-gold);
     transform: translateX(10px);
+    opacity: 1;
 }
 
-/* ===== Social Drawer ===== */
+/* ===== REDESIGNED SOCIAL DRAWER - Clean & Minimal ===== */
 .social-drawer-container {
     margin-top: auto;
     width: 100%;
@@ -133,40 +152,49 @@
     cursor: pointer;
     padding: 1rem 0;
     transition: all 0.3s ease;
-    color: var(--metallic-gold);
+    color: var(--off-white);
+    opacity: 0.7;
     position: relative;
     z-index: 1003;
 }
 
+.social-toggle:hover {
+    opacity: 1;
+    color: var(--metallic-gold);
+}
+
 .social-toggle i {
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     transition: all 0.3s ease;
 }
 
 .social-toggle .fa-globe {
-    font-size: 1.6rem;
+    font-size: 1.4rem;
 }
 
 .social-toggle .arrow-symbol {
-    font-size: 1.2rem;
-    font-weight: bold;
+    font-size: 1rem;
+    font-weight: 300;
     font-family: monospace;
     transition: transform 0.3s ease;
     display: inline-block;
-    transform: translateX(5px);
-    color: var(--metallic-gold);
+    transform: translateX(3px);
+    color: var(--off-white);
+    opacity: 0.7;
 }
 
 .sidebar:not(.expanded) .social-toggle .arrow-symbol {
-    transform: translateX(8px);
+    transform: translateX(5px);
 }
 
 .social-toggle.active .arrow-symbol {
-    transform: translateX(5px) rotate(180deg);
+    transform: translateX(3px) rotate(180deg);
+    color: var(--metallic-gold);
+    opacity: 1;
 }
 
 .sidebar:not(.expanded) .social-toggle.active .arrow-symbol {
-    transform: translateX(8px) rotate(180deg);
+    transform: translateX(5px) rotate(180deg);
 }
 
 .social-drawer {
@@ -174,21 +202,21 @@
     left: var(--sidebar-width-collapsed);
     bottom: 2rem;
     background-color: var(--deep-charcoal);
-    border-radius: 0 12px 12px 0;
-    padding: 1.2rem 2rem;
+    border-radius: 12px;
+    padding: 1rem 1.8rem;
     display: flex;
-    gap: 2rem;
+    gap: 1.5rem;
     align-items: center;
-    box-shadow: 5px 5px 30px rgba(0,0,0,0.8);
-    border-left: 3px solid var(--metallic-gold);
-    transform: translateX(-20px);
+    box-shadow: 0 5px 25px rgba(0,0,0,0.5);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    transform: translateX(-10px);
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
     pointer-events: none;
     z-index: 2000;
-    min-width: 200px;
-    backdrop-filter: blur(5px);
+    min-width: 180px;
+    backdrop-filter: blur(10px);
 }
 
 .sidebar.expanded .social-drawer {
@@ -204,22 +232,24 @@
 
 .social-drawer a {
     color: var(--off-white);
-    font-size: 2rem;
+    font-size: 1.5rem;
     transition: all 0.2s ease;
     transform: scale(1);
     text-decoration: none;
+    opacity: 0.8;
 }
 
 .social-drawer a:hover {
     color: var(--metallic-gold);
-    transform: scale(1.3);
+    transform: scale(1.2);
+    opacity: 1;
 }
 
 /* ===== MOBILE OFF-CANVAS STYLES ===== */
 @media (max-width: 768px) {
     .sidebar {
-        width: var(--sidebar-width-mobile); /* Keep a consistent width for transition */
-        transform: translateX(-100%); /* Move completely off-screen */
+        width: var(--sidebar-width-mobile);
+        transform: translateX(-100%);
         transition: transform 0.3s ease;
         padding: 1.5rem 0;
     }
@@ -230,9 +260,9 @@
         box-shadow: 2px 0 20px rgba(0,0,0,0.5);
     }
     
-    /* Adjust internal elements for mobile expanded */
     .sidebar.mobile-visible .hamburger-menu {
         margin-bottom: 2rem;
+        gap: 8px; /* Increased spacing on mobile too */
     }
     
     .sidebar.mobile-visible .nav-menu {
@@ -249,53 +279,84 @@
         font-size: 1.2rem;
     }
     
-    /* Social drawer positioning when mobile sidebar is visible */
     .sidebar.mobile-visible .social-drawer {
         left: var(--sidebar-width-mobile-expanded);
     }
     
-    /* Adjust arrow for mobile */
     .sidebar.mobile-visible .social-toggle .arrow-symbol {
-        transform: translateX(5px);
+        transform: translateX(3px);
     }
     
     .sidebar.mobile-visible .social-toggle.active .arrow-symbol {
-        transform: translateX(5px) rotate(180deg);
+        transform: translateX(3px) rotate(180deg);
     }
 }
 
-/* ===== FLOATING MOBILE TOGGLE ===== */
+/* ===== REDESIGNED FLOATING MOBILE TOGGLE - Three Strips with Increased Spacing ===== */
 .mobile-menu-toggle {
     position: fixed;
     top: 1rem;
     left: 1rem;
     z-index: 1002;
-    width: 40px;
-    height: 40px;
-    background: var(--deep-charcoal);
-    border: 1px solid var(--metallic-gold);
-    border-radius: 8px;
+    width: 44px;
+    height: 44px;
+    background: transparent;
+    border: none;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 6px;
+    gap: 8px; /* Increased from 5px to 8px for more spacing */
     cursor: pointer;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-    transition: opacity 0.3s ease;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    opacity: 0.7;
+}
+
+.mobile-menu-toggle:hover {
+    opacity: 1;
 }
 
 .mobile-menu-toggle.hidden {
     opacity: 0;
+    visibility: hidden;
     pointer-events: none;
 }
 
 .mobile-menu-toggle .strip {
-    width: 24px;
+    width: 30px;
     height: 2px;
-    background-color: var(--metallic-gold);
-    border-radius: 2px;
+    background-color: var(--off-white);
+    border-radius: 4px;
     transition: 0.3s;
+}
+
+/* Three strips for mobile toggle - all visible */
+.mobile-menu-toggle .strip:nth-child(1),
+.mobile-menu-toggle .strip:nth-child(2),
+.mobile-menu-toggle .strip:nth-child(3) {
+    display: block;
+}
+
+/* Overlay when sidebar is open on mobile */
+body.sidebar-open::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    height: calc(var(--vh, 1vh) * 100);
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+    pointer-events: none;
+    backdrop-filter: blur(3px);
+    animation: fadeIn 0.3s ease;
+}
+
+body.sidebar-open .mobile-menu-toggle {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
 }
 
 /* ===== RESPONSIVE ADJUSTMENTS ===== */
@@ -313,11 +374,22 @@
     .hamburger-menu {
         width: 30px;
         height: 30px;
-        gap: 6px;
+        gap: 7px; /* Slightly reduced but still more than before */
+        margin-bottom: 2rem;
     }
     
     .hamburger-strip {
         height: 2px;
+    }
+    
+    .sidebar.expanded .hamburger-strip:nth-child(1),
+    .sidebar.expanded .hamburger-strip:nth-child(3) {
+        width: 65%;
+        transform: rotate(45deg) translate(6px, 6px); /* Adjusted for smaller size */
+    }
+    
+    .sidebar.expanded .hamburger-strip:nth-child(3) {
+        transform: rotate(-45deg) translate(6px, -6px); /* Adjusted for smaller size */
     }
     
     .nav-menu {
@@ -330,28 +402,28 @@
     }
     
     .social-toggle i {
-        font-size: 1.2rem;
+        font-size: 1.1rem;
     }
     
     .social-toggle .fa-globe {
-        font-size: 1.3rem;
+        font-size: 1.1rem;
     }
     
     .social-toggle .arrow-symbol {
-        font-size: 1rem;
-        transform: translateX(3px);
+        font-size: 0.9rem;
+        transform: translateX(2px);
     }
     
     .sidebar:not(.expanded):not(.mobile-visible) .social-toggle .arrow-symbol {
-        transform: translateX(5px);
+        transform: translateX(4px);
     }
     
     .social-drawer {
         left: 0;
         bottom: 1.5rem;
         padding: 0.8rem 1.2rem;
-        gap: 1.2rem;
-        min-width: 150px;
+        gap: 1rem;
+        min-width: 140px;
     }
     
     .sidebar.mobile-visible .social-drawer {
@@ -359,40 +431,15 @@
     }
     
     .social-drawer a {
-        font-size: 1.5rem;
+        font-size: 1.3rem;
     }
     
     .mobile-menu-toggle {
-        width: 35px;
-        height: 35px;
-    }
-}
-
-/* Landscape mode for phones */
-@media (max-height: 500px) and (orientation: landscape) {
-    .sidebar {
-        padding: 1rem 0;
+        gap: 7px; /* Increased spacing for mobile toggle */
     }
     
-    .hamburger-menu {
-        margin-bottom: 1rem;
-    }
-    
-    .nav-menu {
-        gap: 0.8rem;
-    }
-    
-    .nav-menu li a {
-        font-size: 1rem;
-        padding: 0.2rem 0;
-    }
-    
-    .social-toggle {
-        padding: 0.5rem 0;
-    }
-    
-    .social-drawer {
-        bottom: 1rem;
+    .mobile-menu-toggle .strip {
+        width: 28px;
     }
 }
 
@@ -415,17 +462,125 @@
     }
 }
 
+/* Height-based adjustments for short screens */
+@media (max-height: 700px) {
+    .sidebar {
+        padding: 1.5rem 0;
+    }
+    
+    .hamburger-menu {
+        margin-bottom: 2rem;
+        gap: 8px; /* Keep increased spacing */
+    }
+    
+    .nav-menu {
+        gap: 1.5rem;
+    }
+    
+    .nav-menu li a {
+        font-size: 1.2rem;
+        padding: 0.2rem 0;
+    }
+    
+    .social-toggle {
+        padding: 0.8rem 0;
+    }
+}
+
+@media (max-height: 600px) {
+    .sidebar {
+        padding: 1rem 0;
+    }
+    
+    .hamburger-menu {
+        margin-bottom: 1.5rem;
+        width: 35px;
+        height: 35px;
+        gap: 7px; /* Slightly reduced but still good spacing */
+    }
+    
+    .nav-menu {
+        gap: 1rem;
+    }
+    
+    .nav-menu li a {
+        font-size: 1rem;
+    }
+    
+    .social-toggle {
+        padding: 0.5rem 0;
+    }
+    
+    .social-drawer {
+        bottom: 1rem;
+        padding: 0.6rem 1.2rem;
+    }
+    
+    .social-drawer a {
+        font-size: 1.3rem;
+    }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+    .sidebar {
+        padding: 0.8rem 0;
+    }
+    
+    .hamburger-menu {
+        margin-bottom: 1rem;
+        width: 30px;
+        height: 30px;
+        gap: 6px; /* Still increased from original */
+    }
+    
+    .nav-menu {
+        gap: 0.8rem;
+    }
+    
+    .nav-menu li a {
+        font-size: 0.9rem;
+        padding: 0.15rem 0;
+    }
+    
+    .social-toggle {
+        padding: 0.3rem 0;
+    }
+    
+    .social-drawer {
+        bottom: 0.8rem;
+        padding: 0.4rem 1rem;
+        gap: 0.8rem;
+    }
+    
+    .social-drawer a {
+        font-size: 1.1rem;
+    }
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
 /* ===== ACCESSIBILITY ===== */
 @media (prefers-reduced-motion: reduce) {
     .sidebar,
     .hamburger-strip,
     .nav-menu,
     .nav-menu li,
+    .nav-menu li a,
     .social-toggle,
     .social-toggle .arrow-symbol,
     .social-drawer,
-    .mobile-menu-toggle {
+    .mobile-menu-toggle,
+    body.sidebar-open::after {
         transition: none !important;
+        animation: none !important;
     }
 }
 
@@ -439,11 +594,7 @@
     }
     
     .social-drawer {
-        border: 2px solid var(--metallic-gold);
-    }
-    
-    .mobile-menu-toggle {
-        border: 2px solid var(--metallic-gold);
+        border: 1px solid var(--metallic-gold);
     }
 }
 

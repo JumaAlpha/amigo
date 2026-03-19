@@ -2,8 +2,9 @@ const Sidebar = {
     render() {
         return `
             <aside class="sidebar" id="mainSidebar">
-                <!-- Hamburger Menu (Two Strips) - visible when sidebar is open -->
+                <!-- Hamburger Menu (Three Strips) -->
                 <div class="hamburger-menu" id="hamburgerMenu">
+                    <div class="hamburger-strip"></div>
                     <div class="hamburger-strip"></div>
                     <div class="hamburger-strip"></div>
                 </div>
@@ -20,7 +21,7 @@ const Sidebar = {
                 <!-- Social Drawer - Opens to Right with > symbol -->
                 <div class="social-drawer-container">
                     <div class="social-toggle" id="socialToggle">
-                        <i class="fas fa-globe"></i>
+                        <i class="fas fa-ellipsis-h"></i>
                         <span class="arrow-symbol">></span>
                     </div>
                     
@@ -108,7 +109,7 @@ const Sidebar = {
         if (!document.querySelector('.mobile-menu-toggle') && isMobile()) {
             const toggle = document.createElement('div');
             toggle.className = 'mobile-menu-toggle';
-            toggle.innerHTML = '<div class="strip"></div><div class="strip"></div>';
+            toggle.innerHTML = '<div class="strip"></div><div class="strip"></div><div class="strip"></div>';
             document.body.appendChild(toggle);
             
             toggle.addEventListener('click', (e) => {
@@ -142,10 +143,6 @@ const Sidebar = {
         // Social toggle click
         socialToggle.addEventListener('click', (e) => {
             e.stopPropagation();
-            
-            // If on mobile and sidebar is hidden, open sidebar first? Or just open drawer?
-            // We'll allow drawer to open even if sidebar hidden, but need to ensure drawer is positioned correctly.
-            // Since drawer is fixed, it's fine.
             
             socialToggle.classList.toggle('active');
             socialDrawer.classList.toggle('open');
@@ -199,6 +196,10 @@ const Sidebar = {
         navLinks.forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
+                
+                // Update active state
+                navLinks.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
                 
                 const sectionId = link.dataset.section;
                 const sectionMap = {
@@ -256,7 +257,7 @@ const Sidebar = {
                 if (!document.querySelector('.mobile-menu-toggle')) {
                     const toggle = document.createElement('div');
                     toggle.className = 'mobile-menu-toggle';
-                    toggle.innerHTML = '<div class="strip"></div><div class="strip"></div>';
+                    toggle.innerHTML = '<div class="strip"></div><div class="strip"></div><div class="strip"></div>';
                     document.body.appendChild(toggle);
                     toggle.addEventListener('click', (e) => {
                         e.stopPropagation();
@@ -280,7 +281,7 @@ const Sidebar = {
             }
         });
         
-        // Optional: swipe to open sidebar on mobile (from left edge)
+        // Swipe to open sidebar on mobile (from left edge)
         if (isMobile()) {
             let touchStartX = 0;
             document.addEventListener('touchstart', (e) => {
@@ -307,7 +308,7 @@ const Sidebar = {
             if (!document.querySelector('.mobile-menu-toggle')) {
                 const toggle = document.createElement('div');
                 toggle.className = 'mobile-menu-toggle';
-                toggle.innerHTML = '<div class="strip"></div><div class="strip"></div>';
+                toggle.innerHTML = '<div class="strip"></div><div class="strip"></div><div class="strip"></div>';
                 document.body.appendChild(toggle);
                 toggle.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -333,5 +334,7 @@ const Sidebar = {
         } else {
             arrow.style.transform = `translateX(${arrowOffset}px)`;
         }
+        
+        console.log('Sidebar initialized');
     }
 };

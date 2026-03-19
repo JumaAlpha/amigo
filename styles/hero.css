@@ -3,6 +3,9 @@
     position: relative;
     justify-content: flex-start;
     background-color: var(--pure-black);
+    overflow: hidden !important; /* Prevent any overflow */
+    height: 100%;
+    height: calc(var(--vh, 1vh) * 100);
 }
 
 /* High Quality Video Settings */
@@ -86,8 +89,25 @@
     position: relative;
     z-index: 3;
     max-width: 1200px;
+    max-height: 85vh; /* Limit height to leave space for scroll indicator */
+    overflow-y: auto; /* Allow scrolling if content is too tall */
     padding: 2rem 4rem;
     animation: titleReveal 2s ease-out;
+    margin: 0 auto;
+}
+
+/* Custom scrollbar for hero title */
+.hero-title::-webkit-scrollbar {
+    width: 4px;
+}
+
+.hero-title::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.hero-title::-webkit-scrollbar-thumb {
+    background: var(--metallic-gold);
+    border-radius: 4px;
 }
 
 .title-pre {
@@ -214,10 +234,10 @@
 /* ===== HORIZONTAL SCROLL INDICATOR ===== */
 .scroll-indicator {
     position: absolute;
-    bottom: 3rem;
+    bottom: 1.5rem; /* Fixed from bottom */
     left: 50%;
     transform: translateX(-50%);
-    z-index: 3;
+    z-index: 10;
     display: flex;
     align-items: center;
     gap: 1rem;
@@ -228,9 +248,10 @@
     opacity: 0.7;
     background: rgba(0, 0, 0, 0.3);
     backdrop-filter: blur(5px);
-    padding: 0.8rem 1.5rem;
+    padding: 0.6rem 1.2rem;
     border-radius: 50px;
     border: 1px solid rgba(212, 175, 55, 0.3);
+    white-space: nowrap; /* Prevent wrapping */
 }
 
 .scroll-indicator:hover {
@@ -241,7 +262,7 @@
 }
 
 .scroll-arrow {
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: bold;
     font-family: monospace;
     animation: horizontalPulse 1.5s infinite;
@@ -256,8 +277,8 @@
 }
 
 .scroll-text {
-    font-size: 0.9rem;
-    letter-spacing: 3px;
+    font-size: 0.8rem;
+    letter-spacing: 2px;
     font-weight: 500;
     color: var(--off-white);
 }
@@ -332,6 +353,169 @@
 }
 
 /* ===== RESPONSIVE BREAKPOINTS ===== */
+
+/* Height-based adjustments first - for all devices */
+@media (max-height: 800px) {
+    .hero-title {
+        max-height: 80vh;
+        padding: 1.5rem 3rem;
+    }
+    
+    .title-stats {
+        margin: 1.5rem 0;
+    }
+    
+    .stat-number {
+        font-size: 2.2rem;
+    }
+}
+
+@media (max-height: 700px) {
+    .hero-title {
+        max-height: 75vh;
+        padding: 1.2rem 2.5rem;
+    }
+    
+    .title-pre {
+        font-size: 1rem;
+        margin-bottom: 0.8rem;
+    }
+    
+    .hero-title h1 {
+        font-size: clamp(2.5rem, 8vw, 80px);
+        margin-bottom: 1.2rem;
+    }
+    
+    .title-stats {
+        margin: 1.2rem 0;
+        gap: 1.5rem;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+    }
+    
+    .title-featured {
+        margin-top: 1.2rem;
+        padding: 0.8rem 1.2rem;
+    }
+    
+    .scroll-indicator {
+        bottom: 1rem;
+        padding: 0.5rem 1rem;
+    }
+}
+
+@media (max-height: 600px) {
+    .hero-title {
+        max-height: 70vh;
+        padding: 1rem 2rem;
+    }
+    
+    .title-pre {
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .hero-title h1 {
+        font-size: clamp(2rem, 6vw, 60px);
+        margin-bottom: 0.8rem;
+    }
+    
+    .title-stats {
+        margin: 0.8rem 0;
+        gap: 1rem;
+    }
+    
+    .stat-number {
+        font-size: 1.6rem;
+    }
+    
+    .stat-label {
+        font-size: 0.7rem;
+    }
+    
+    .title-featured {
+        margin-top: 0.8rem;
+        padding: 0.6rem 1rem;
+        font-size: 0.8rem;
+    }
+    
+    .rotating-artist {
+        min-width: 100px;
+        font-size: 0.8rem;
+    }
+    
+    .scroll-indicator {
+        bottom: 0.8rem;
+        padding: 0.4rem 0.8rem;
+        gap: 0.5rem;
+    }
+    
+    .scroll-arrow {
+        font-size: 1.2rem;
+    }
+    
+    .scroll-text {
+        font-size: 0.7rem;
+        letter-spacing: 1.5px;
+    }
+}
+
+@media (max-height: 500px) {
+    .hero-title {
+        max-height: 65vh;
+        padding: 0.8rem 1.5rem;
+    }
+    
+    .title-pre {
+        font-size: 0.8rem;
+        margin-bottom: 0.3rem;
+    }
+    
+    .hero-title h1 {
+        font-size: clamp(1.8rem, 5vw, 40px);
+        margin-bottom: 0.5rem;
+    }
+    
+    .title-stats {
+        margin: 0.5rem 0;
+        gap: 0.8rem;
+    }
+    
+    .stat-number {
+        font-size: 1.3rem;
+    }
+    
+    .stat-label {
+        font-size: 0.6rem;
+    }
+    
+    .title-featured {
+        margin-top: 0.5rem;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.7rem;
+    }
+    
+    .rotating-artist {
+        min-width: 80px;
+        font-size: 0.7rem;
+    }
+    
+    .scroll-indicator {
+        bottom: 0.5rem;
+        padding: 0.3rem 0.6rem;
+    }
+    
+    .scroll-arrow {
+        font-size: 1rem;
+    }
+    
+    .scroll-text {
+        font-size: 0.6rem;
+        letter-spacing: 1px;
+    }
+}
 
 /* Very small phones (≤360px) */
 @media (max-width: 360px) {
@@ -656,6 +840,7 @@
     .hero-title {
         padding: 1rem 2rem;
         max-width: 80%;
+        max-height: 70vh;
     }
 
     .title-pre {
@@ -767,12 +952,15 @@
     .hero-section {
         background: white;
         height: auto;
+        min-height: auto;
     }
 
     .hero-title {
         color: black;
         padding: 1rem;
         animation: none;
+        max-height: none;
+        overflow: visible;
     }
 
     .hero-title h1 {
