@@ -21,83 +21,108 @@ const BTSSlider = {
         `;
     },
     
+    getVideoPath(index) {
+        // Videos are stored in assets/bts and named alphabetically (video1.mp4, video2.mp4, etc.)
+        const videoNumber = String(index + 1).padStart(2, '0');
+        return `assets/bts/video${videoNumber}.mp4`;
+    },
+    
     renderSlides() {
-        // Define columns/slides with varying heights but consistent widths
+        // Define columns/slides with video references
         const slides = [
             {
                 width: 'normal',
-                images: [
-                    { src: 'https://picsum.photos/600/800?random=1', text: 'CRANE SHOT', height: '60' },
-                    { src: 'https://picsum.photos/600/400?random=2', text: 'DRONE OP', height: '40' }
+                videos: [
+                    { text: 'CRANE SHOT', height: '60' },
+                    { text: 'DRONE OP', height: '40' }
                 ]
             },
             {
                 width: 'wide',
-                images: [
-                    { src: 'https://picsum.photos/600/900?random=3', text: 'LIVE RECORDING', height: '70' },
-                    { src: 'https://picsum.photos/600/500?random=4', text: 'RHEMA FEAST', height: '30' }
+                videos: [
+                    { text: 'LIVE RECORDING', height: '70' },
+                    { text: 'RHEMA FEAST', height: '30' }
                 ]
             },
             {
                 width: 'normal',
-                images: [
-                    { src: 'https://picsum.photos/600/700?random=5', text: 'CAMERA OP', height: '55' },
-                    { src: 'https://picsum.photos/600/600?random=6', text: 'DIRECTOR', height: '45' }
+                videos: [
+                    { text: 'CAMERA OP', height: '55' },
+                    { text: 'DIRECTOR', height: '45' }
                 ]
             },
             {
                 width: 'narrow',
-                images: [
-                    { src: 'https://picsum.photos/500/700?random=7', text: 'LIGHTING', height: '65' },
-                    { src: 'https://picsum.photos/500/500?random=8', text: 'SOUND', height: '35' }
+                videos: [
+                    { text: 'LIGHTING', height: '65' },
+                    { text: 'SOUND', height: '35' }
                 ]
             },
             {
                 width: 'normal',
-                images: [
-                    { src: 'https://picsum.photos/600/750?random=9', text: 'CAMERA DOLLY', height: '50' },
-                    { src: 'https://picsum.photos/600/550?random=10', text: 'DRONE SHOT', height: '50' }
+                videos: [
+                    { text: 'CAMERA DOLLY', height: '50' },
+                    { text: 'DRONE SHOT', height: '50' }
                 ]
             },
             {
                 width: 'wide',
-                images: [
-                    { src: 'https://picsum.photos/600/850?random=11', text: 'CHOIR', height: '75' },
-                    { src: 'https://picsum.photos/600/450?random=12', text: 'STAGE', height: '25' }
+                videos: [
+                    { text: 'CHOIR', height: '75' },
+                    { text: 'STAGE', height: '25' }
                 ]
             },
             {
                 width: 'normal',
-                images: [
-                    { src: 'https://picsum.photos/600/720?random=13', text: 'BTS', height: '40' },
-                    { src: 'https://picsum.photos/600/580?random=14', text: 'PRODUCTION', height: '60' }
+                videos: [
+                    { text: 'BTS', height: '40' },
+                    { text: 'PRODUCTION', height: '60' }
                 ]
             },
             {
                 width: 'narrow',
-                images: [
-                    { src: 'https://picsum.photos/500/680?random=15', text: 'LIGHT DESIGN', height: '55' },
-                    { src: 'https://picsum.photos/500/520?random=16', text: 'AUDIO MIX', height: '45' }
+                videos: [
+                    { text: 'LIGHT DESIGN', height: '55' },
+                    { text: 'AUDIO MIX', height: '45' }
                 ]
             }
         ];
         
+        let videoCounter = 0;
+        
         return slides.map((slide, index) => `
             <div class="swiper-slide">
                 <div class="bts-slide-content ${slide.width}">
-                    ${slide.images.map((img, imgIndex) => `
-                        <div class="bts-slide-item" 
-                             data-rotation="${this.getRandomRotation()}"
-                             data-height="${img.height}"
-                             style="flex: 0 0 ${img.height}%; height: ${img.height}%;">
-                            <img src="${img.src}" alt="${img.text}" loading="lazy">
-                            <div class="bts-slide-overlay">
-                                <span class="bts-slide-caption">${img.text}</span>
-                                <span class="bts-slide-number">${String(index + 1).padStart(2, '0')}.${String(imgIndex + 1).padStart(2, '0')}</span>
+                    ${slide.videos.map((video, imgIndex) => {
+                        const videoPath = this.getVideoPath(videoCounter);
+                        videoCounter++;
+                        
+                        return `
+                            <div class="bts-slide-item video-item" 
+                                 data-rotation="${this.getRandomRotation()}"
+                                 data-height="${video.height}"
+                                 data-video-src="${videoPath}"
+                                 style="flex: 0 0 ${video.height}%; height: ${video.height}%;">
+                                <video class="bts-video" 
+                                       src="${videoPath}"
+                                       muted
+                                       loop
+                                       playsinline
+                                       preload="auto"
+                                       autoplay>
+                                    Your browser does not support the video tag.
+                                </video>
+                                <div class="bts-slide-overlay">
+                                    <span class="bts-slide-caption">${video.text}</span>
+                                    <span class="bts-slide-number">${String(index + 1).padStart(2, '0')}.${String(imgIndex + 1).padStart(2, '0')}</span>
+                                </div>
+                                <div class="bts-slide-pattern"></div>
+                                <div class="video-control-hint">
+                                    <i class="fas fa-play"></i>
+                                </div>
                             </div>
-                            <div class="bts-slide-pattern"></div>
-                        </div>
-                    `).join('')}
+                        `;
+                    }).join('')}
                 </div>
             </div>
         `).join('');
@@ -187,6 +212,14 @@ const BTSSlider = {
             // Callbacks
             on: {
                 init: function() {
+                    console.log('BTS Swiper initialized');
+                    // Ensure all videos are playing
+                    setTimeout(() => {
+                        const videos = document.querySelectorAll('.bts-video');
+                        videos.forEach(video => {
+                            video.play().catch(e => console.log('Video autoplay failed:', e));
+                        });
+                    }, 500);
                 },
                 slideChange: function() {
                     // Optional: Add any effects on slide change
@@ -194,26 +227,85 @@ const BTSSlider = {
             }
         });
         
-        // Add hover rotation effect
-        const slides = document.querySelectorAll('.bts-slide-item');
-        slides.forEach((slide) => {
+        // Add hover rotation effect (without video control since videos are always playing)
+        const videoItems = document.querySelectorAll('.bts-slide-item.video-item');
+        videoItems.forEach((item) => {
             // Get the pre-generated rotation value
-            const rotation = slide.dataset.rotation;
+            const rotation = item.dataset.rotation;
             
-            slide.addEventListener('mouseenter', () => {
-                // Apply the rotation on hover
-                slide.style.transform = `rotate(${rotation}deg) scale(1.05)`;
+            // Hover rotation only (no video control)
+            item.addEventListener('mouseenter', () => {
+                item.style.transform = `rotate(${rotation}deg) scale(1.05)`;
             });
             
-            slide.addEventListener('mouseleave', () => {
-                // Reset rotation when hover ends
-                slide.style.transform = 'rotate(0deg) scale(1)';
+            item.addEventListener('mouseleave', () => {
+                item.style.transform = 'rotate(0deg) scale(1)';
             });
             
-            // Add click handler for slides
-            slide.addEventListener('click', () => {
+            // Click handler for slides - open modal with full video
+            item.addEventListener('click', () => {
+                const videoSrc = item.dataset.videoSrc;
+                const caption = item.querySelector('.bts-slide-caption').textContent;
+                console.log(`Video slide clicked with rotation ${rotation}°`);
+                if (videoSrc) {
+                    this.openVideoModal(videoSrc, caption);
+                }
             });
         });
         
+        console.log('BTS Slider initialized with Swiper - all videos auto-playing');
+    },
+    
+    openVideoModal(videoSrc, caption) {
+        // Create modal for full video playback
+        const modal = document.createElement('div');
+        modal.className = 'video-modal';
+        modal.innerHTML = `
+            <div class="video-modal-content">
+                <span class="video-modal-close">&times;</span>
+                <video class="video-modal-player" src="${videoSrc}" controls autoplay loop></video>
+                <div class="video-modal-caption">${caption}</div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // Close modal functionality
+        modal.querySelector('.video-modal-close').addEventListener('click', () => {
+            const video = modal.querySelector('video');
+            if (video) {
+                video.pause();
+                video.removeAttribute('src');
+                video.load();
+            }
+            modal.remove();
+        });
+        
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                const video = modal.querySelector('video');
+                if (video) {
+                    video.pause();
+                    video.removeAttribute('src');
+                    video.load();
+                }
+                modal.remove();
+            }
+        });
+        
+        // Handle escape key
+        const escHandler = (e) => {
+            if (e.key === 'Escape') {
+                const video = modal.querySelector('video');
+                if (video) {
+                    video.pause();
+                    video.removeAttribute('src');
+                    video.load();
+                }
+                modal.remove();
+                document.removeEventListener('keydown', escHandler);
+            }
+        };
+        document.addEventListener('keydown', escHandler);
     }
 };
