@@ -70,8 +70,7 @@ const BTSSlider = {
                                        muted
                                        loop
                                        playsinline
-                                       preload="none"
-                                       poster="assets/bts/poster${String(videoCounter).padStart(2, '0')}.jpg">
+                                       preload="none">
                                     Your browser does not support the video tag.
                                 </video>
                                 <div class="bts-slide-pattern"></div>
@@ -304,6 +303,7 @@ const BTSSlider = {
                         }
                     }
                 } else {
+                    // Already loaded, play immediately
                     if (video && video.readyState >= 2) {
                         video.play().catch(e => console.log('Video play failed:', e));
                     }
