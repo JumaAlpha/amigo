@@ -160,24 +160,55 @@
     height: 20%;
 }
 
-.bts-slide-item img {
+/* ===== VIDEO ELEMENTS ===== */
+.bts-slide-item.video-item {
+    cursor: pointer;
+    position: relative;
+    background-color: #1a1a1a; /* Fallback background */
+}
+
+.bts-video {
     width: 100%;
     height: 100%;
     object-fit: cover;
     transition: transform 0.6s cubic-bezier(0.2, 0.9, 0.3, 1);
     filter: grayscale(0.3) brightness(0.9);
     will-change: transform;
+    background-color: #1a1a1a; /* Fallback color while loading */
+    display: block;
 }
 
-/* Rotation is applied via JavaScript inline style */
-.bts-slide-item:hover {
-    box-shadow: 0 30px 40px rgba(212, 175, 55, 0.3);
-    border-color: rgba(212, 175, 55, 0.6);
-    z-index: 10;
-}
-
-.bts-slide-item:hover img {
+.bts-slide-item.video-item:hover .bts-video {
     filter: grayscale(0) brightness(1.05);
+}
+
+/* Video play hint - shows play icon on hover */
+.video-control-hint {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 40px;
+    background: rgba(212, 175, 55, 0.8);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--pure-black);
+    font-size: 1.2rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 3;
+    pointer-events: none;
+}
+
+.bts-slide-item.video-item:hover .video-control-hint {
+    opacity: 0.7;
+}
+
+.bts-slide-item.video-item .video-control-hint i {
+    margin-left: 3px; /* Slight adjustment for play icon */
 }
 
 /* Pattern overlay for texture */
@@ -196,50 +227,6 @@
 
 .bts-slide-item:hover .bts-slide-pattern {
     opacity: 0.2;
-}
-
-/* Overlay */
-.bts-slide-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-        to top,
-        rgba(0, 0, 0, 0.95) 0%,
-        rgba(0, 0, 0, 0.5) 50%,
-        transparent 100%
-    );
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    padding: 1.5rem;
-    opacity: 0;
-    transition: opacity 0.4s ease;
-    z-index: 2;
-}
-
-.bts-slide-item:hover .bts-slide-overlay {
-    opacity: 1;
-}
-
-.bts-slide-caption {
-    font-family: 'Inter', sans-serif;
-    font-size: 1rem;
-    font-weight: 500;
-    color: var(--off-white);
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-}
-
-.bts-slide-number {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.5rem;
-    color: var(--metallic-gold);
-    opacity: 0.9;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
 }
 
 /* ===== SWIPER NAVIGATION ===== */
@@ -338,25 +325,15 @@
         max-width: 230px;
     }
     
-    .bts-slide-caption {
-        font-size: 0.9rem;
-    }
-    
-    .bts-slide-number {
-        font-size: 1.2rem;
-    }
-    
     .bts-swiper-button {
         width: 40px;
         height: 40px;
     }
     
-    .bts-slide-item[data-height="60"],
-    .bts-slide-item[data-height="40"],
-    .bts-slide-item[data-height="70"],
-    .bts-slide-item[data-height="30"],
-    .bts-slide-item[data-height="50"] {
-        /* Heights maintain percentage, no change needed */
+    .video-control-hint {
+        width: 35px;
+        height: 35px;
+        font-size: 1rem;
     }
 }
 
@@ -407,6 +384,12 @@
     .bts-swiper-pagination .swiper-pagination-bullet-active {
         width: 30px;
     }
+    
+    .video-control-hint {
+        width: 30px;
+        height: 30px;
+        font-size: 0.9rem;
+    }
 }
 
 /* Small phones */
@@ -438,14 +421,6 @@
         max-width: 180px;
     }
     
-    .bts-slide-caption {
-        font-size: 0.8rem;
-    }
-    
-    .bts-slide-number {
-        font-size: 1rem;
-    }
-    
     .bts-swiper-button {
         width: 32px;
         height: 32px;
@@ -453,6 +428,12 @@
     
     .bts-swiper-button::after {
         font-size: 1rem;
+    }
+    
+    .video-control-hint {
+        width: 28px;
+        height: 28px;
+        font-size: 0.8rem;
     }
 }
 
@@ -463,7 +444,7 @@
     }
     
     .bts-slide-item[data-height="60"] {
-        flex: 0 0 58%; /* Slightly adjusted for shorter screens */
+        flex: 0 0 58%;
         height: 58%;
     }
     
@@ -531,16 +512,10 @@
         min-height: 80px;
     }
     
-    .bts-slide-overlay {
-        padding: 0.8rem;
-    }
-    
-    .bts-slide-caption {
+    .video-control-hint {
+        width: 24px;
+        height: 24px;
         font-size: 0.7rem;
-    }
-    
-    .bts-slide-number {
-        font-size: 0.9rem;
     }
     
     /* Adjust heights for landscape */
@@ -576,8 +551,7 @@
     .swiper-slide,
     .bts-slide-item,
     .bts-slide-item img,
-    .bts-slide-overlay,
-    .bts-slide-pattern,
+    .bts-slide-item video,
     .bts-swiper-button,
     .bts-swiper-pagination .swiper-pagination-bullet {
         transition: none !important;
@@ -598,9 +572,16 @@
         border: 2px solid var(--metallic-gold);
         background: var(--pure-black);
     }
+}
+
+/* Data saving preference */
+@media (prefers-reduced-data: reduce) {
+    .bts-video {
+        preload: none;
+    }
     
-    .bts-slide-overlay {
-        background: rgba(0, 0, 0, 0.9);
+    .video-control-hint {
+        display: none;
     }
 }
 
@@ -643,27 +624,15 @@
         margin-bottom: 0.3cm;
     }
     
-    .bts-slide-item img {
-        filter: none;
-    }
-    
-    .bts-slide-overlay {
-        opacity: 1;
-        background: rgba(255, 255, 255, 0.1);
-        position: static;
-        padding: 0.5rem;
-        color: #333;
-    }
-    
-    .bts-slide-caption,
-    .bts-slide-number {
-        color: #333;
-        text-shadow: none;
+    .bts-slide-item video,
+    .bts-video {
+        display: none; /* Don't print videos */
     }
     
     .bts-slide-pattern,
     .bts-swiper-button,
-    .bts-swiper-pagination {
+    .bts-swiper-pagination,
+    .video-control-hint {
         display: none !important;
     }
 }
@@ -704,12 +673,10 @@
         font-size: 1.4rem;
     }
     
-    .bts-slide-caption {
-        font-size: 1.1rem;
-    }
-    
-    .bts-slide-number {
-        font-size: 1.8rem;
+    .video-control-hint {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
     }
 }
 
@@ -721,6 +688,11 @@
     
     .bts-slide-item {
         transform: translateZ(0); /* Force hardware acceleration */
+    }
+    
+    .bts-video {
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
     }
 }
 
