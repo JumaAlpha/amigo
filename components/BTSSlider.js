@@ -1,4 +1,7 @@
 const BTSSlider = {
+    // Cache storage key
+    CACHE_KEY: 'bts_videos_cache',
+    
     render() {
         return `
             <section class="section bts-section">
@@ -28,62 +31,62 @@ const BTSSlider = {
     },
     
     renderSlides() {
-        // Define columns/slides with video references
+        // Define columns/slides with video references (no descriptions)
         const slides = [
             {
                 width: 'normal',
                 videos: [
-                    { text: 'CRANE SHOT', height: '60' },
-                    { text: 'DRONE OP', height: '40' }
+                    { height: '60' },
+                    { height: '40' }
                 ]
             },
             {
                 width: 'wide',
                 videos: [
-                    { text: 'LIVE RECORDING', height: '70' },
-                    { text: 'RHEMA FEAST', height: '30' }
+                    { height: '70' },
+                    { height: '30' }
                 ]
             },
             {
                 width: 'normal',
                 videos: [
-                    { text: 'CAMERA OP', height: '55' },
-                    { text: 'DIRECTOR', height: '45' }
+                    { height: '55' },
+                    { height: '45' }
                 ]
             },
             {
                 width: 'narrow',
                 videos: [
-                    { text: 'LIGHTING', height: '65' },
-                    { text: 'SOUND', height: '35' }
+                    { height: '65' },
+                    { height: '35' }
                 ]
             },
             {
                 width: 'normal',
                 videos: [
-                    { text: 'CAMERA DOLLY', height: '50' },
-                    { text: 'DRONE SHOT', height: '50' }
+                    { height: '50' },
+                    { height: '50' }
                 ]
             },
             {
                 width: 'wide',
                 videos: [
-                    { text: 'CHOIR', height: '75' },
-                    { text: 'STAGE', height: '25' }
+                    { height: '75' },
+                    { height: '25' }
                 ]
             },
             {
                 width: 'normal',
                 videos: [
-                    { text: 'BTS', height: '40' },
-                    { text: 'PRODUCTION', height: '60' }
+                    { height: '40' },
+                    { height: '60' }
                 ]
             },
             {
                 width: 'narrow',
                 videos: [
-                    { text: 'LIGHT DESIGN', height: '55' },
-                    { text: 'AUDIO MIX', height: '45' }
+                    { height: '55' },
+                    { height: '45' }
                 ]
             }
         ];
@@ -95,6 +98,7 @@ const BTSSlider = {
                 <div class="bts-slide-content ${slide.width}">
                     ${slide.videos.map((video, imgIndex) => {
                         const videoPath = this.getVideoPath(videoCounter);
+                        const videoId = `video_${videoCounter}`;
                         videoCounter++;
                         
                         return `
@@ -102,24 +106,18 @@ const BTSSlider = {
                                  data-rotation="${this.getRandomRotation()}"
                                  data-height="${video.height}"
                                  data-video-src="${videoPath}"
+                                 data-video-id="${videoId}"
                                  style="flex: 0 0 ${video.height}%; height: ${video.height}%;">
                                 <video class="bts-video" 
-                                       src="${videoPath}"
+                                       data-src="${videoPath}"
                                        muted
                                        loop
                                        playsinline
-                                       preload="auto"
-                                       autoplay>
+                                       preload="none"
+                                       poster="assets/bts/poster${String(videoCounter).padStart(2, '0')}.jpg">
                                     Your browser does not support the video tag.
                                 </video>
-                                <div class="bts-slide-overlay">
-                                    <span class="bts-slide-caption">${video.text}</span>
-                                    <span class="bts-slide-number">${String(index + 1).padStart(2, '0')}.${String(imgIndex + 1).padStart(2, '0')}</span>
-                                </div>
                                 <div class="bts-slide-pattern"></div>
-                                <div class="video-control-hint">
-                                    <i class="fas fa-play"></i>
-                                </div>
                             </div>
                         `;
                     }).join('')}
@@ -132,6 +130,94 @@ const BTSSlider = {
         // Generate random rotation between -8 and 8 degrees
         const rotations = [-8, -6, -4, -2, 2, 4, 6, 8];
         return rotations[Math.floor(Math.random() * rotations.length)];
+    },
+    
+    async checkAndLoadCache() {
+        // Check if Cache API is available
+        if (!('caches' in window)) {
+            console.log('Cache API not supported, falling back to regular loading');
+            return false;
+        }
+        
+        try {
+            const cache = await caches.open('bts-videos-cache-v1');
+            const cachedResponse = await cache.match('/bts-videos-manifest');
+            
+            if (cachedResponse) {
+                const cachedData = await cachedResponse.json();
+                console.log('Found cached video data', cachedData);
+                return cachedData;
+            }
+        } catch (error) {
+            console.log('Error checking cache:', error);
+        }
+        
+        return false;
+    },
+    
+    async cacheVideo(videoUrl, videoId) {
+        if (!('caches' in window)) return;
+        
+        try {
+            const cache = await caches.open('bts-videos-cache-v1');
+            
+            // Check if already cached
+            const cached = await cache.match(videoUrl);
+            if (cached) {
+                console.log(`Video ${videoId} already in cache`);
+                return;
+            }
+            
+            // Fetch and cache the video
+            const response = await fetch(videoUrl);
+            if (response.ok) {
+                await cache.put(videoUrl, response.clone());
+                console.log(`Cached video: ${videoId}`);
+            }
+        } catch (error) {
+            console.log(`Error caching video ${videoId}:`, error);
+        }
+    },
+    
+    async loadVideoFromCache(videoElement, videoUrl, videoId) {
+        if (!('caches' in window)) {
+            // Fallback: load normally
+            videoElement.src = videoUrl;
+            videoElement.load();
+            return false;
+        }
+        
+        try {
+            const cache = await caches.open('bts-videos-cache-v1');
+            const cachedResponse = await cache.match(videoUrl);
+            
+            if (cachedResponse) {
+                // Create blob URL from cached response
+                const blob = await cachedResponse.blob();
+                const blobUrl = URL.createObjectURL(blob);
+                videoElement.src = blobUrl;
+                videoElement.load();
+                console.log(`Loaded video ${videoId} from cache`);
+                return true;
+            } else {
+                // Not in cache, load normally and cache
+                videoElement.src = videoUrl;
+                videoElement.load();
+                
+                // Cache for next time
+                videoElement.addEventListener('canplaythrough', () => {
+                    this.cacheVideo(videoUrl, videoId);
+                }, { once: true });
+                
+                console.log(`Loading video ${videoId} from network`);
+                return false;
+            }
+        } catch (error) {
+            console.log(`Error loading video ${videoId} from cache:`, error);
+            videoElement.src = videoUrl;
+            videoElement.load();
+            return false;
+        }
     },
     
     init() {
@@ -213,13 +299,23 @@ const BTSSlider = {
             on: {
                 init: function() {
                     console.log('BTS Swiper initialized');
-                    // Ensure all videos are playing
+                    
+                    // Start loading videos with cache
                     setTimeout(() => {
-                        const videos = document.querySelectorAll('.bts-video');
-                        videos.forEach(video => {
-                            video.play().catch(e => console.log('Video autoplay failed:', e));
+                        const videoElements = document.querySelectorAll('.bts-video');
+                        const videoItems = document.querySelectorAll('.bts-slide-item.video-item');
+                        
+                        videoItems.forEach((item, index) => {
+                            const video = item.querySelector('.bts-video');
+                            const videoSrc = item.dataset.videoSrc;
+                            const videoId = item.dataset.videoId || `video_${index}`;
+                            
+                            if (video && videoSrc) {
+                                // Load video with cache support
+                                window.BTSSliderInstance.loadVideoFromCache(video, videoSrc, videoId);
+                            }
                         });
-                    }, 500);
+                    }, 100);
                 },
                 slideChange: function() {
                     // Optional: Add any effects on slide change
@@ -227,85 +323,92 @@ const BTSSlider = {
             }
         });
         
-        // Add hover rotation effect (without video control since videos are always playing)
+        // Store instance for callbacks
+        window.BTSSliderInstance = this;
+        
+        // Add hover rotation effect (no modal)
         const videoItems = document.querySelectorAll('.bts-slide-item.video-item');
         videoItems.forEach((item) => {
-            // Get the pre-generated rotation value
             const rotation = item.dataset.rotation;
             
-            // Hover rotation only (no video control)
+            // Hover rotation
             item.addEventListener('mouseenter', () => {
                 item.style.transform = `rotate(${rotation}deg) scale(1.05)`;
+                
+                // Play video on hover if it's loaded
+                const video = item.querySelector('.bts-video');
+                if (video && video.readyState >= 2) {
+                    video.play().catch(e => console.log('Video play failed:', e));
+                }
             });
             
             item.addEventListener('mouseleave', () => {
                 item.style.transform = 'rotate(0deg) scale(1)';
-            });
-            
-            // Click handler for slides - open modal with full video
-            item.addEventListener('click', () => {
-                const videoSrc = item.dataset.videoSrc;
-                const caption = item.querySelector('.bts-slide-caption').textContent;
-                console.log(`Video slide clicked with rotation ${rotation}°`);
-                if (videoSrc) {
-                    this.openVideoModal(videoSrc, caption);
+                
+                // Pause video when not hovering
+                const video = item.querySelector('.bts-video');
+                if (video && !video.paused) {
+                    video.pause();
                 }
             });
         });
         
-        console.log('BTS Slider initialized with Swiper - all videos auto-playing');
+        // Add visibility change handler to pause videos when tab is hidden
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                // Tab is hidden, pause all videos
+                const videos = document.querySelectorAll('.bts-video');
+                videos.forEach(video => {
+                    video.pause();
+                });
+            } else {
+                // Tab is visible again, resume playing visible videos
+                const visibleVideos = document.querySelectorAll('.bts-video');
+                visibleVideos.forEach(video => {
+                    const parent = video.closest('.bts-slide-item');
+                    if (parent && parent.matches(':hover')) {
+                        video.play().catch(e => console.log('Video resume failed:', e));
+                    }
+                });
+            }
+        });
+        
+        // Setup preload strategy
+        this.setupPreloadStrategy();
+        
+        console.log('BTS Slider initialized with persistent video cache - descriptions and modal removed');
     },
     
-    openVideoModal(videoSrc, caption) {
-        // Create modal for full video playback
-        const modal = document.createElement('div');
-        modal.className = 'video-modal';
-        modal.innerHTML = `
-            <div class="video-modal-content">
-                <span class="video-modal-close">&times;</span>
-                <video class="video-modal-player" src="${videoSrc}" controls autoplay loop></video>
-                <div class="video-modal-caption">${caption}</div>
-            </div>
-        `;
+    setupPreloadStrategy() {
+        // Preload videos when user is about to scroll to them
+        const swiperContainer = document.querySelector('.bts-swiper');
+        const videoItems = document.querySelectorAll('.bts-slide-item.video-item');
         
-        document.body.appendChild(modal);
+        if (!swiperContainer) return;
         
-        // Close modal functionality
-        modal.querySelector('.video-modal-close').addEventListener('click', () => {
-            const video = modal.querySelector('video');
-            if (video) {
-                video.pause();
-                video.removeAttribute('src');
-                video.load();
-            }
-            modal.remove();
+        // Create intersection observer for preloading videos near viewport
+        const preloadObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const item = entry.target;
+                    const video = item.querySelector('.bts-video');
+                    const videoSrc = item.dataset.videoSrc;
+                    const videoId = item.dataset.videoId;
+                    
+                    // Preload video when it's 500px from viewport
+                    if (video && videoSrc && !video.src) {
+                        this.loadVideoFromCache(video, videoSrc, videoId);
+                    }
+                }
+            });
+        }, {
+            root: swiperContainer,
+            rootMargin: '500px',
+            threshold: 0
         });
         
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                const video = modal.querySelector('video');
-                if (video) {
-                    video.pause();
-                    video.removeAttribute('src');
-                    video.load();
-                }
-                modal.remove();
-            }
+        videoItems.forEach(item => {
+            preloadObserver.observe(item);
         });
-        
-        // Handle escape key
-        const escHandler = (e) => {
-            if (e.key === 'Escape') {
-                const video = modal.querySelector('video');
-                if (video) {
-                    video.pause();
-                    video.removeAttribute('src');
-                    video.load();
-                }
-                modal.remove();
-                document.removeEventListener('keydown', escHandler);
-            }
-        };
-        document.addEventListener('keydown', escHandler);
     }
 };
