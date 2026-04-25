@@ -15,6 +15,7 @@ const Sidebar = {
                     <li><a href="#" class="nav-link" data-section="work">WORK</a></li>
                     <li><a href="#" class="nav-link" data-section="bts">BTS</a></li>
                     <li><a href="#" class="nav-link" data-section="about">ABOUT</a></li>
+                    <li><a href="#" class="nav-link" data-section="values">VALUES</a></li>
                     <li><a href="#" class="nav-link" data-section="booking">BOOKING</a></li>
                 </ul>
                 
@@ -54,7 +55,7 @@ const Sidebar = {
             if (isMobile()) {
                 // When mobile and sidebar is visible, it's expanded width, otherwise 0
                 return sidebar.classList.contains('mobile-visible') ? 
-                    (isSmallMobile() ? 220 : 240) : 0;
+                    (isSmallMobile() ? 280 : 300) : 0;
             } else {
                 return sidebar.classList.contains('expanded') ? 
                     (isSmallMobile() ? 200 : 250) : (isSmallMobile() ? 60 : 80);
@@ -87,7 +88,7 @@ const Sidebar = {
         // Open sidebar on mobile (show it)
         const openMobileSidebar = () => {
             sidebar.classList.add('mobile-visible');
-            mainContent.classList.add('sidebar-open'); // Add overlay class to main content
+            document.body.classList.add('sidebar-open'); // Add class to body for overlay
             // Hide floating toggle
             const mobileToggle = document.querySelector('.mobile-menu-toggle');
             if (mobileToggle) mobileToggle.classList.add('hidden');
@@ -97,7 +98,7 @@ const Sidebar = {
         // Close sidebar on mobile (hide it)
         const closeMobileSidebar = () => {
             sidebar.classList.remove('mobile-visible');
-            mainContent.classList.remove('sidebar-open'); // Remove overlay class from main content
+            document.body.classList.remove('sidebar-open'); // Remove class from body
             // Show floating toggle
             const mobileToggle = document.querySelector('.mobile-menu-toggle');
             if (mobileToggle) mobileToggle.classList.remove('hidden');
@@ -184,15 +185,15 @@ const Sidebar = {
         // Prevent closing when clicking inside drawer
         socialDrawer.addEventListener('click', (e) => e.stopPropagation());
         
-        // Close mobile sidebar when clicking on overlay (now attached to main content)
+        // Close mobile sidebar when clicking on overlay
         document.addEventListener('click', (e) => {
-            if (isMobile() && mainContent.classList.contains('sidebar-open') && 
+            if (isMobile() && document.body.classList.contains('sidebar-open') && 
                 !sidebar.contains(e.target) && !e.target.classList.contains('mobile-menu-toggle')) {
                 closeMobileSidebar();
             }
         });
         
-        // Navigation link clicks
+        // Navigation link clicks - Updated section mapping with VALUES
         navLinks.forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -203,9 +204,15 @@ const Sidebar = {
                 
                 const sectionId = link.dataset.section;
                 const sectionMap = {
-                    'hero': 0, 'work': 1, 'bts': 2, 'about': 3, 'booking': 4
+                    'hero': 0,
+                    'work': 1,
+                    'bts': 2,
+                    'about': 3,
+                    'values': 4,
+                    'booking': 5
                 };
                 const targetIndex = sectionMap[sectionId];
+                
                 if (targetIndex !== undefined && sections[targetIndex]) {
                     sections[targetIndex].scrollIntoView({ 
                         behavior: 'smooth', 
@@ -224,21 +231,54 @@ const Sidebar = {
         // Intersection Observer for active section highlighting
         const observerOptions = {
             root: mainContent,
-            threshold: 0.5
+            threshold: 0.4
         };
+        
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
-                    const sectionId = entry.target.classList[1]?.replace('-section', '') || 'hero';
-                    navLinks.forEach(link => {
-                        link.classList.remove('active');
-                        if (link.dataset.section === sectionId) {
-                            link.classList.add('active');
+                    // Determine section ID from the section's class or id
+                    let sectionId = '';
+                    const section = entry.target;
+                    
+                    if (section.id === 'about-values-section') {
+                        sectionId = 'values';
+                    } else if (section.classList.contains('hero-section')) {
+                        sectionId = 'hero';
+                    } else if (section.classList.contains('work-section')) {
+                        sectionId = 'work';
+                    } else if (section.classList.contains('bts-section')) {
+                        sectionId = 'bts';
+                    } else if (section.querySelector('.about-split')) {
+                        sectionId = 'about';
+                    } else if (section.classList.contains('booking-section')) {
+                        sectionId = 'booking';
+                    } else {
+                        // Fallback to class name
+                        const classList = section.classList;
+                        for (let cls of classList) {
+                            if (cls.includes('section')) {
+                                const match = cls.replace('-section', '');
+                                if (match === 'about') sectionId = 'about';
+                                else if (match === 'values') sectionId = 'values';
+                                else if (match !== 'section') sectionId = match;
+                                break;
+                            }
                         }
-                    });
+                    }
+                    
+                    if (sectionId) {
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.dataset.section === sectionId) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
                 }
             });
         }, observerOptions);
+        
         sections.forEach(section => observer.observe(section));
         
         // Window resize handling
@@ -246,14 +286,14 @@ const Sidebar = {
             if (window.innerWidth > 768) {
                 // Switch to desktop mode
                 sidebar.classList.remove('mobile-visible');
-                mainContent.classList.remove('sidebar-open'); // Remove overlay class
+                document.body.classList.remove('sidebar-open');
                 mainContent.classList.remove('sidebar-expanded');
                 const mobileToggle = document.querySelector('.mobile-menu-toggle');
                 if (mobileToggle) mobileToggle.remove(); // Remove floating toggle on desktop
             } else {
                 // Switch to mobile mode: ensure sidebar is hidden initially, and create toggle if needed
                 sidebar.classList.remove('mobile-visible', 'expanded');
-                mainContent.classList.remove('sidebar-open'); // Remove overlay class
+                document.body.classList.remove('sidebar-open');
                 mainContent.classList.remove('sidebar-expanded');
                 if (!document.querySelector('.mobile-menu-toggle')) {
                     const toggle = document.createElement('div');
@@ -309,7 +349,7 @@ const Sidebar = {
         if (isMobile()) {
             // Ensure sidebar is hidden on mobile start
             sidebar.classList.remove('mobile-visible', 'expanded');
-            mainContent.classList.remove('sidebar-open'); // Remove overlay class
+            document.body.classList.remove('sidebar-open');
             mainContent.classList.remove('sidebar-expanded');
             // Create toggle if not exists
             if (!document.querySelector('.mobile-menu-toggle')) {
@@ -325,7 +365,7 @@ const Sidebar = {
         } else {
             // Desktop: initial collapsed state
             sidebar.classList.remove('mobile-visible', 'expanded');
-            mainContent.classList.remove('sidebar-open'); // Remove overlay class
+            document.body.classList.remove('sidebar-open');
             mainContent.classList.remove('sidebar-expanded');
         }
         
@@ -343,6 +383,6 @@ const Sidebar = {
             arrow.style.transform = `translateX(${arrowOffset}px)`;
         }
         
-        console.log('Sidebar initialized');
+        console.log('Sidebar initialized with VALUES navigation item');
     }
 };
