@@ -1,7 +1,7 @@
 const AboutValues = {
     render() {
         return `
-            <section class="section about-values-section" id="about-values-section">
+            <section class="section values-section" id="values-section">
                 <!-- Content -->
                 <div class="about-values-container">
                     <div class="about-values-wrapper">
@@ -237,7 +237,7 @@ const AboutValues = {
         });
 
         // Animate skill bars when section becomes visible
-        const section = document.getElementById('about-values-section');
+        const section = document.getElementById('values-section');
         if (section) {
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
