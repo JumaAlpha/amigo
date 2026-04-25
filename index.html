@@ -89,9 +89,10 @@
     <script src="components/WorkGallery.js"></script>
     <script src="components/BTSSlider.js"></script>
     <script src="components/AboutGear.js"></script>
+    <script src="components/AboutValues.js"></script>
     <script src="components/BookingForm.js"></script>
     <script src="components/FogMarquee.js"></script>
-
+    
     <!-- Swiper JS -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     
@@ -125,6 +126,7 @@
                 loadComponentCSS('styles/work-gallery.css'),
                 loadComponentCSS('styles/bts-slider.css'),
                 loadComponentCSS('styles/about-gear.css'),
+                loadComponentCSS('styles/about-values.css'),
                 loadComponentCSS('styles/booking-form.css'),
                 loadComponentCSS('styles/fog-marquee.css')
             ]).then(() => {
@@ -162,7 +164,7 @@
                 
                 // Check if all section components exist
                 const components = {
-                    HeroSection, WorkGallery, BTSSlider, AboutGear, BookingForm
+                    HeroSection, WorkGallery, BTSSlider, AboutGear, AboutValues, BookingForm
                 };
                 
                 for (const [name, component] of Object.entries(components)) {
@@ -181,6 +183,7 @@
                         ${WorkGallery.render()}
                         ${BTSSlider.render()}
                         ${AboutGear.render()}
+                        ${AboutValues.render()}
                         ${BookingForm.render()}
                     `;
                 } else {
@@ -221,6 +224,11 @@
                         console.log('AboutGear initialized');
                     }
                     
+                    if (typeof AboutValues.init === 'function') {
+                        AboutValues.init();
+                        console.log('AboutValues initialized');
+                    }
+                    
                     if (typeof BookingForm.init === 'function') {
                         BookingForm.init();
                         console.log('BookingForm initialized');
@@ -255,6 +263,7 @@
                         ${WorkGallery?.render() || ''}
                         ${BTSSlider?.render() || ''}
                         ${AboutGear?.render() || ''}
+                        ${AboutValues?.render() || ''}
                         ${BookingForm?.render() || ''}
                     `;
                 }
@@ -266,6 +275,7 @@
                 if (typeof WorkGallery?.init === 'function') WorkGallery.init();
                 if (typeof BTSSlider?.init === 'function') BTSSlider.init();
                 if (typeof AboutGear?.init === 'function') AboutGear.init();
+                if (typeof AboutValues?.init === 'function') AboutValues.init();
                 if (typeof BookingForm?.init === 'function') BookingForm.init();
             });
             

@@ -1,0 +1,348 @@
+/* ========== ABOUT VALUES SECTION - INTEGRATED STYLES ========== */
+.about-values-section {
+    background: var(--pure-black);
+    position: relative;
+    overflow-y: auto;
+    padding: 2rem;
+}
+
+.about-values-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.about-values-wrapper {
+    width: 100%;
+}
+
+/* Header Styles */
+.about-values-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.about-values-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    color: var(--off-white);
+    letter-spacing: 3px;
+    margin-bottom: 1rem;
+}
+
+.about-values-title .gradient-text {
+    background: linear-gradient(135deg, var(--metallic-gold) 0%, #e8c860 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-family: 'Caveat', cursive;
+}
+
+.about-values-subtitle {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(0.9rem, 2vw, 1.1rem);
+    color: #aaa;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* Card Styles */
+.about-values-card {
+    background: rgba(18, 18, 18, 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(212, 175, 55, 0.15);
+    border-radius: 20px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.about-values-card:hover {
+    border-color: rgba(212, 175, 55, 0.3);
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.05);
+}
+
+.about-values-card-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(1.3rem, 3vw, 1.8rem);
+    color: var(--metallic-gold);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.about-values-card-title i {
+    font-size: 1.3rem;
+    background: rgba(212, 175, 55, 0.15);
+    padding: 0.5rem;
+    border-radius: 12px;
+}
+
+.about-values-card-text {
+    color: #ccc;
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(0.85rem, 2vw, 0.95rem);
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+}
+
+.about-values-card-text p {
+    margin-bottom: 0.75rem;
+}
+
+/* Stats Grid */
+.about-values-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.about-values-stat-item {
+    text-align: center;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    padding: 0.75rem 0.5rem;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(212, 175, 55, 0.1);
+}
+
+.about-values-stat-item:hover {
+    transform: translateY(-3px);
+    border-color: rgba(212, 175, 55, 0.3);
+}
+
+.about-values-stat-number {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(1.2rem, 3vw, 1.8rem);
+    color: var(--metallic-gold);
+    font-weight: 500;
+}
+
+.about-values-stat-label {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(0.7rem, 2vw, 0.8rem);
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Mobile Tabs */
+.about-values-mobile-tabs {
+    display: none;
+}
+
+/* Desktop Layout */
+.about-values-desktop {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+}
+
+/* Skills Section */
+.about-values-skills {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.about-values-skill-item {
+    width: 100%;
+}
+
+.about-values-skill-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.5rem;
+}
+
+.about-values-skill-header h4 {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(0.85rem, 2vw, 1rem);
+    font-weight: 600;
+    color: var(--off-white);
+}
+
+.about-values-skill-header span {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(0.9rem, 2vw, 1.1rem);
+    color: var(--metallic-gold);
+}
+
+.about-values-skill-desc {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    color: #888;
+    margin-bottom: 0.5rem;
+}
+
+.about-values-skill-bar {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    height: 4px;
+    overflow: hidden;
+}
+
+.about-values-skill-progress {
+    background: linear-gradient(90deg, var(--metallic-gold), #e8c860);
+    border-radius: 10px;
+    height: 100%;
+    width: 0%;
+    transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ===== TAB STYLES FOR MOBILE ===== */
+.about-values-tab-headers {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+    padding-bottom: 0.5rem;
+}
+
+.about-values-tab-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 10px;
+    color: #888;
+}
+
+.about-values-tab-btn i {
+    font-size: 1.1rem;
+}
+
+.about-values-tab-btn span {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.about-values-tab-btn.active {
+    color: var(--metallic-gold);
+    background: rgba(212, 175, 55, 0.1);
+}
+
+.about-values-tab-content {
+    display: none;
+    animation: valuesFadeIn 0.4s ease;
+}
+
+.about-values-tab-content.active {
+    display: block;
+}
+
+@keyframes valuesFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===== RESPONSIVE BREAKPOINTS ===== */
+@media (max-width: 1024px) {
+    .about-values-section {
+        padding: 1.5rem;
+    }
+    
+    .about-values-desktop {
+        gap: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .about-values-mobile-tabs {
+        display: block;
+    }
+    
+    .about-values-desktop {
+        display: none;
+    }
+    
+    .about-values-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+    }
+    
+    .about-values-card {
+        padding: 1.25rem;
+    }
+    
+    .about-values-header {
+        margin-bottom: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .about-values-section {
+        padding: 1rem;
+    }
+    
+    .about-values-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .about-values-stat-item {
+        padding: 0.5rem;
+    }
+    
+    .about-values-stat-number {
+        font-size: 1.1rem;
+    }
+    
+    .about-values-stat-label {
+        font-size: 0.65rem;
+    }
+    
+    .about-values-card-title i {
+        font-size: 1rem;
+        padding: 0.4rem;
+    }
+    
+    .about-values-tab-btn {
+        padding: 0.5rem;
+    }
+}
+
+/* Landscape mode */
+@media (max-height: 600px) and (orientation: landscape) {
+    .about-values-section {
+        padding: 1rem;
+    }
+    
+    .about-values-header {
+        margin-bottom: 1rem;
+    }
+    
+    .about-values-stats-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .about-values-card,
+    .about-values-stat-item,
+    .about-values-skill-progress,
+    .about-values-tab-content {
+        transition: none;
+        animation: none;
+    }
+    
+    .about-values-skill-progress {
+        transition: none;
+    }
+}
