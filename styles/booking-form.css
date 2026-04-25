@@ -1,14 +1,22 @@
-/* ========== BOOKING FORM SPECIFIC STYLES ========== */
+/* ========== BOOKING FORM SPECIFIC STYLES - FULLY RESPONSIVE ========== */
+
 .booking-section {
     background: var(--pure-black);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
 }
 
 .gold-form {
     background: transparent;
-    width: 600px;
-    max-width: 90%;
+    width: 100%;
+    max-width: 550px;
+    margin: 0 auto;
     border: 2px solid var(--metallic-gold);
-    padding: 3rem 2.5rem;
+    padding: 2.5rem;
     border-radius: 2px;
     box-shadow: 0 0 30px rgba(212, 175, 55, 0.2);
     animation: formGlow 3s infinite alternate;
@@ -26,9 +34,9 @@
 .gold-form h2 {
     font-family: 'Bebas Neue', sans-serif;
     color: var(--metallic-gold);
-    font-size: 3.5rem;
+    font-size: clamp(2rem, 8vw, 3.5rem);
     letter-spacing: 4px;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
     text-align: center;
 }
 
@@ -37,37 +45,40 @@
     border: none;
     border-bottom: 1px solid var(--metallic-gold);
     width: 100%;
-    margin-bottom: 2rem;
-    padding: 1rem 0.5rem;
-    font-size: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 0.75rem 0.5rem;
+    font-size: clamp(0.9rem, 3vw, 1rem);
     color: var(--off-white);
     outline: none;
     transition: 0.2s;
+    box-sizing: border-box;
 }
 
 .input-line:focus {
-    border-bottom-width: 3px;
+    border-bottom-width: 2px;
     border-bottom-color: var(--metallic-gold);
 }
 
 .input-line::placeholder {
     color: #888;
     font-style: italic;
+    font-size: clamp(0.8rem, 3vw, 0.9rem);
 }
 
 .gold-btn {
     background: transparent;
     border: 2px solid var(--metallic-gold);
     color: var(--metallic-gold);
-    padding: 1rem 2.5rem;
+    padding: 0.875rem 2rem;
     font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.8rem;
+    font-size: clamp(1.3rem, 5vw, 1.8rem);
     letter-spacing: 2px;
     width: 100%;
     cursor: pointer;
     transition: 0.3s;
     position: relative;
     overflow: hidden;
+    margin-top: 0.5rem;
 }
 
 .gold-btn:hover {
@@ -91,4 +102,198 @@
 .gold-btn:active::after {
     width: 300px;
     height: 300px;
+}
+
+.booking-note {
+    color: #aaa;
+    text-align: center;
+    margin-top: 1.5rem;
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(0.7rem, 2.5vw, 0.85rem);
+    letter-spacing: 0.5px;
+}
+
+/* ===== RESPONSIVE BREAKPOINTS ===== */
+
+/* Small phones (up to 480px) */
+@media (max-width: 480px) {
+    .gold-form {
+        padding: 1.5rem;
+        max-width: 90%;
+        border-width: 1.5px;
+    }
+    
+    .gold-form h2 {
+        margin-bottom: 1rem;
+        letter-spacing: 2px;
+    }
+    
+    .input-line {
+        margin-bottom: 1rem;
+        padding: 0.6rem 0.4rem;
+    }
+    
+    .gold-btn {
+        padding: 0.7rem 1.5rem;
+    }
+    
+    .booking-note {
+        margin-top: 1rem;
+    }
+}
+
+/* Medium phones (481px - 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+    .gold-form {
+        padding: 2rem;
+        max-width: 85%;
+    }
+    
+    .gold-form h2 {
+        font-size: 2.5rem;
+    }
+    
+    .input-line {
+        padding: 0.7rem 0.5rem;
+    }
+}
+
+/* Tablets (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .gold-form {
+        max-width: 500px;
+        padding: 2.5rem;
+    }
+}
+
+/* Landscape mode on phones */
+@media (max-height: 500px) and (orientation: landscape) {
+    .booking-section {
+        align-items: flex-start;
+        padding-top: 1rem;
+    }
+    
+    .gold-form {
+        padding: 1rem 1.5rem;
+        max-width: 80%;
+    }
+    
+    .gold-form h2 {
+        font-size: 1.8rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .input-line {
+        margin-bottom: 0.75rem;
+        padding: 0.5rem 0.4rem;
+    }
+    
+    .gold-btn {
+        padding: 0.5rem 1rem;
+        font-size: 1.2rem;
+    }
+    
+    .booking-note {
+        margin-top: 0.75rem;
+    }
+}
+
+/* Large screens (1440px+) */
+@media (min-width: 1440px) {
+    .gold-form {
+        max-width: 600px;
+        padding: 3rem;
+    }
+    
+    .gold-form h2 {
+        font-size: 4rem;
+        margin-bottom: 2rem;
+    }
+    
+    .input-line {
+        margin-bottom: 2rem;
+        padding: 1rem 0.5rem;
+        font-size: 1.1rem;
+    }
+    
+    .gold-btn {
+        padding: 1rem 2.5rem;
+        font-size: 2rem;
+    }
+}
+
+/* 4K screens (2560px+) */
+@media (min-width: 2560px) {
+    .gold-form {
+        max-width: 800px;
+        padding: 4rem;
+    }
+    
+    .gold-form h2 {
+        font-size: 5rem;
+        letter-spacing: 6px;
+    }
+    
+    .input-line {
+        margin-bottom: 2.5rem;
+        padding: 1.2rem 0.5rem;
+        font-size: 1.3rem;
+    }
+    
+    .gold-btn {
+        padding: 1.2rem 3rem;
+        font-size: 2.2rem;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .gold-btn:hover {
+        background: transparent;
+        color: var(--metallic-gold);
+    }
+    
+    .gold-btn:active {
+        background: var(--metallic-gold);
+        color: var(--pure-black);
+        transform: scale(0.98);
+    }
+    
+    .input-line {
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .gold-form {
+        animation: none;
+    }
+    
+    .gold-btn::after {
+        transition: none;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .gold-form {
+        border: 2px solid var(--metallic-gold);
+        box-shadow: none;
+    }
+    
+    .input-line {
+        border-bottom: 2px solid var(--metallic-gold);
+    }
+    
+    .gold-btn {
+        border: 2px solid var(--metallic-gold);
+    }
+}
+
+/* Fix for iOS Safari input zoom */
+@supports (-webkit-touch-callout: none) {
+    .input-line {
+        font-size: 16px;
+    }
 }

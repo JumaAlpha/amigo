@@ -317,22 +317,37 @@
 
 @media (max-width: 768px) {
     .about-split {
-        padding: 1rem;
-        gap: 1rem;
+        padding: 0.75rem;
+        gap: 0.75rem;
+        max-height: 90vh;
     }
     
     .bw-photo {
-        flex: 0 0 220px;
+        flex: 0 0 auto;
+        min-height: 200px;
+        max-height: 250px;
+        width: 100%;
+        border-radius: 12px;
+    }
+    
+    .bw-photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center 30%;
     }
     
     .bio-gear {
+        flex: 1;
         padding: 1rem;
+        min-height: 0;
     }
     
     .typing-name {
-        margin-bottom: 1rem;
-        white-space: nowrap;
-        min-width: auto;
+        font-size: 1.8rem;
+        margin-bottom: 0.75rem;
+        white-space: normal;
+        word-break: keep-all;
     }
     
     .tab-btn {
@@ -360,12 +375,19 @@
 
 @media (max-width: 480px) {
     .about-split {
-        padding: 0.75rem;
-        gap: 0.75rem;
+        padding: 0.5rem;
+        gap: 0.5rem;
+        max-height: 92vh;
     }
     
     .bw-photo {
-        flex: 0 0 180px;
+        min-height: 160px;
+        max-height: 200px;
+        border-radius: 10px;
+    }
+    
+    .bw-photo img {
+        object-position: center 25%;
     }
     
     .bio-gear {
@@ -373,12 +395,14 @@
     }
     
     .typing-name {
-        font-size: clamp(1.5rem, 6vw, 2rem);
-        margin-bottom: 0.75rem;
+        font-size: 1.5rem;
+        white-space: normal;
+        word-break: keep-all;
+        min-width: auto;
     }
     
     .tab-btn {
-        font-size: 0.75rem;
+        font-size: 0.7rem;
         padding: 0.25rem 0.4rem;
     }
     
@@ -391,8 +415,12 @@
     }
     
     .tab-text {
-        font-size: 0.8rem;
-        line-height: 1.5;
+        font-size: 0.75rem;
+        line-height: 1.45;
+    }
+    
+    .gear-list li {
+        font-size: 0.7rem;
     }
 }
 
@@ -400,21 +428,30 @@
 @media (max-height: 600px) and (orientation: landscape) {
     .about-split {
         flex-direction: row;
-        padding: 0.75rem;
-        gap: 0.75rem;
+        padding: 0.5rem;
+        gap: 0.5rem;
+        max-height: 88vh;
     }
     
     .bw-photo {
         flex: 0 0 35%;
+        min-height: 140px;
+        max-height: 180px;
+    }
+    
+    .bw-photo img {
+        object-position: center;
     }
     
     .bio-gear {
-        padding: 0.75rem;
+        flex: 1;
+        padding: 0.5rem;
     }
     
     .typing-name {
-        font-size: clamp(1.2rem, 3vw, 1.8rem);
-        margin-bottom: 0.5rem;
+        font-size: 1.2rem;
+        margin-bottom: 0.25rem;
+        white-space: nowrap;
     }
     
     .tab-buttons {

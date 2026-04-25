@@ -196,10 +196,14 @@
 @media (max-width: 480px) {
     .values-container {
         padding: 0.75rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: 100%;
     }
     
     .values-header {
-        margin-bottom: 1rem;
+        margin-bottom: 0.75rem;
     }
     
     .values-header h2 {
@@ -212,32 +216,111 @@
     }
     
     .values-grid {
+        gap: 0.6rem;
+        margin-bottom: 0.6rem;
+    }
+    
+    .values-card {
+        padding: 0.7rem;
+        border-radius: 10px;
+    }
+    
+    .values-card h3 {
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+        padding-left: 0.5rem;
+        border-left-width: 2px;
+    }
+    
+    .values-card p {
+        font-size: 0.7rem;
+        line-height: 1.4;
+    }
+    
+    .stat-number {
+        font-size: 1rem;
+    }
+    
+    .stat-label {
+        font-size: 0.5rem;
+    }
+    
+    .values-stats {
+        gap: 0.4rem;
+    }
+    
+    .values-stats .stat {
+        min-width: 50px;
+    }
+    
+    .values-sliders {
+        gap: 0.7rem;
+    }
+    
+    .value-header {
+        margin-bottom: 0.3rem;
+    }
+    
+    .value-header strong {
+        font-size: 0.75rem;
+    }
+    
+    .value-percent {
+        font-size: 0.75rem;
+    }
+    
+    .value-slider-track {
+        height: 2px;
+    }
+    
+    .values-philosophy {
+        margin-top: 0;
+    }
+}
+
+/* Medium phones + Tablets (481px - 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+    .values-container {
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-height: 100%;
+    }
+    
+    .values-header {
+        margin-bottom: 1rem;
+    }
+    
+    .values-header h2 {
+        font-size: 1.8rem;
+    }
+    
+    .values-header p {
+        font-size: 0.8rem;
+    }
+    
+    .values-grid {
         gap: 0.75rem;
         margin-bottom: 0.75rem;
     }
     
     .values-card {
         padding: 0.875rem;
-        border-radius: 10px;
     }
     
     .values-card h3 {
-        font-size: 1rem;
+        font-size: 1.1rem;
         margin-bottom: 0.6rem;
-        padding-left: 0.5rem;
     }
     
     .values-card p {
-        font-size: 0.7rem;
+        font-size: 0.75rem;
         line-height: 1.45;
     }
     
-    .values-stats {
-        gap: 0.5rem;
-    }
-    
     .stat-number {
-        font-size: 1.1rem;
+        font-size: 1.2rem;
     }
     
     .stat-label {
@@ -255,52 +338,13 @@
     .value-percent {
         font-size: 0.8rem;
     }
-    
-    .value-slider-track {
-        height: 2px;
-    }
-}
-
-/* Medium phones + Tablets (481px - 768px) */
-@media (min-width: 481px) and (max-width: 768px) {
-    .values-container {
-        padding: 1rem;
-    }
-    
-    .values-header h2 {
-        font-size: 2rem;
-    }
-    
-    .values-header p {
-        font-size: 0.85rem;
-    }
-    
-    .values-grid {
-        gap: 1rem;
-    }
-    
-    .values-card {
-        padding: 1rem;
-    }
-    
-    .values-card h3 {
-        font-size: 1.2rem;
-        margin-bottom: 0.75rem;
-    }
-    
-    .stat-number {
-        font-size: 1.4rem;
-    }
-    
-    .value-header strong {
-        font-size: 0.9rem;
-    }
 }
 
 /* Landscape mode on phones */
 @media (max-height: 500px) and (orientation: landscape) {
     .values-container {
         padding: 0.5rem;
+        justify-content: flex-start;
     }
     
     .values-header {
@@ -313,7 +357,7 @@
     }
     
     .values-header p {
-        font-size: 0.7rem;
+        font-size: 0.65rem;
     }
     
     .values-grid {
@@ -352,11 +396,11 @@
     }
     
     .value-header strong {
-        font-size: 0.75rem;
+        font-size: 0.7rem;
     }
     
     .value-percent {
-        font-size: 0.75rem;
+        font-size: 0.7rem;
     }
     
     .value-slider-track {
@@ -403,6 +447,15 @@
     
     .values-card {
         padding: 1.75rem;
+    }
+}
+
+/* Ensure proper centering on taller screens */
+@media (min-height: 800px) {
+    .values-container {
+        justify-content: center;
+        display: flex;
+        flex-direction: column;
     }
 }
 
