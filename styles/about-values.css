@@ -1,348 +1,447 @@
-/* ========== ABOUT VALUES SECTION - INTEGRATED STYLES ========== */
-.about-values-section {
-    background: var(--pure-black);
-    position: relative;
-    overflow-y: auto;
-    padding: 2rem;
-}
+/* ========== VALUES SECTION - FULLY RESPONSIVE ========== */
 
-.about-values-container {
-    max-width: 1400px;
-    margin: 0 auto;
-    width: 100%;
-}
-
-.about-values-wrapper {
-    width: 100%;
-}
-
-/* Header Styles */
-.about-values-header {
-    text-align: center;
-    margin-bottom: 2rem;
-}
-
-.about-values-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(2rem, 5vw, 3.5rem);
-    color: var(--off-white);
-    letter-spacing: 3px;
-    margin-bottom: 1rem;
-}
-
-.about-values-title .gradient-text {
-    background: linear-gradient(135deg, var(--metallic-gold) 0%, #e8c860 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    font-family: 'Caveat', cursive;
-}
-
-.about-values-subtitle {
-    font-family: 'Inter', sans-serif;
-    font-size: clamp(0.9rem, 2vw, 1.1rem);
-    color: #aaa;
-    max-width: 600px;
-    margin: 0 auto;
-    line-height: 1.6;
-}
-
-/* Card Styles */
-.about-values-card {
-    background: rgba(18, 18, 18, 0.8);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(212, 175, 55, 0.15);
-    border-radius: 20px;
-    padding: 1.5rem;
-    transition: all 0.3s ease;
-}
-
-.about-values-card:hover {
-    border-color: rgba(212, 175, 55, 0.3);
-    box-shadow: 0 0 20px rgba(212, 175, 55, 0.05);
-}
-
-.about-values-card-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(1.3rem, 3vw, 1.8rem);
-    color: var(--metallic-gold);
-    margin-bottom: 1rem;
+.values-section {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: var(--pure-black);
 }
 
-.about-values-card-title i {
-    font-size: 1.3rem;
-    background: rgba(212, 175, 55, 0.15);
-    padding: 0.5rem;
-    border-radius: 12px;
+.values-container {
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 1.5rem;
+    box-sizing: border-box;
+    height: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
-.about-values-card-text {
-    color: #ccc;
-    font-family: 'Inter', sans-serif;
-    font-size: clamp(0.85rem, 2vw, 0.95rem);
-    line-height: 1.7;
+/* Custom scrollbar */
+.values-container::-webkit-scrollbar {
+    width: 3px;
+}
+
+.values-container::-webkit-scrollbar-track {
+    background: #2c2c2c;
+}
+
+.values-container::-webkit-scrollbar-thumb {
+    background: var(--metallic-gold);
+    border-radius: 3px;
+}
+
+/* Header */
+.values-header {
+    text-align: center;
     margin-bottom: 1.5rem;
 }
 
-.about-values-card-text p {
-    margin-bottom: 0.75rem;
-}
-
-/* Stats Grid */
-.about-values-stats-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0.75rem;
-    margin-top: 1rem;
-}
-
-.about-values-stat-item {
-    text-align: center;
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 12px;
-    padding: 0.75rem 0.5rem;
-    transition: all 0.3s ease;
-    border: 1px solid rgba(212, 175, 55, 0.1);
-}
-
-.about-values-stat-item:hover {
-    transform: translateY(-3px);
-    border-color: rgba(212, 175, 55, 0.3);
-}
-
-.about-values-stat-number {
+.values-header h2 {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(1.2rem, 3vw, 1.8rem);
+    font-size: clamp(1.6rem, 6vw, 3.5rem);
     color: var(--metallic-gold);
-    font-weight: 500;
+    letter-spacing: 2px;
+    margin-bottom: 0.5rem;
+    font-weight: 400;
 }
 
-.about-values-stat-label {
+.values-header p {
     font-family: 'Inter', sans-serif;
-    font-size: clamp(0.7rem, 2vw, 0.8rem);
-    color: #888;
-    text-transform: uppercase;
+    font-size: clamp(0.8rem, 3vw, 1rem);
+    color: #aaa;
     letter-spacing: 1px;
 }
 
-/* Mobile Tabs */
-.about-values-mobile-tabs {
-    display: none;
-}
-
-/* Desktop Layout */
-.about-values-desktop {
+/* Grid Layout */
+.values-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 2rem;
+    gap: 1rem;
+    margin-bottom: 1rem;
 }
 
-/* Skills Section */
-.about-values-skills {
+/* Cards */
+.values-card {
+    background: #0a0a0a;
+    border: 1px solid #2c2c2c;
+    border-radius: 12px;
+    padding: 1.25rem;
+    transition: border-color 0.2s ease;
+}
+
+.values-card:hover {
+    border-color: rgba(212, 175, 55, 0.3);
+}
+
+.values-card h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(1.1rem, 4vw, 1.6rem);
+    color: var(--metallic-gold);
+    letter-spacing: 1px;
+    margin-bottom: 1rem;
+    font-weight: 400;
+    border-left: 2px solid var(--metallic-gold);
+    padding-left: 0.6rem;
+}
+
+.values-card p {
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(0.8rem, 3vw, 0.95rem);
+    color: #ccc;
+    line-height: 1.55;
+}
+
+/* Stats */
+.values-stats {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.values-stats .stat {
+    text-align: center;
+    flex: 1;
+    min-width: 60px;
+}
+
+.stat-number {
+    display: block;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(1.3rem, 5vw, 2.2rem);
+    color: var(--metallic-gold);
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+.stat-label {
+    display: block;
+    font-family: 'Inter', sans-serif;
+    font-size: clamp(0.6rem, 2.5vw, 0.7rem);
+    color: #888;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-top: 0.2rem;
+}
+
+/* ===== SLIDERS ===== */
+.values-sliders {
     display: flex;
     flex-direction: column;
     gap: 1.25rem;
 }
 
-.about-values-skill-item {
+.value-slider-item {
     width: 100%;
 }
 
-.about-values-skill-header {
+.value-header {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
     margin-bottom: 0.5rem;
 }
 
-.about-values-skill-header h4 {
+.value-header strong {
     font-family: 'Inter', sans-serif;
-    font-size: clamp(0.85rem, 2vw, 1rem);
-    font-weight: 600;
+    font-size: clamp(0.85rem, 3.5vw, 1rem);
     color: var(--off-white);
+    font-weight: 600;
+    letter-spacing: 0.3px;
 }
 
-.about-values-skill-header span {
+.value-percent {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(0.9rem, 2vw, 1.1rem);
+    font-size: clamp(0.85rem, 3.5vw, 1rem);
     color: var(--metallic-gold);
-}
-
-.about-values-skill-desc {
-    font-family: 'Inter', sans-serif;
-    font-size: 0.75rem;
-    color: #888;
-    margin-bottom: 0.5rem;
-}
-
-.about-values-skill-bar {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    height: 4px;
-    overflow: hidden;
-}
-
-.about-values-skill-progress {
-    background: linear-gradient(90deg, var(--metallic-gold), #e8c860);
-    border-radius: 10px;
-    height: 100%;
-    width: 0%;
-    transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* ===== TAB STYLES FOR MOBILE ===== */
-.about-values-tab-headers {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1.5rem;
-    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
-    padding-bottom: 0.5rem;
-}
-
-.about-values-tab-btn {
-    flex: 1;
-    background: transparent;
-    border: none;
-    padding: 0.75rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.4rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border-radius: 10px;
-    color: #888;
-}
-
-.about-values-tab-btn i {
-    font-size: 1.1rem;
-}
-
-.about-values-tab-btn span {
-    font-family: 'Inter', sans-serif;
-    font-size: 0.75rem;
     font-weight: 500;
 }
 
-.about-values-tab-btn.active {
-    color: var(--metallic-gold);
-    background: rgba(212, 175, 55, 0.1);
+/* Slider Track */
+.value-slider-track {
+    width: 100%;
+    height: 3px;
+    background: #2c2c2c;
+    border-radius: 3px;
+    overflow: hidden;
 }
 
-.about-values-tab-content {
-    display: none;
-    animation: valuesFadeIn 0.4s ease;
+/* Slider Fill */
+.value-slider-fill {
+    width: 0%;
+    height: 100%;
+    background: var(--metallic-gold);
+    border-radius: 3px;
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 2px;
 }
 
-.about-values-tab-content.active {
-    display: block;
+/* Full width card */
+.values-card.full-width {
+    grid-column: span 2;
 }
 
-@keyframes valuesFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
+.values-philosophy {
+    margin-top: 0;
+}
+
+/* ===== MOBILE FIRST RESPONSIVE ===== */
+
+/* Small phones (up to 480px) */
+@media (max-width: 480px) {
+    .values-container {
+        padding: 0.75rem;
     }
-    to {
-        opacity: 1;
-        transform: translateY(0);
+    
+    .values-header {
+        margin-bottom: 1rem;
+    }
+    
+    .values-header h2 {
+        font-size: 1.5rem;
+        letter-spacing: 1px;
+    }
+    
+    .values-header p {
+        font-size: 0.7rem;
+    }
+    
+    .values-grid {
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .values-card {
+        padding: 0.875rem;
+        border-radius: 10px;
+    }
+    
+    .values-card h3 {
+        font-size: 1rem;
+        margin-bottom: 0.6rem;
+        padding-left: 0.5rem;
+    }
+    
+    .values-card p {
+        font-size: 0.7rem;
+        line-height: 1.45;
+    }
+    
+    .values-stats {
+        gap: 0.5rem;
+    }
+    
+    .stat-number {
+        font-size: 1.1rem;
+    }
+    
+    .stat-label {
+        font-size: 0.55rem;
+    }
+    
+    .values-sliders {
+        gap: 0.875rem;
+    }
+    
+    .value-header strong {
+        font-size: 0.8rem;
+    }
+    
+    .value-percent {
+        font-size: 0.8rem;
+    }
+    
+    .value-slider-track {
+        height: 2px;
     }
 }
 
-/* ===== RESPONSIVE BREAKPOINTS ===== */
-@media (max-width: 1024px) {
-    .about-values-section {
+/* Medium phones + Tablets (481px - 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+    .values-container {
+        padding: 1rem;
+    }
+    
+    .values-header h2 {
+        font-size: 2rem;
+    }
+    
+    .values-header p {
+        font-size: 0.85rem;
+    }
+    
+    .values-grid {
+        gap: 1rem;
+    }
+    
+    .values-card {
+        padding: 1rem;
+    }
+    
+    .values-card h3 {
+        font-size: 1.2rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .stat-number {
+        font-size: 1.4rem;
+    }
+    
+    .value-header strong {
+        font-size: 0.9rem;
+    }
+}
+
+/* Landscape mode on phones */
+@media (max-height: 500px) and (orientation: landscape) {
+    .values-container {
+        padding: 0.5rem;
+    }
+    
+    .values-header {
+        margin-bottom: 0.5rem;
+    }
+    
+    .values-header h2 {
+        font-size: 1.3rem;
+        margin-bottom: 0.2rem;
+    }
+    
+    .values-header p {
+        font-size: 0.7rem;
+    }
+    
+    .values-grid {
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .values-card {
+        padding: 0.6rem;
+    }
+    
+    .values-card h3 {
+        font-size: 0.9rem;
+        margin-bottom: 0.4rem;
+    }
+    
+    .values-card p {
+        font-size: 0.65rem;
+        line-height: 1.3;
+    }
+    
+    .values-stats {
+        gap: 0.4rem;
+    }
+    
+    .stat-number {
+        font-size: 0.9rem;
+    }
+    
+    .stat-label {
+        font-size: 0.5rem;
+    }
+    
+    .values-sliders {
+        gap: 0.6rem;
+    }
+    
+    .value-header strong {
+        font-size: 0.75rem;
+    }
+    
+    .value-percent {
+        font-size: 0.75rem;
+    }
+    
+    .value-slider-track {
+        height: 2px;
+    }
+}
+
+/* Tablets (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .values-container {
         padding: 1.5rem;
     }
     
-    .about-values-desktop {
+    .values-grid {
+        gap: 1.25rem;
+    }
+    
+    .values-card {
+        padding: 1.25rem;
+    }
+}
+
+/* Desktops (1025px - 1440px) */
+@media (min-width: 1025px) and (max-width: 1440px) {
+    .values-container {
+        padding: 2rem;
+    }
+    
+    .values-grid {
         gap: 1.5rem;
     }
 }
 
-@media (max-width: 768px) {
-    .about-values-mobile-tabs {
-        display: block;
+/* Large screens (1441px+) */
+@media (min-width: 1441px) {
+    .values-container {
+        max-width: 1400px;
+        padding: 5rem;
     }
     
-    .about-values-desktop {
-        display: none;
+    .values-grid {
+        gap: 2rem;
     }
     
-    .about-values-stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 0.5rem;
-    }
-    
-    .about-values-card {
-        padding: 1.25rem;
-    }
-    
-    .about-values-header {
-        margin-bottom: 1.5rem;
+    .values-card {
+        padding: 1.75rem;
     }
 }
 
-@media (max-width: 480px) {
-    .about-values-section {
-        padding: 1rem;
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .values-card {
+        cursor: default;
     }
     
-    .about-values-stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-    
-    .about-values-stat-item {
-        padding: 0.5rem;
-    }
-    
-    .about-values-stat-number {
-        font-size: 1.1rem;
-    }
-    
-    .about-values-stat-label {
-        font-size: 0.65rem;
-    }
-    
-    .about-values-card-title i {
-        font-size: 1rem;
-        padding: 0.4rem;
-    }
-    
-    .about-values-tab-btn {
-        padding: 0.5rem;
-    }
-}
-
-/* Landscape mode */
-@media (max-height: 600px) and (orientation: landscape) {
-    .about-values-section {
-        padding: 1rem;
-    }
-    
-    .about-values-header {
-        margin-bottom: 1rem;
-    }
-    
-    .about-values-stats-grid {
-        grid-template-columns: repeat(4, 1fr);
+    .values-card:active {
+        border-color: rgba(212, 175, 55, 0.3);
     }
 }
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-    .about-values-card,
-    .about-values-stat-item,
-    .about-values-skill-progress,
-    .about-values-tab-content {
+    .value-slider-fill {
         transition: none;
-        animation: none;
     }
     
-    .about-values-skill-progress {
-        transition: none;
+    .values-container {
+        scroll-behavior: auto;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .values-card {
+        border: 1px solid var(--metallic-gold);
+    }
+    
+    .value-slider-track {
+        background: #444;
+    }
+}
+
+/* Fix for iOS Safari */
+@supports (-webkit-touch-callout: none) {
+    .values-container {
+        -webkit-overflow-scrolling: touch;
     }
 }

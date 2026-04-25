@@ -50,7 +50,7 @@
 .am-bts-swiper .swiper-wrapper {
     display: flex;
     align-items: stretch;
-    height: 100%;
+    height: 90%;
 }
 
 /* BTS Swiper Slides */
@@ -108,7 +108,7 @@
 
 /* Ensure exactly 3 rows by giving each item equal flex growth */
 .am-bts-slide-content {
-    height: 100%;
+    height: 88%;
     display: flex;
     flex-direction: column;
 }

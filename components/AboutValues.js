@@ -2,208 +2,93 @@ const AboutValues = {
     render() {
         return `
             <section class="section values-section" id="values-section">
-                <!-- Content -->
-                <div class="about-values-container">
-                    <div class="about-values-wrapper">
-                        <!-- Header Section -->
-                        <div class="about-values-header">
-                            <h2 class="about-values-title">
-                                Our Story &amp;
-                                <span class="gradient-text">Values</span>
-                            </h2>
-                            <p class="about-values-subtitle">
-                                Founded in 2016, we lead visual storytelling in Tanzania with passion and innovation.
-                            </p>
-                        </div>
+                <div class="values-container">
+                    <div class="values-header">
+                        <h2>Amijoji Company</h2>
+                        <p>East Africa's premier visual storytelling collective</p>
+                    </div>
 
-                        <!-- Mobile Tabs -->
-                        <div class="about-values-mobile-tabs">
-                            <!-- Tab Headers -->
-                            <div class="about-values-tab-headers">
-                                <button class="about-values-tab-btn active" data-tab="story">
-                                    <i class="fas fa-history"></i>
-                                    <span>Our Story</span>
-                                </button>
-                                <button class="about-values-tab-btn" data-tab="values">
-                                    <i class="fas fa-star"></i>
-                                    <span>Our Values</span>
-                                </button>
+                    <div class="values-grid">
+                        <!-- Left Column - Mission & Impact -->
+                        <div class="values-left">
+                            <div class="values-card">
+                                <h3>Mission</h3>
+                                <p>To elevate African gospel music through uncompromising visual excellence, bridging local talent with global production standards.</p>
                             </div>
-
-                            <!-- Story Tab Content -->
-                            <div class="about-values-tab-content active" id="story-tab-mobile">
-                                <div class="about-values-card">
-                                    <h3 class="about-values-card-title">
-                                        <i class="fas fa-rocket"></i>
-                                        Our Journey
-                                    </h3>
-                                    <div class="about-values-card-text">
-                                        <p>Founded by Johnson Jimmy Sangu, we set new standards in production services through visual storytelling excellence.</p>
-                                        <p>Since 2016, we've built a strong reputation as Tanzania's leading production company.</p>
+                            
+                            <div class="values-card">
+                                <h3>Impact</h3>
+                                <div class="values-stats">
+                                    <div class="stat">
+                                        <span class="stat-number">50+</span>
+                                        <span class="stat-label">Artists</span>
                                     </div>
-
-                                    <!-- Stats Grid -->
-                                    <div class="about-values-stats-grid">
-                                        <div class="about-values-stat-item">
-                                            <div class="about-values-stat-number">150+</div>
-                                            <div class="about-values-stat-label">Projects</div>
-                                        </div>
-                                        <div class="about-values-stat-item">
-                                            <div class="about-values-stat-number">50+</div>
-                                            <div class="about-values-stat-label">Clients</div>
-                                        </div>
-                                        <div class="about-values-stat-item">
-                                            <div class="about-values-stat-number">7+</div>
-                                            <div class="about-values-stat-label">Years</div>
-                                        </div>
-                                        <div class="about-values-stat-item">
-                                            <div class="about-values-stat-number">12</div>
-                                            <div class="about-values-stat-label">Awards</div>
-                                        </div>
+                                    <div class="stat">
+                                        <span class="stat-number">8</span>
+                                        <span class="stat-label">Countries</span>
                                     </div>
-                                </div>
-                            </div>
-
-                            <!-- Values Tab Content -->
-                            <div class="about-values-tab-content" id="values-tab-mobile">
-                                <div class="about-values-card">
-                                    <h3 class="about-values-card-title">
-                                        <i class="fas fa-gem"></i>
-                                        Our Values
-                                    </h3>
-                                    <div class="about-values-skills">
-                                        <div class="about-values-skill-item">
-                                            <div class="about-values-skill-header">
-                                                <h4>Creativity</h4>
-                                                <span>95%</span>
-                                            </div>
-                                            <p class="about-values-skill-desc">Pushing storytelling boundaries</p>
-                                            <div class="about-values-skill-bar">
-                                                <div class="about-values-skill-progress" data-width="95"></div>
-                                            </div>
-                                        </div>
-                                        <div class="about-values-skill-item">
-                                            <div class="about-values-skill-header">
-                                                <h4>Excellence</h4>
-                                                <span>90%</span>
-                                            </div>
-                                            <p class="about-values-skill-desc">Highest quality standards</p>
-                                            <div class="about-values-skill-bar">
-                                                <div class="about-values-skill-progress" data-width="90"></div>
-                                            </div>
-                                        </div>
-                                        <div class="about-values-skill-item">
-                                            <div class="about-values-skill-header">
-                                                <h4>Collaboration</h4>
-                                                <span>92%</span>
-                                            </div>
-                                            <p class="about-values-skill-desc">Teamwork for best results</p>
-                                            <div class="about-values-skill-bar">
-                                                <div class="about-values-skill-progress" data-width="92"></div>
-                                            </div>
-                                        </div>
-                                        <div class="about-values-skill-item">
-                                            <div class="about-values-skill-header">
-                                                <h4>Innovation</h4>
-                                                <span>88%</span>
-                                            </div>
-                                            <p class="about-values-skill-desc">Embracing new technologies</p>
-                                            <div class="about-values-skill-bar">
-                                                <div class="about-values-skill-progress" data-width="88"></div>
-                                            </div>
-                                        </div>
+                                    <div class="stat">
+                                        <span class="stat-number">200+</span>
+                                        <span class="stat-label">Productions</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Desktop Layout (2 columns) -->
-                        <div class="about-values-desktop">
-                            <!-- Story Section -->
-                            <div class="about-values-story">
-                                <div class="about-values-card">
-                                    <h3 class="about-values-card-title">
-                                        <i class="fas fa-rocket"></i>
-                                        Our Journey
-                                    </h3>
-                                    <div class="about-values-card-text">
-                                        <p>Founded by Johnson Jimmy Sangu, we've set new standards in production services through exceptional visual storytelling.</p>
-                                        <p>Since 2016, we've grown into Tanzania's premier production company, known for quality and innovation.</p>
-                                        <p>We continuously evolve with cutting-edge equipment and emerging technologies.</p>
-                                    </div>
-
-                                    <div class="about-values-stats-grid">
-                                        <div class="about-values-stat-item">
-                                            <div class="about-values-stat-number">150+</div>
-                                            <div class="about-values-stat-label">Projects</div>
+                        <!-- Right Column - Core Values with Sliders -->
+                        <div class="values-right">
+                            <div class="values-card">
+                                <h3>Core Values</h3>
+                                <div class="values-sliders">
+                                    <div class="value-slider-item">
+                                        <div class="value-header">
+                                            <strong>Authenticity</strong>
+                                            <span class="value-percent">98%</span>
                                         </div>
-                                        <div class="about-values-stat-item">
-                                            <div class="about-values-stat-number">50+</div>
-                                            <div class="about-values-stat-label">Clients</div>
-                                        </div>
-                                        <div class="about-values-stat-item">
-                                            <div class="about-values-stat-number">7+</div>
-                                            <div class="about-values-stat-label">Years</div>
-                                        </div>
-                                        <div class="about-values-stat-item">
-                                            <div class="about-values-stat-number">12</div>
-                                            <div class="about-values-stat-label">Awards</div>
+                                        <div class="value-slider-track">
+                                            <div class="value-slider-fill" style="width: 0%;" data-target="98"></div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-
-                            <!-- Values Section -->
-                            <div class="about-values-values">
-                                <div class="about-values-card">
-                                    <h3 class="about-values-card-title">
-                                        <i class="fas fa-gem"></i>
-                                        Our Values
-                                    </h3>
-                                    <div class="about-values-skills">
-                                        <div class="about-values-skill-item">
-                                            <div class="about-values-skill-header">
-                                                <h4>Creativity</h4>
-                                                <span>95%</span>
-                                            </div>
-                                            <p class="about-values-skill-desc">Pushing boundaries in visual storytelling.</p>
-                                            <div class="about-values-skill-bar">
-                                                <div class="about-values-skill-progress" data-width="95"></div>
-                                            </div>
+                                    
+                                    <div class="value-slider-item">
+                                        <div class="value-header">
+                                            <strong>Excellence</strong>
+                                            <span class="value-percent">96%</span>
                                         </div>
-                                        <div class="about-values-skill-item">
-                                            <div class="about-values-skill-header">
-                                                <h4>Excellence</h4>
-                                                <span>90%</span>
-                                            </div>
-                                            <p class="about-values-skill-desc">Maintaining highest quality standards.</p>
-                                            <div class="about-values-skill-bar">
-                                                <div class="about-values-skill-progress" data-width="90"></div>
-                                            </div>
+                                        <div class="value-slider-track">
+                                            <div class="value-slider-fill" style="width: 0%;" data-target="96"></div>
                                         </div>
-                                        <div class="about-values-skill-item">
-                                            <div class="about-values-skill-header">
-                                                <h4>Collaboration</h4>
-                                                <span>92%</span>
-                                            </div>
-                                            <p class="about-values-skill-desc">Achieving excellence through teamwork.</p>
-                                            <div class="about-values-skill-bar">
-                                                <div class="about-values-skill-progress" data-width="92"></div>
-                                            </div>
+                                    </div>
+                                    
+                                    <div class="value-slider-item">
+                                        <div class="value-header">
+                                            <strong>Collaboration</strong>
+                                            <span class="value-percent">94%</span>
                                         </div>
-                                        <div class="about-values-skill-item">
-                                            <div class="about-values-skill-header">
-                                                <h4>Innovation</h4>
-                                                <span>88%</span>
-                                            </div>
-                                            <p class="about-values-skill-desc">Embracing latest technologies.</p>
-                                            <div class="about-values-skill-bar">
-                                                <div class="about-values-skill-progress" data-width="88"></div>
-                                            </div>
+                                        <div class="value-slider-track">
+                                            <div class="value-slider-fill" style="width: 0%;" data-target="94"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="value-slider-item">
+                                        <div class="value-header">
+                                            <strong>Innovation</strong>
+                                            <span class="value-percent">92%</span>
+                                        </div>
+                                        <div class="value-slider-track">
+                                            <div class="value-slider-fill" style="width: 0%;" data-target="92"></div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Section - Philosophy -->
+                    <div class="values-philosophy">
+                        <div class="values-card full-width">
+                            <h3>Philosophy</h3>
+                            <p>We don't just film. We capture moments that transcend screens — connecting audiences to something greater. Every frame is intentional. Every edit serves the message.</p>
                         </div>
                     </div>
                 </div>
@@ -212,53 +97,45 @@ const AboutValues = {
     },
 
     init() {
-        // Tab functionality for mobile
-        const tabBtns = document.querySelectorAll('.about-values-tab-btn');
-        const tabContents = document.querySelectorAll('.about-values-tab-content');
-
-        tabBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const tabId = btn.dataset.tab;
-                
-                // Update active button
-                tabBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                
-                // Update active content
-                tabContents.forEach(content => {
-                    content.classList.remove('active');
-                });
-                
-                const activeContent = document.getElementById(`${tabId}-tab-mobile`);
-                if (activeContent) {
-                    activeContent.classList.add('active');
-                }
-            });
-        });
-
-        // Animate skill bars when section becomes visible
+        // Animate sliders when section becomes visible
         const section = document.getElementById('values-section');
         if (section) {
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        this.animateSkillBars();
+                        this.animateSliders();
                         observer.unobserve(entry.target);
                     }
                 });
-            }, { threshold: 0.3 });
+            }, { threshold: 0.15, rootMargin: '50px' });
             
             observer.observe(section);
         }
+        
+        // Also trigger on window resize for mobile orientation changes
+        window.addEventListener('resize', () => {
+            if (this.isElementInViewport(section)) {
+                this.animateSliders();
+            }
+        });
+    },
+    
+    isElementInViewport(el) {
+        if (!el) return false;
+        const rect = el.getBoundingClientRect();
+        return rect.top < window.innerHeight - 100 && rect.bottom > 100;
     },
 
-    animateSkillBars() {
-        const progressBars = document.querySelectorAll('.about-values-skill-progress');
-        progressBars.forEach(bar => {
-            const width = bar.dataset.width;
+    animateSliders() {
+        const sliders = document.querySelectorAll('.value-slider-fill');
+        sliders.forEach(slider => {
+            const target = parseInt(slider.dataset.target);
+            // Reset width first (in case of re-animation)
+            slider.style.width = '0%';
+            // Animate the width after a tiny delay
             setTimeout(() => {
-                bar.style.width = width + '%';
-            }, 100);
+                slider.style.width = target + '%';
+            }, 50);
         });
     }
 };
