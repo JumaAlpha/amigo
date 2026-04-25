@@ -22,7 +22,7 @@ const Sidebar = {
                 <!-- Social Drawer - Opens to Right with > symbol -->
                 <div class="social-drawer-container">
                     <div class="social-toggle" id="socialToggle">
-                        <i class="fas fa-share-alt"></i>
+                        <i class="fas fa-ellipsis-h"></i>
                         <span class="arrow-symbol">></span>
                     </div>
                     
