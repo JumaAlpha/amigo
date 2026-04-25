@@ -2,6 +2,19 @@ const BTSSlider = {
     // Cache storage key
     CACHE_KEY: 'bts_videos_cache',
     
+    // Track active video instances for cleanup
+    activeVideos: new Map(),
+    thumbnailCache: new Map(),
+    
+    // Configuration for performance
+    config: {
+        maxConcurrentLoads: 3,
+        thumbnailGenerationDelay: 500,
+        videoUnloadDelay: 10000,
+        preloadAheadDistance: 800,
+        lowPowerMode: false
+    },
+    
     render() {
         return `
             <section class="section bts-section">
@@ -25,78 +38,28 @@ const BTSSlider = {
     },
     
     getVideoPath(index) {
-        // Videos are stored in assets/bts and named alphabetically (video1.mp4, video2.mp4, etc.)
         const videoNumber = String(index + 1).padStart(2, '0');
         return `assets/bts/video${videoNumber}.mp4`;
     },
     
     renderSlides() {
-        // Define columns/slides with video references (no descriptions)
         const slides = [
-            {
-                width: 'normal',
-                videos: [
-                    { height: '60' },
-                    { height: '40' }
-                ]
-            },
-            {
-                width: 'wide',
-                videos: [
-                    { height: '70' },
-                    { height: '30' }
-                ]
-            },
-            {
-                width: 'normal',
-                videos: [
-                    { height: '55' },
-                    { height: '45' }
-                ]
-            },
-            {
-                width: 'narrow',
-                videos: [
-                    { height: '65' },
-                    { height: '35' }
-                ]
-            },
-            {
-                width: 'normal',
-                videos: [
-                    { height: '50' },
-                    { height: '50' }
-                ]
-            },
-            {
-                width: 'wide',
-                videos: [
-                    { height: '75' },
-                    { height: '25' }
-                ]
-            },
-            {
-                width: 'normal',
-                videos: [
-                    { height: '40' },
-                    { height: '60' }
-                ]
-            },
-            {
-                width: 'narrow',
-                videos: [
-                    { height: '55' },
-                    { height: '45' }
-                ]
-            }
+            { width: 'normal', videos: [{ height: '60' }, { height: '40' }] },
+            { width: 'wide', videos: [{ height: '70' }, { height: '30' }] },
+            { width: 'normal', videos: [{ height: '55' }, { height: '45' }] },
+            { width: 'narrow', videos: [{ height: '65' }, { height: '35' }] },
+            { width: 'normal', videos: [{ height: '50' }, { height: '50' }] },
+            { width: 'wide', videos: [{ height: '75' }, { height: '25' }] },
+            { width: 'normal', videos: [{ height: '40' }, { height: '60' }] },
+            { width: 'narrow', videos: [{ height: '55' }, { height: '45' }] }
         ];
         
         let videoCounter = 0;
         
-        return slides.map((slide, index) => `
+        return slides.map((slide) => `
             <div class="swiper-slide">
                 <div class="bts-slide-content ${slide.width}">
-                    ${slide.videos.map((video, imgIndex) => {
+                    ${slide.videos.map(() => {
                         const videoPath = this.getVideoPath(videoCounter);
                         const videoId = `video_${videoCounter}`;
                         videoCounter++;
@@ -104,16 +67,20 @@ const BTSSlider = {
                         return `
                             <div class="bts-slide-item video-item" 
                                  data-rotation="${this.getRandomRotation()}"
-                                 data-height="${video.height}"
                                  data-video-src="${videoPath}"
                                  data-video-id="${videoId}"
-                                 style="flex: 0 0 ${video.height}%; height: ${video.height}%;">
+                                 data-loaded="false"
+                                 style="flex: 0 0 auto; height: auto; min-height: 120px;">
+                                <div class="video-thumbnail-placeholder" style="background: #1a1a1a; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                                    <div class="loading-spinner" style="width: 30px; height: 30px; border: 2px solid var(--metallic-gold); border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+                                </div>
                                 <video class="bts-video" 
                                        data-src="${videoPath}"
                                        muted
                                        loop
                                        playsinline
-                                       preload="metadata">
+                                       preload="none"
+                                       style="display: none;">
                                     Your browser does not support the video tag.
                                 </video>
                                 <div class="bts-slide-pattern"></div>
@@ -126,401 +93,572 @@ const BTSSlider = {
     },
     
     getRandomRotation() {
-        // Generate random rotation between -8 and 8 degrees
-        const rotations = [-8, -6, -4, -2, 2, 4, 6, 8];
+        const rotations = [-4, -2, 0, 2, 4];
         return rotations[Math.floor(Math.random() * rotations.length)];
     },
     
-    async checkAndLoadCache() {
-        // Check if Cache API is available
-        if (!('caches' in window)) {
-            console.log('Cache API not supported, falling back to regular loading');
-            return false;
+    // Check if device is in low power mode or has limited resources
+    detectPerformanceMode() {
+        // Check for battery saver mode
+        if ('getBattery' in navigator) {
+            navigator.getBattery().then(battery => {
+                if (battery.charging === false && battery.level < 0.2) {
+                    this.config.lowPowerMode = true;
+                    console.log('Low power mode detected, reducing video quality');
+                }
+            }).catch(() => {});
         }
         
-        try {
-            const cache = await caches.open('bts-videos-cache-v1');
-            const cachedResponse = await cache.match('/bts-videos-manifest');
-            
-            if (cachedResponse) {
-                const cachedData = await cachedResponse.json();
-                console.log('Found cached video data', cachedData);
-                return cachedData;
-            }
-        } catch (error) {
-            console.log('Error checking cache:', error);
+        // Check for memory constraints
+        if ('deviceMemory' in navigator && navigator.deviceMemory < 4) {
+            this.config.lowPowerMode = true;
+            console.log('Limited device memory detected, optimizing performance');
         }
         
-        return false;
-    },
-    
-    async cacheVideo(videoUrl, videoId) {
-        if (!('caches' in window)) return;
-        
-        try {
-            const cache = await caches.open('bts-videos-cache-v1');
-            
-            // Check if already cached
-            const cached = await cache.match(videoUrl);
-            if (cached) {
-                console.log(`Video ${videoId} already in cache`);
-                return;
+        // Check for slow connection
+        if ('connection' in navigator) {
+            const conn = navigator.connection;
+            if (conn.saveData || conn.effectiveType === 'slow-2g' || conn.effectiveType === '2g') {
+                this.config.lowPowerMode = true;
+                console.log('Slow connection detected, reducing preload');
             }
-            
-            // Fetch and cache the video
-            const response = await fetch(videoUrl);
-            if (response.ok) {
-                await cache.put(videoUrl, response.clone());
-                console.log(`Cached video: ${videoId}`);
-            }
-        } catch (error) {
-            console.log(`Error caching video ${videoId}:`, error);
         }
     },
     
     async loadVideoFromCache(videoElement, videoUrl, videoId) {
-        if (!('caches' in window)) {
-            // Fallback: load normally
-            videoElement.src = videoUrl;
-            videoElement.load();
-            // Generate thumbnail after loading
-            this.generateThumbnailFromVideo(videoElement, videoUrl, videoId);
+        // Don't load if already loaded or currently loading
+        if (videoElement.dataset.loaded === 'true' || videoElement.dataset.loading === 'true') {
             return false;
         }
         
+        videoElement.dataset.loading = 'true';
+        
+        // Show loading indicator
+        const parent = videoElement.closest('.bts-slide-item');
+        const placeholder = parent?.querySelector('.video-thumbnail-placeholder');
+        
         try {
+            // First, try to load cached thumbnail
+            const thumbnailLoaded = await this.loadThumbnailFromCache(videoElement, videoUrl, videoId);
+            
+            if (!('caches' in window)) {
+                this.setupVideoElement(videoElement, videoUrl, videoId);
+                return false;
+            }
+            
             const cache = await caches.open('bts-videos-cache-v1');
             const cachedResponse = await cache.match(videoUrl);
             
             if (cachedResponse) {
-                // Create blob URL from cached response
                 const blob = await cachedResponse.blob();
                 const blobUrl = URL.createObjectURL(blob);
-                videoElement.src = blobUrl;
-                videoElement.load();
-                console.log(`Loaded video ${videoId} from cache`);
-                // Generate thumbnail from cached video
-                this.generateThumbnailFromVideo(videoElement, videoUrl, videoId);
+                this.setupVideoElement(videoElement, blobUrl, videoId, true);
                 return true;
             } else {
-                // Not in cache, load normally and cache
-                videoElement.src = videoUrl;
-                videoElement.load();
+                this.setupVideoElement(videoElement, videoUrl, videoId);
                 
-                // Generate thumbnail from video
-                this.generateThumbnailFromVideo(videoElement, videoUrl, videoId);
+                // Cache in background with lower priority
+                setTimeout(() => {
+                    this.cacheVideoInBackground(videoUrl, videoId);
+                }, 3000);
                 
-                // Cache for next time
-                videoElement.addEventListener('canplaythrough', () => {
-                    this.cacheVideo(videoUrl, videoId);
-                }, { once: true });
-                
-                console.log(`Loading video ${videoId} from network`);
                 return false;
             }
         } catch (error) {
-            console.log(`Error loading video ${videoId} from cache:`, error);
-            videoElement.src = videoUrl;
-            videoElement.load();
-            this.generateThumbnailFromVideo(videoElement, videoUrl, videoId);
+            console.log(`Error loading video ${videoId}:`, error);
+            this.setupVideoElement(videoElement, videoUrl, videoId);
             return false;
+        } finally {
+            videoElement.dataset.loading = 'false';
+            if (placeholder) {
+                setTimeout(() => {
+                    if (placeholder.parentNode) {
+                        placeholder.style.opacity = '0';
+                        setTimeout(() => {
+                            if (placeholder.parentNode) placeholder.remove();
+                        }, 300);
+                    }
+                }, 100);
+            }
         }
     },
     
-    /**
-     * Generates a thumbnail from the video file itself and sets it as the poster
-     * This ensures every video has a preview frame without external poster images
-     */
-    generateThumbnailFromVideo(videoElement, videoUrl, videoId) {
-        // Prevent multiple thumbnail generation attempts
-        if (videoElement.dataset.thumbnailGenerated === 'true') {
-            return;
+    async loadThumbnailFromCache(videoElement, videoUrl, videoId) {
+        // Check if we already have a cached thumbnail
+        if (this.thumbnailCache.has(videoUrl)) {
+            const thumbnailUrl = this.thumbnailCache.get(videoUrl);
+            const parent = videoElement.closest('.bts-slide-item');
+            const placeholder = parent?.querySelector('.video-thumbnail-placeholder');
+            
+            if (placeholder) {
+                placeholder.style.backgroundImage = `url(${thumbnailUrl})`;
+                placeholder.style.backgroundSize = 'cover';
+                placeholder.style.backgroundPosition = 'center';
+                const spinner = placeholder.querySelector('.loading-spinner');
+                if (spinner) spinner.style.display = 'none';
+            }
+            videoElement.poster = thumbnailUrl;
+            return true;
         }
         
-        // Mark as processing to avoid duplicate calls
-        videoElement.dataset.thumbnailGenerating = 'true';
-        
-        // Create a temporary video element just for thumbnail extraction
-        const tempVideo = document.createElement('video');
-        tempVideo.muted = true;
-        tempVideo.preload = 'metadata';
-        tempVideo.crossOrigin = 'Anonymous';
-        tempVideo.src = videoUrl;
-        
-        // Set a timeout in case video takes too long to load
-        const timeoutId = setTimeout(() => {
-            if (tempVideo.parentNode) {
-                tempVideo.remove();
-            }
-            console.log(`Thumbnail generation timeout for ${videoId}`);
-            videoElement.dataset.thumbnailGenerating = 'false';
-        }, 5000);
-        
-        tempVideo.addEventListener('loadedmetadata', () => {
-            // Seek to 0.5 seconds or 10% of duration, whichever is smaller
-            // This ensures we get a meaningful frame even for short videos
-            const seekTime = Math.min(0.5, tempVideo.duration * 0.1);
-            if (isNaN(seekTime) || seekTime <= 0) {
-                // If duration is invalid, try seeking to a small value
-                tempVideo.currentTime = 0.1;
-            } else {
-                tempVideo.currentTime = seekTime;
-            }
+        // Try to generate thumbnail (with delay to not block main thread)
+        return new Promise((resolve) => {
+            setTimeout(async () => {
+                const thumbnail = await this.generateThumbnailEfficient(videoUrl, videoId);
+                if (thumbnail) {
+                    this.thumbnailCache.set(videoUrl, thumbnail);
+                    const parent = videoElement.closest('.bts-slide-item');
+                    const placeholder = parent?.querySelector('.video-thumbnail-placeholder');
+                    
+                    if (placeholder) {
+                        placeholder.style.backgroundImage = `url(${thumbnail})`;
+                        placeholder.style.backgroundSize = 'cover';
+                        placeholder.style.backgroundPosition = 'center';
+                        const spinner = placeholder.querySelector('.loading-spinner');
+                        if (spinner) spinner.style.display = 'none';
+                    }
+                    videoElement.poster = thumbnail;
+                    resolve(true);
+                }
+                resolve(false);
+            }, this.config.thumbnailGenerationDelay);
         });
-        
-        tempVideo.addEventListener('seeked', () => {
-            clearTimeout(timeoutId);
+    },
+    
+    generateThumbnailEfficient(videoUrl, videoId) {
+        return new Promise((resolve) => {
+            const tempVideo = document.createElement('video');
+            tempVideo.muted = true;
+            tempVideo.preload = 'metadata';
+            tempVideo.crossOrigin = 'Anonymous';
+            tempVideo.src = videoUrl;
             
-            try {
-                // Create canvas to capture the frame
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                
-                // Set canvas dimensions to match video aspect ratio (max 400px width for performance)
-                const videoWidth = tempVideo.videoWidth;
-                const videoHeight = tempVideo.videoHeight;
-                
-                if (videoWidth === 0 || videoHeight === 0) {
-                    console.log(`Cannot get video dimensions for ${videoId}`);
-                    tempVideo.remove();
-                    videoElement.dataset.thumbnailGenerating = 'false';
-                    return;
-                }
-                
-                // Scale down for thumbnail (max width 320px to keep data URL small)
-                const maxThumbWidth = 320;
-                let thumbWidth = videoWidth;
-                let thumbHeight = videoHeight;
-                
-                if (thumbWidth > maxThumbWidth) {
-                    const ratio = maxThumbWidth / thumbWidth;
-                    thumbWidth = maxThumbWidth;
-                    thumbHeight = Math.floor(videoHeight * ratio);
-                }
-                
-                canvas.width = thumbWidth;
-                canvas.height = thumbHeight;
-                
-                // Draw video frame to canvas
-                ctx.drawImage(tempVideo, 0, 0, thumbWidth, thumbHeight);
-                
-                // Convert canvas to data URL (JPEG at 0.7 quality for smaller size)
-                const dataURL = canvas.toDataURL('image/jpeg', 0.7);
-                
-                // Set as poster on the original video element
-                videoElement.poster = dataURL;
-                videoElement.dataset.thumbnailGenerated = 'true';
-                
-                console.log(`Thumbnail generated for ${videoId}`);
-            } catch (error) {
-                console.error(`Error generating thumbnail for ${videoId}:`, error);
-            } finally {
-                // Clean up
+            const timeoutId = setTimeout(() => {
                 tempVideo.remove();
-                videoElement.dataset.thumbnailGenerating = 'false';
+                resolve(null);
+            }, 3000);
+            
+            tempVideo.addEventListener('loadedmetadata', () => {
+                tempVideo.currentTime = Math.min(0.3, tempVideo.duration * 0.05);
+            });
+            
+            tempVideo.addEventListener('seeked', () => {
+                clearTimeout(timeoutId);
+                
+                try {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    const videoWidth = tempVideo.videoWidth;
+                    const videoHeight = tempVideo.videoHeight;
+                    
+                    if (videoWidth === 0 || videoHeight === 0) {
+                        tempVideo.remove();
+                        resolve(null);
+                        return;
+                    }
+                    
+                    const maxThumbWidth = 160;
+                    let thumbWidth = videoWidth;
+                    let thumbHeight = videoHeight;
+                    
+                    if (thumbWidth > maxThumbWidth) {
+                        const ratio = maxThumbWidth / thumbWidth;
+                        thumbWidth = maxThumbWidth;
+                        thumbHeight = Math.floor(videoHeight * ratio);
+                    }
+                    
+                    canvas.width = thumbWidth;
+                    canvas.height = thumbHeight;
+                    ctx.drawImage(tempVideo, 0, 0, thumbWidth, thumbHeight);
+                    
+                    const dataURL = canvas.toDataURL('image/jpeg', 0.5);
+                    resolve(dataURL);
+                } catch (error) {
+                    console.error(`Thumbnail error for ${videoId}:`, error);
+                    resolve(null);
+                } finally {
+                    tempVideo.remove();
+                }
+            });
+            
+            tempVideo.addEventListener('error', () => {
+                clearTimeout(timeoutId);
+                tempVideo.remove();
+                resolve(null);
+            });
+            
+            tempVideo.load();
+        });
+    },
+    
+    setupVideoElement(videoElement, src, videoId, isCached = false) {
+        const parent = videoElement.closest('.bts-slide-item');
+        
+        // Store the source URL for cleanup
+        videoElement.dataset.currentSrc = src;
+        videoElement.dataset.loaded = 'true';
+        
+        // Set up event listeners once
+        if (!videoElement.dataset.listenersSetup) {
+            videoElement.addEventListener('play', () => {
+                this.activeVideos.set(videoId, videoElement);
+            });
+            
+            videoElement.addEventListener('pause', () => {
+                if (this.activeVideos.get(videoId) === videoElement) {
+                    this.activeVideos.delete(videoId);
+                }
+            });
+            
+            videoElement.dataset.listenersSetup = 'true';
+        }
+        
+        // Load the video
+        videoElement.src = src;
+        videoElement.load();
+        
+        // Show video element when ready
+        videoElement.addEventListener('canplay', () => {
+            videoElement.style.display = 'block';
+            if (parent) {
+                parent.style.minHeight = 'auto';
             }
-        });
+        }, { once: true });
         
-        tempVideo.addEventListener('error', (e) => {
-            clearTimeout(timeoutId);
-            console.error(`Error loading video for thumbnail: ${videoId}`, e);
-            tempVideo.remove();
-            videoElement.dataset.thumbnailGenerating = 'false';
-        });
+        console.log(`Video ${videoId} setup complete (${isCached ? 'cached' : 'network'})`);
+    },
+    
+    async cacheVideoInBackground(videoUrl, videoId) {
+        if (!('caches' in window)) return;
         
-        // Start loading the video metadata
-        tempVideo.load();
+        try {
+            const cache = await caches.open('bts-videos-cache-v1');
+            const cached = await cache.match(videoUrl);
+            if (cached) return;
+            
+            const response = await fetch(videoUrl);
+            if (response.ok) {
+                await cache.put(videoUrl, response.clone());
+                console.log(`Background cached: ${videoId}`);
+            }
+        } catch (error) {
+            console.log(`Background cache failed for ${videoId}:`, error);
+        }
+    },
+    
+    unloadVideo(videoElement, videoId) {
+        if (!videoElement || videoElement.dataset.loaded !== 'true') return;
+        
+        // Don't unload if video is currently playing
+        if (!videoElement.paused) return;
+        
+        // Store current time for potential resume
+        const currentTime = videoElement.currentTime;
+        
+        // Unload the video
+        videoElement.pause();
+        videoElement.src = '';
+        videoElement.load();
+        videoElement.style.display = 'none';
+        videoElement.dataset.loaded = 'false';
+        
+        // Show placeholder again
+        const parent = videoElement.closest('.bts-slide-item');
+        const placeholder = parent?.querySelector('.video-thumbnail-placeholder');
+        if (placeholder) {
+            placeholder.style.opacity = '1';
+            placeholder.style.display = 'flex';
+        }
+        
+        // Clean up blob URL if it exists
+        if (videoElement.dataset.currentSrc && videoElement.dataset.currentSrc.startsWith('blob:')) {
+            URL.revokeObjectURL(videoElement.dataset.currentSrc);
+        }
+        
+        console.log(`Unloaded video ${videoId} to free memory`);
     },
     
     init() {
-        // Initialize Swiper
+        // Detect performance mode first
+        this.detectPerformanceMode();
+        
+        // Initialize Swiper with performance optimizations
         const btsSwiper = new Swiper('.bts-swiper', {
-            // Core settings
             slidesPerView: 'auto',
-            spaceBetween: 30,
+            spaceBetween: this.config.lowPowerMode ? 15 : 30,
             centeredSlides: false,
             loop: true,
-            speed: 800,
+            speed: this.config.lowPowerMode ? 400 : 800,
             
-            // Auto-scroll settings
-            autoplay: {
-                delay: 3000,
+            autoplay: this.config.lowPowerMode ? false : {
+                delay: 4000,
                 disableOnInteraction: false,
                 pauseOnMouseEnter: true,
             },
             
-            // Navigation
             navigation: {
                 nextEl: '.swiper-button-next',
                 prevEl: '.swiper-button-prev',
             },
             
-            // Pagination
             pagination: {
                 el: '.swiper-pagination',
                 clickable: true,
                 dynamicBullets: true,
             },
             
-            // Free mode for smooth scrolling
             freeMode: {
                 enabled: true,
-                momentum: true,
+                momentum: !this.config.lowPowerMode,
                 momentumRatio: 0.5,
-                momentumVelocityRatio: 0.5,
             },
             
-            // Responsive breakpoints
             breakpoints: {
-                320: {
-                    spaceBetween: 15,
-                    slidesPerView: 'auto',
-                },
-                768: {
-                    spaceBetween: 20,
-                    slidesPerView: 'auto',
-                },
-                1024: {
-                    spaceBetween: 30,
-                    slidesPerView: 'auto',
-                }
+                320: { spaceBetween: 10 },
+                768: { spaceBetween: 15 },
+                1024: { spaceBetween: this.config.lowPowerMode ? 20 : 30 }
             },
             
-            // Mousewheel control
             mousewheel: {
                 forceToAxis: true,
                 sensitivity: 1,
-                releaseOnEdges: true,
             },
             
-            // Keyboard control
-            keyboard: {
-                enabled: true,
-                onlyInViewport: true,
-            },
-            
-            // Touch settings
+            keyboard: { enabled: true, onlyInViewport: true },
             touchRatio: 1.5,
-            touchAngle: 45,
             grabCursor: true,
             
-            // Effect
-            effect: 'slide',
-            
-            // Callbacks
             on: {
-                init: function() {
-                    console.log('BTS Swiper initialized');
-                    
-                    // Start loading videos with cache and thumbnail generation
-                    setTimeout(() => {
-                        const videoElements = document.querySelectorAll('.bts-video');
-                        const videoItems = document.querySelectorAll('.bts-slide-item.video-item');
-                        
-                        videoItems.forEach((item, index) => {
-                            const video = item.querySelector('.bts-video');
-                            const videoSrc = item.dataset.videoSrc;
-                            const videoId = item.dataset.videoId || `video_${index}`;
-                            
-                            if (video && videoSrc) {
-                                // Load video with cache support
-                                window.BTSSliderInstance.loadVideoFromCache(video, videoSrc, videoId);
-                            }
-                        });
-                    }, 100);
+                init: () => {
+                    console.log('BTS Swiper initialized (optimized mode)');
+                    if (this.config.lowPowerMode) {
+                        console.log('Running in low-power/performance mode');
+                    }
+                    this.startLazyLoading();
                 },
-                slideChange: function() {
-                    // Optional: Add any effects on slide change
+                slideChange: () => {
+                    this.manageVideoQueue();
+                },
+                resize: () => {
+                    this.manageVideoQueue();
                 }
             }
         });
         
-        // Store instance for callbacks
         window.BTSSliderInstance = this;
+        this.btsSwiper = btsSwiper;
         
-        // Add hover rotation effect (no modal)
+        this.setupVideoInteractions();
+        this.setupVisibilityHandler();
+        this.setupMemoryCleanup();
+        
+        console.log('BTS Slider initialized with performance optimizations for 16+ videos');
+    },
+    
+    startLazyLoading() {
+        // Queue for sequential loading
+        this.loadQueue = [];
+        this.activeLoads = 0;
+        
+        const allVideoItems = document.querySelectorAll('.bts-slide-item.video-item');
+        allVideoItems.forEach(item => {
+            const video = item.querySelector('.bts-video');
+            const videoSrc = item.dataset.videoSrc;
+            const videoId = item.dataset.videoId;
+            
+            if (video && videoSrc) {
+                this.loadQueue.push({ video, videoSrc, videoId, item });
+            }
+        });
+        
+        // Start initial loads
+        for (let i = 0; i < this.config.maxConcurrentLoads && i < this.loadQueue.length; i++) {
+            this.processNextInQueue();
+        }
+    },
+    
+    processNextInQueue() {
+        if (this.loadQueue.length === 0 || this.activeLoads >= this.config.maxConcurrentLoads) {
+            return;
+        }
+        
+        const next = this.loadQueue.shift();
+        if (!next) return;
+        
+        this.activeLoads++;
+        
+        // Check if this video is in viewport or near it
+        const isNearViewport = this.isElementNearViewport(next.item);
+        
+        if (isNearViewport || this.activeLoads <= 2) {
+            this.loadVideoFromCache(next.video, next.videoSrc, next.videoId)
+                .finally(() => {
+                    this.activeLoads--;
+                    this.processNextInQueue();
+                });
+        } else {
+            // Put back in queue for later
+            setTimeout(() => {
+                this.activeLoads--;
+                this.loadQueue.unshift(next);
+                this.processNextInQueue();
+            }, 500);
+        }
+    },
+    
+    isElementNearViewport(element) {
+        if (!element) return false;
+        
+        const swiperContainer = document.querySelector('.bts-swiper');
+        if (!swiperContainer) return true;
+        
+        const containerRect = swiperContainer.getBoundingClientRect();
+        const elementRect = element.getBoundingClientRect();
+        
+        // Check if element is within preload distance
+        const preloadDistance = this.config.preloadAheadDistance;
+        const isNear = (elementRect.right >= containerRect.left - preloadDistance &&
+                        elementRect.left <= containerRect.right + preloadDistance);
+        
+        return isNear;
+    },
+    
+    manageVideoQueue() {
+        // Pause videos that are far from viewport
+        const allVideos = document.querySelectorAll('.bts-video');
+        const swiperContainer = document.querySelector('.bts-swiper');
+        
+        if (!swiperContainer) return;
+        
+        const containerRect = swiperContainer.getBoundingClientRect();
+        const unloadDistance = 1500;
+        
+        allVideos.forEach(video => {
+            const parent = video.closest('.bts-slide-item');
+            if (!parent) return;
+            
+            const elementRect = parent.getBoundingClientRect();
+            const isFar = (elementRect.right < containerRect.left - unloadDistance ||
+                          elementRect.left > containerRect.right + unloadDistance);
+            
+            const videoId = parent.dataset.videoId;
+            
+            if (isFar && video.dataset.loaded === 'true' && video.paused) {
+                // Schedule unload after delay
+                if (this.unloadTimeouts && this.unloadTimeouts[videoId]) {
+                    clearTimeout(this.unloadTimeouts[videoId]);
+                }
+                
+                this.unloadTimeouts = this.unloadTimeouts || {};
+                this.unloadTimeouts[videoId] = setTimeout(() => {
+                    this.unloadVideo(video, videoId);
+                }, this.config.videoUnloadDelay);
+            } else if (!isFar && video.dataset.loaded !== 'true') {
+                // Load this video if it's near
+                const videoSrc = parent.dataset.videoSrc;
+                const videoId = parent.dataset.videoId;
+                if (videoSrc && video.dataset.loaded !== 'true' && video.dataset.loading !== 'true') {
+                    this.loadVideoFromCache(video, videoSrc, videoId);
+                }
+            }
+        });
+    },
+    
+    setupVideoInteractions() {
         const videoItems = document.querySelectorAll('.bts-slide-item.video-item');
+        
         videoItems.forEach((item) => {
             const rotation = item.dataset.rotation;
+            const video = item.querySelector('.bts-video');
             
-            // Hover rotation
             item.addEventListener('mouseenter', () => {
-                item.style.transform = `rotate(${rotation}deg) scale(1.05)`;
+                item.style.transform = `rotate(${rotation}deg) scale(1.03)`;
+                item.style.transition = 'transform 0.3s ease';
                 
-                // Play video on hover if it's loaded
-                const video = item.querySelector('.bts-video');
-                if (video && video.readyState >= 2) {
-                    video.play().catch(e => console.log('Video play failed:', e));
+                if (video && video.dataset.loaded === 'true' && video.readyState >= 2) {
+                    video.play().catch(e => console.log('Play failed:', e));
                 }
             });
             
             item.addEventListener('mouseleave', () => {
                 item.style.transform = 'rotate(0deg) scale(1)';
                 
-                // Pause video when not hovering
-                const video = item.querySelector('.bts-video');
                 if (video && !video.paused) {
                     video.pause();
                 }
             });
         });
-        
-        // Add visibility change handler to pause videos when tab is hidden
+    },
+    
+    setupVisibilityHandler() {
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
-                // Tab is hidden, pause all videos
                 const videos = document.querySelectorAll('.bts-video');
                 videos.forEach(video => {
-                    video.pause();
+                    if (!video.paused) {
+                        video.pause();
+                        video.dataset.wasPlaying = 'true';
+                    }
                 });
             } else {
-                // Tab is visible again, resume playing visible videos
-                const visibleVideos = document.querySelectorAll('.bts-video');
-                visibleVideos.forEach(video => {
+                const videos = document.querySelectorAll('.bts-video');
+                videos.forEach(video => {
                     const parent = video.closest('.bts-slide-item');
-                    if (parent && parent.matches(':hover')) {
-                        video.play().catch(e => console.log('Video resume failed:', e));
+                    if (parent && parent.matches(':hover') && video.dataset.wasPlaying === 'true') {
+                        video.play().catch(() => {});
+                        delete video.dataset.wasPlaying;
                     }
                 });
             }
         });
-        
-        // Setup preload strategy
-        this.setupPreloadStrategy();
-        
-        console.log('BTS Slider initialized with persistent video cache and auto-generated thumbnails');
     },
     
-    setupPreloadStrategy() {
-        // Preload videos when user is about to scroll to them
-        const swiperContainer = document.querySelector('.bts-swiper');
-        const videoItems = document.querySelectorAll('.bts-slide-item.video-item');
-        
-        if (!swiperContainer) return;
-        
-        // Create intersection observer for preloading videos near viewport
-        const preloadObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const item = entry.target;
-                    const video = item.querySelector('.bts-video');
-                    const videoSrc = item.dataset.videoSrc;
-                    const videoId = item.dataset.videoId;
-                    
-                    // Preload video when it's 500px from viewport
-                    if (video && videoSrc && !video.src) {
-                        this.loadVideoFromCache(video, videoSrc, videoId);
-                    }
+    setupMemoryCleanup() {
+        // Periodic memory cleanup every 30 seconds
+        setInterval(() => {
+            const videos = document.querySelectorAll('.bts-video');
+            videos.forEach(video => {
+                const parent = video.closest('.bts-slide-item');
+                if (parent && !this.isElementNearViewport(parent) && video.paused && video.dataset.loaded === 'true') {
+                    this.unloadVideo(video, parent.dataset.videoId);
                 }
             });
-        }, {
-            root: swiperContainer,
-            rootMargin: '500px',
-            threshold: 0
-        });
+        }, 30000);
         
-        videoItems.forEach(item => {
-            preloadObserver.observe(item);
+        // Clean up on page unload
+        window.addEventListener('beforeunload', () => {
+            const videos = document.querySelectorAll('.bts-video');
+            videos.forEach(video => {
+                if (video.src && video.src.startsWith('blob:')) {
+                    URL.revokeObjectURL(video.src);
+                }
+            });
         });
     }
 };
+
+// Add CSS for spinner animation if not already present
+if (!document.getElementById('bts-spinner-style')) {
+    const style = document.createElement('style');
+    style.id = 'bts-spinner-style';
+    style.textContent = `
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .bts-slide-item {
+            transition: transform 0.3s ease, min-height 0.2s ease;
+        }
+        .video-thumbnail-placeholder {
+            transition: opacity 0.3s ease;
+            background-size: cover;
+            background-position: center;
+            border-radius: 12px;
+        }
+        .bts-video {
+            transition: display 0.2s ease;
+            border-radius: 12px;
+        }
+    `;
+    document.head.appendChild(style);
+}
