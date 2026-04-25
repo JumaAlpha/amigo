@@ -209,7 +209,7 @@
 }
 
 .bts-slide-item.video-item .video-control-hint i {
-    margin-left: 3px; /* Slight adjustment for play icon */
+    margin-left: 3px;
 }
 
 /* Pattern overlay for texture */
@@ -228,6 +228,56 @@
 
 .bts-slide-item:hover .bts-slide-pattern {
     opacity: 0.2;
+}
+
+/* ===== LOADING ANIMATION ===== */
+.video-loading-animation {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    gap: 6px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    z-index: 5;
+    pointer-events: none;
+}
+
+.bts-slide-item.video-loading .video-loading-animation {
+    opacity: 1;
+    visibility: visible;
+}
+
+.video-loading-animation .dot {
+    width: 8px;
+    height: 8px;
+    background-color: var(--metallic-gold);
+    border-radius: 50%;
+    display: inline-block;
+    animation: dotPulse 1.2s infinite ease-in-out;
+}
+
+.video-loading-animation .dot:nth-child(1) {
+    animation-delay: 0s;
+}
+.video-loading-animation .dot:nth-child(2) {
+    animation-delay: 0.2s;
+}
+.video-loading-animation .dot:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes dotPulse {
+    0%, 60%, 100% {
+        transform: scale(0.8);
+        opacity: 0.5;
+    }
+    30% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
 }
 
 /* Overlay */
@@ -738,9 +788,7 @@
     .bts-slide-overlay,
     .bts-slide-pattern,
     .bts-swiper-button,
-    .bts-swiper-pagination .swiper-pagination-bullet,
-    .video-modal,
-    .video-modal-close {
+    .bts-swiper-pagination .swiper-pagination-bullet {
         transition: none !important;
         animation: none !important;
     }
@@ -758,14 +806,6 @@
     .bts-swiper-button {
         border: 2px solid var(--metallic-gold);
         background: var(--pure-black);
-    }
-    
-    .bts-slide-overlay {
-        background: rgba(0, 0, 0, 0.9);
-    }
-    
-    .video-modal-content {
-        border: 3px solid var(--metallic-gold);
     }
 }
 
@@ -841,8 +881,7 @@
     .bts-slide-pattern,
     .bts-swiper-button,
     .bts-swiper-pagination,
-    .video-control-hint,
-    .video-modal {
+    .video-control-hint {
         display: none !important;
     }
 }
