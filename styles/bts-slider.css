@@ -160,7 +160,7 @@
     height: 20%;
 }
 
-/* ===== VIDEO ELEMENTS ===== */
+/* ===== VIDEO ELEMENTS - AUTO-PLAY ===== */
 .bts-slide-item.video-item {
     cursor: pointer;
     position: relative;
@@ -178,6 +178,7 @@
     display: block;
 }
 
+/* Remove hover filter change since videos are always playing */
 .bts-slide-item.video-item:hover .bts-video {
     filter: grayscale(0) brightness(1.05);
 }
@@ -229,6 +230,50 @@
     opacity: 0.2;
 }
 
+/* Overlay */
+.bts-slide-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 0.95) 0%,
+        rgba(0, 0, 0, 0.5) 50%,
+        transparent 100%
+    );
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 1.5rem;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: 2;
+}
+
+.bts-slide-item:hover .bts-slide-overlay {
+    opacity: 1;
+}
+
+.bts-slide-caption {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--off-white);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.bts-slide-number {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    color: var(--metallic-gold);
+    opacity: 0.9;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
 /* ===== SWIPER NAVIGATION ===== */
 .bts-swiper-button {
     color: var(--metallic-gold);
@@ -273,6 +318,91 @@
 .bts-swiper-pagination .swiper-pagination-bullet:hover {
     background: var(--metallic-gold);
     opacity: 0.8;
+}
+
+/* ===== VIDEO MODAL ===== */
+.video-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+    animation: modalFadeIn 0.3s ease;
+}
+
+.video-modal-content {
+    position: relative;
+    width: 90%;
+    max-width: 1200px;
+    max-height: 90vh;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 30px 50px rgba(0, 0, 0, 0.5);
+    border: 2px solid var(--metallic-gold);
+    background: #000;
+}
+
+.video-modal-player {
+    width: 100%;
+    height: auto;
+    max-height: 80vh;
+    display: block;
+    background: #000;
+}
+
+.video-modal-caption {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+    color: var(--off-white);
+    padding: 2rem 1.5rem 1.5rem;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: 2px;
+    text-align: center;
+    pointer-events: none;
+}
+
+.video-modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 40px;
+    height: 40px;
+    background: var(--deep-charcoal);
+    border: 2px solid var(--metallic-gold);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--metallic-gold);
+    font-size: 1.5rem;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.3s ease;
+}
+
+.video-modal-close:hover {
+    background: var(--metallic-gold);
+    color: var(--pure-black);
+    transform: scale(1.1);
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
 }
 
 /* ===== RESPONSIVE BREAKPOINTS ===== */
@@ -323,6 +453,14 @@
     .bts-slide-content.narrow {
         min-width: 200px;
         max-width: 230px;
+    }
+    
+    .bts-slide-caption {
+        font-size: 0.9rem;
+    }
+    
+    .bts-slide-number {
+        font-size: 1.2rem;
     }
     
     .bts-swiper-button {
@@ -421,6 +559,14 @@
         max-width: 180px;
     }
     
+    .bts-slide-caption {
+        font-size: 0.8rem;
+    }
+    
+    .bts-slide-number {
+        font-size: 1rem;
+    }
+    
     .bts-swiper-button {
         width: 32px;
         height: 32px;
@@ -512,6 +658,18 @@
         min-height: 80px;
     }
     
+    .bts-slide-overlay {
+        padding: 0.8rem;
+    }
+    
+    .bts-slide-caption {
+        font-size: 0.7rem;
+    }
+    
+    .bts-slide-number {
+        font-size: 0.9rem;
+    }
+    
     .video-control-hint {
         width: 24px;
         height: 24px;
@@ -527,6 +685,31 @@
     .bts-slide-item[data-height="40"] {
         flex: 0 0 45%;
         height: 45%;
+    }
+}
+
+/* Responsive modal */
+@media (max-width: 768px) {
+    .video-modal-content {
+        width: 95%;
+    }
+    
+    .video-modal-caption {
+        font-size: 1.2rem;
+        padding: 1.5rem 1rem 1rem;
+    }
+    
+    .video-modal-close {
+        width: 35px;
+        height: 35px;
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .video-modal-caption {
+        font-size: 1rem;
+        padding: 1rem 0.8rem 0.8rem;
     }
 }
 
@@ -552,8 +735,12 @@
     .bts-slide-item,
     .bts-slide-item img,
     .bts-slide-item video,
+    .bts-slide-overlay,
+    .bts-slide-pattern,
     .bts-swiper-button,
-    .bts-swiper-pagination .swiper-pagination-bullet {
+    .bts-swiper-pagination .swiper-pagination-bullet,
+    .video-modal,
+    .video-modal-close {
         transition: none !important;
         animation: none !important;
     }
@@ -571,6 +758,14 @@
     .bts-swiper-button {
         border: 2px solid var(--metallic-gold);
         background: var(--pure-black);
+    }
+    
+    .bts-slide-overlay {
+        background: rgba(0, 0, 0, 0.9);
+    }
+    
+    .video-modal-content {
+        border: 3px solid var(--metallic-gold);
     }
 }
 
@@ -629,10 +824,25 @@
         display: none; /* Don't print videos */
     }
     
+    .bts-slide-overlay {
+        opacity: 1;
+        background: rgba(255, 255, 255, 0.1);
+        position: static;
+        padding: 0.5rem;
+        color: #333;
+    }
+    
+    .bts-slide-caption,
+    .bts-slide-number {
+        color: #333;
+        text-shadow: none;
+    }
+    
     .bts-slide-pattern,
     .bts-swiper-button,
     .bts-swiper-pagination,
-    .video-control-hint {
+    .video-control-hint,
+    .video-modal {
         display: none !important;
     }
 }
@@ -671,6 +881,14 @@
     
     .bts-swiper-button::after {
         font-size: 1.4rem;
+    }
+    
+    .bts-slide-caption {
+        font-size: 1.1rem;
+    }
+    
+    .bts-slide-number {
+        font-size: 1.8rem;
     }
     
     .video-control-hint {
