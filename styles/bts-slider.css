@@ -5,7 +5,7 @@
     background: var(--pure-black);
     display: flex;
     flex-direction: column;
-    justify-content: center;  /* Center vertically */
+    justify-content: center;
     align-items: center;
     padding: 2rem 0;
     position: relative;
@@ -42,7 +42,6 @@
     padding: 0.5rem 0 2rem 0;
     position: relative;
     overflow: visible;
-    /* Allow vertical touch actions, prevent horizontal scroll conflict */
     touch-action: pan-y pinch-zoom;
 }
 
@@ -66,7 +65,7 @@
     opacity: 1;
 }
 
-/* BTS Slide Content Container - now with 3 rows */
+/* BTS Slide Content Container */
 .am-bts-slide-content {
     display: flex;
     flex-direction: column;
@@ -88,7 +87,7 @@
     max-width: 300px;
 }
 
-/* BTS Individual Item - now all items flex to create 3 rows */
+/* BTS Individual Item */
 .am-bts-item {
     position: relative;
     border-radius: 12px;
@@ -99,25 +98,24 @@
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(212, 175, 55, 0.1);
     width: 100%;
-    flex: 1 1 auto;  /* Each item takes equal height to create 3 rows */
+    flex: 1 1 auto;
     min-height: 120px;
     transform: rotate(0deg) scale(1);
     will-change: transform;
     background: #1a1a1a;
 }
 
-/* Ensure exactly 3 rows by giving each item equal flex growth */
 .am-bts-slide-content {
     height: 88%;
     display: flex;
     flex-direction: column;
 }
+
 .am-bts-slide-content .am-bts-item {
     flex: 1;
     min-height: 0;
 }
 
-/* Override any height attributes - we want all items to fill equally */
 .am-bts-item[data-h] {
     min-height: 0;
     flex: 1;
@@ -144,7 +142,6 @@
     display: block;
 }
 
-/* Hover effect on video */
 .am-bts-item:hover .am-bts-video {
     filter: grayscale(0) brightness(1.02);
     transform: scale(1.02);
@@ -240,7 +237,7 @@
     }
 }
 
-/* Caption overlay (optional) */
+/* Caption overlay */
 .am-bts-caption {
     position: absolute;
     bottom: 0;
@@ -493,6 +490,61 @@
     .am-bts-swiper-button-next {
         width: 28px;
         height: 28px;
+    }
+}
+
+/* Mobile-specific fixes for BTS section */
+@media (max-width: 768px) {
+    .am-bts-section {
+        padding: 1rem 0;
+        justify-content: flex-start;
+        overflow-y: auto;
+    }
+    
+    .am-bts-header {
+        margin-bottom: 0.5rem;
+        margin-top: 0.5rem;
+    }
+    
+    .am-bts-swiper {
+        flex: none;
+        height: auto;
+        min-height: 60vh;
+        padding: 0.5rem 0 1rem 0;
+    }
+    
+    .am-bts-pagination {
+        margin-top: 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .am-bts-swiper {
+        touch-action: pan-y pinch-zoom;
+    }
+}
+
+@media (max-width: 480px) {
+    .am-bts-swiper {
+        min-height: 50vh;
+        padding: 0.3rem 0 0.8rem 0;
+    }
+    
+    .am-bts-side-scroll {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+}
+
+/* Ensure main content can scroll horizontally on mobile */
+@media (max-width: 768px) {
+    .main-content {
+        scroll-snap-type: x mandatory;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .section {
+        scroll-snap-align: start;
     }
 }
 
