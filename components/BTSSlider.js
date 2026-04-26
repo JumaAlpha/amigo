@@ -270,16 +270,16 @@ const BTSSlider = {
     init() {
         this.detectPerformanceMode();
         
-        // Initialize Swiper with continuous loop settings
+        // Initialize Swiper with carousel animation
         const btsSwiper = new Swiper('.am-bts-swiper', {
             slidesPerView: 'auto',
             spaceBetween: this.config.lowPowerMode ? 15 : 25,
             centeredSlides: false,
-            loop: true, // Enables continuous loop
-            loopAdditionalSlides: 3, // Extra slides for smoother loop
-            speed: this.config.lowPowerMode ? 400 : 800,
+            loop: true,
+            loopAdditionalSlides: 3,
+            speed: this.config.lowPowerMode ? 800 : 1200,
             autoplay: this.config.lowPowerMode ? false : {
-                delay: 0, // Zero delay for continuous movement
+                delay: 0,
                 disableOnInteraction: false,
                 pauseOnMouseEnter: true,
                 stopOnLastSlide: false,
@@ -295,9 +295,13 @@ const BTSSlider = {
                 bulletClass: 'am-bts-pagination-bullet',
                 bulletActiveClass: 'am-bts-pagination-bullet-active',
             },
-            freeMode: { 
-                enabled: false // Disable free mode for continuous scroll
+            freeMode: {
+                enabled: false
             },
+            effect: 'slide',
+            slidesPerGroup: 1,
+            simulateTouch: true,
+            allowTouchMove: true,
             breakpoints: {
                 320: { spaceBetween: 10 },
                 768: { spaceBetween: 15 },
@@ -308,64 +312,70 @@ const BTSSlider = {
             touchRatio: 1.5,
             grabCursor: true,
             touchMoveStopPropagation: true,
-            // For continuous smooth scrolling
-            effect: 'slide',
-            slidesPerGroup: 1,
-            simulateTouch: true,
-            allowTouchMove: true,
             on: {
                 init: () => {
-                    console.log('BTS Swiper ready - Continuous loop mode enabled');
+                    console.log('BTS Swiper ready - Full width carousel mode');
                     this.startLazyLoading();
                     
-                    // Start continuous autoplay
-                    if (!this.config.lowPowerMode && btsSwiper.autoplay) {
-                        btsSwiper.autoplay.start();
-                    }
+                    // Add CSS for smooth infinite scroll
+                    const style = document.createElement('style');
+                    style.textContent = `
+                        .am-bts-swiper .swiper-wrapper {
+                            transition-timing-function: linear !important;
+                        }
+                        .am-bts-swiper .swiper-slide {
+                            transition: all 0.3s ease;
+                        }
+                    `;
+                    document.head.appendChild(style);
                 },
                 slideChange: () => this.manageVideoQueue(),
-                resize: () => this.manageVideoQueue(),
-                autoplayTimeLeft: (s, time, progress) => {
-                    // Smooth transition for continuous feel
-                    if (progress < 0.1) {
-                        s.slideNext();
-                    }
-                }
+                resize: () => this.manageVideoQueue()
             }
         });
         
-        // Override autoplay for continuous scrolling effect
-        if (!this.config.lowPowerMode && btsSwiper.autoplay) {
-            // This creates a continuous smooth scroll effect
-            let scrollInterval;
-            const startContinuousScroll = () => {
-                scrollInterval = setInterval(() => {
-                    if (!btsSwiper.autoplay?.paused && !this.config.lowPowerMode) {
-                        btsSwiper.slideNext();
-                    }
-                }, 3000); // Move to next slide every 3 seconds
+        // Create continuous smooth carousel animation
+        if (!this.config.lowPowerMode) {
+            let isPlaying = true;
+            let animationFrame;
+            let lastTimestamp = 0;
+            const slideSpeed = 0.5; // Pixels per frame for smooth movement
+            
+            const animateCarousel = () => {
+                if (!isPlaying || !btsSwiper) return;
+                
+                // Get current translate value and slide incrementally
+                const currentTranslate = btsSwiper.translate;
+                const containerWidth = btsSwiper.width;
+                const slidesWidth = btsSwiper.slidesGrid.reduce((a, b) => a + b, 0);
+                
+                // Move to next slide when necessary
+                if (Math.abs(currentTranslate) >= slidesWidth - containerWidth - 100) {
+                    btsSwiper.slideNext();
+                }
+                
+                animationFrame = requestAnimationFrame(animateCarousel);
             };
             
-            const stopContinuousScroll = () => {
-                if (scrollInterval) clearInterval(scrollInterval);
-            };
-            
-            // Start continuous scroll
-            startContinuousScroll();
-            
-            // Pause on hover
+            // Start animation on hover out
             const swiperContainer = document.querySelector('.am-bts-swiper');
             if (swiperContainer) {
                 swiperContainer.addEventListener('mouseenter', () => {
-                    stopContinuousScroll();
+                    isPlaying = false;
+                    if (animationFrame) cancelAnimationFrame(animationFrame);
                 });
+                
                 swiperContainer.addEventListener('mouseleave', () => {
-                    startContinuousScroll();
+                    isPlaying = true;
+                    animateCarousel();
                 });
             }
             
-            // Store interval for cleanup
-            this.scrollInterval = scrollInterval;
+            // Start the smooth carousel
+            animateCarousel();
+            
+            // Store for cleanup
+            this.carouselAnimation = { animateCarousel, swiperContainer };
         }
         
         window.BTSSliderInstance = this;
@@ -373,7 +383,7 @@ const BTSSlider = {
         this.setupVisibilityHandler();
         this.setupMemoryCleanup();
         
-        console.log('BTS Slider initialized with continuous carousel loop');
+        console.log('BTS Slider initialized with full width carousel animation');
     },
     
     startLazyLoading() {
@@ -444,8 +454,13 @@ const BTSSlider = {
             const videos = document.querySelectorAll('.am-bts-video');
             if (document.hidden) {
                 videos.forEach(v => { if (!v.paused) { v.pause(); v.dataset.wasPlaying = 'true'; } });
-                // Pause continuous scroll when tab is hidden
-                if (this.scrollInterval) clearInterval(this.scrollInterval);
+                // Pause carousel animation when tab is hidden
+                if (this.carouselAnimation && this.carouselAnimation.animateCarousel) {
+                    this.carouselAnimation.isPlaying = false;
+                    if (this.carouselAnimation.animationFrame) {
+                        cancelAnimationFrame(this.carouselAnimation.animationFrame);
+                    }
+                }
             } else {
                 videos.forEach(v => {
                     const parent = v.closest('.am-bts-item');
@@ -454,13 +469,10 @@ const BTSSlider = {
                         delete v.dataset.wasPlaying;
                     }
                 });
-                // Restart continuous scroll when tab is visible
-                if (!this.config.lowPowerMode && this.btsSwiper) {
-                    this.scrollInterval = setInterval(() => {
-                        if (this.btsSwiper && !this.btsSwiper.autoplay?.paused) {
-                            this.btsSwiper.slideNext();
-                        }
-                    }, 3000);
+                // Resume carousel animation when tab is visible
+                if (this.carouselAnimation && this.carouselAnimation.animateCarousel && !this.config.lowPowerMode) {
+                    this.carouselAnimation.isPlaying = true;
+                    this.carouselAnimation.animateCarousel();
                 }
             }
         });
@@ -480,7 +492,10 @@ const BTSSlider = {
             document.querySelectorAll('.am-bts-video').forEach(v => {
                 if (v.src && v.src.startsWith('blob:')) URL.revokeObjectURL(v.src);
             });
-            if (this.scrollInterval) clearInterval(this.scrollInterval);
+            // Clean up carousel animation
+            if (this.carouselAnimation && this.carouselAnimation.animationFrame) {
+                cancelAnimationFrame(this.carouselAnimation.animationFrame);
+            }
         });
     }
 };
@@ -510,6 +525,13 @@ if (!document.getElementById('am-bts-spinner-style')) {
             border-radius: 50%;
             animation: amSpin 0.8s linear infinite;
             box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+        }
+        /* Full width carousel styles */
+        .am-bts-swiper {
+            overflow: visible !important;
+        }
+        .am-bts-swiper .swiper-slide {
+            transition: transform 0.3s ease, opacity 0.3s ease;
         }
         @media (max-width: 480px) {
             .am-bts-loading-spinner {
