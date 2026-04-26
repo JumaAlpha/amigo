@@ -31,6 +31,9 @@ const BTSSlider = {
                     <div class="am-bts-swiper-button-next"></div>
                     
                 </div>
+                
+                <!-- Pagination -->
+                <div class="am-bts-pagination"></div>
             </section>
         `;
     },
@@ -267,17 +270,20 @@ const BTSSlider = {
     init() {
         this.detectPerformanceMode();
         
-        // Initialize Swiper with settings that prevent parent scroll interference
+        // Initialize Swiper with continuous loop settings
         const btsSwiper = new Swiper('.am-bts-swiper', {
             slidesPerView: 'auto',
             spaceBetween: this.config.lowPowerMode ? 15 : 25,
             centeredSlides: false,
-            loop: true,
+            loop: true, // Enables continuous loop
+            loopAdditionalSlides: 3, // Extra slides for smoother loop
             speed: this.config.lowPowerMode ? 400 : 800,
             autoplay: this.config.lowPowerMode ? false : {
-                delay: 4000,
+                delay: 0, // Zero delay for continuous movement
                 disableOnInteraction: false,
                 pauseOnMouseEnter: true,
+                stopOnLastSlide: false,
+                waitForTransition: false
             },
             navigation: {
                 nextEl: '.am-bts-swiper-button-next',
@@ -289,7 +295,9 @@ const BTSSlider = {
                 bulletClass: 'am-bts-pagination-bullet',
                 bulletActiveClass: 'am-bts-pagination-bullet-active',
             },
-            freeMode: { enabled: true, momentum: !this.config.lowPowerMode, momentumRatio: 0.5 },
+            freeMode: { 
+                enabled: false // Disable free mode for continuous scroll
+            },
             breakpoints: {
                 320: { spaceBetween: 10 },
                 768: { spaceBetween: 15 },
@@ -299,24 +307,73 @@ const BTSSlider = {
             keyboard: { enabled: true, onlyInViewport: true },
             touchRatio: 1.5,
             grabCursor: true,
-            // Prevent swipes from bubbling up to parent horizontal scroll
             touchMoveStopPropagation: true,
+            // For continuous smooth scrolling
+            effect: 'slide',
+            slidesPerGroup: 1,
+            simulateTouch: true,
+            allowTouchMove: true,
             on: {
                 init: () => {
-                    console.log('BTS Swiper ready');
+                    console.log('BTS Swiper ready - Continuous loop mode enabled');
                     this.startLazyLoading();
+                    
+                    // Start continuous autoplay
+                    if (!this.config.lowPowerMode && btsSwiper.autoplay) {
+                        btsSwiper.autoplay.start();
+                    }
                 },
                 slideChange: () => this.manageVideoQueue(),
-                resize: () => this.manageVideoQueue()
+                resize: () => this.manageVideoQueue(),
+                autoplayTimeLeft: (s, time, progress) => {
+                    // Smooth transition for continuous feel
+                    if (progress < 0.1) {
+                        s.slideNext();
+                    }
+                }
             }
         });
+        
+        // Override autoplay for continuous scrolling effect
+        if (!this.config.lowPowerMode && btsSwiper.autoplay) {
+            // This creates a continuous smooth scroll effect
+            let scrollInterval;
+            const startContinuousScroll = () => {
+                scrollInterval = setInterval(() => {
+                    if (!btsSwiper.autoplay?.paused && !this.config.lowPowerMode) {
+                        btsSwiper.slideNext();
+                    }
+                }, 3000); // Move to next slide every 3 seconds
+            };
+            
+            const stopContinuousScroll = () => {
+                if (scrollInterval) clearInterval(scrollInterval);
+            };
+            
+            // Start continuous scroll
+            startContinuousScroll();
+            
+            // Pause on hover
+            const swiperContainer = document.querySelector('.am-bts-swiper');
+            if (swiperContainer) {
+                swiperContainer.addEventListener('mouseenter', () => {
+                    stopContinuousScroll();
+                });
+                swiperContainer.addEventListener('mouseleave', () => {
+                    startContinuousScroll();
+                });
+            }
+            
+            // Store interval for cleanup
+            this.scrollInterval = scrollInterval;
+        }
         
         window.BTSSliderInstance = this;
         this.btsSwiper = btsSwiper;
         this.setupVisibilityHandler();
         this.setupMemoryCleanup();
         
-        console.log('BTS Slider initialized with 3-row layout');
+        console.log('BTS Slider initialized with continuous carousel loop');
     },
     
     startLazyLoading() {
@@ -387,6 +444,8 @@ const BTSSlider = {
             const videos = document.querySelectorAll('.am-bts-video');
             if (document.hidden) {
                 videos.forEach(v => { if (!v.paused) { v.pause(); v.dataset.wasPlaying = 'true'; } });
+                // Pause continuous scroll when tab is hidden
+                if (this.scrollInterval) clearInterval(this.scrollInterval);
             } else {
                 videos.forEach(v => {
                     const parent = v.closest('.am-bts-item');
@@ -395,6 +454,14 @@ const BTSSlider = {
                         delete v.dataset.wasPlaying;
                     }
                 });
+                // Restart continuous scroll when tab is visible
+                if (!this.config.lowPowerMode && this.btsSwiper) {
+                    this.scrollInterval = setInterval(() => {
+                        if (this.btsSwiper && !this.btsSwiper.autoplay?.paused) {
+                            this.btsSwiper.slideNext();
+                        }
+                    }, 3000);
+                }
             }
         });
     },
@@ -413,6 +480,7 @@ const BTSSlider = {
             document.querySelectorAll('.am-bts-video').forEach(v => {
                 if (v.src && v.src.startsWith('blob:')) URL.revokeObjectURL(v.src);
             });
+            if (this.scrollInterval) clearInterval(this.scrollInterval);
         });
     }
 };

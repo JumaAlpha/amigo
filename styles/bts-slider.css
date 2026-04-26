@@ -39,12 +39,14 @@
     max-width: 1400px;
     overflow: visible;
     position: relative;
+    padding: 0 40px;
 }
 
 /* BTS Swiper Wrapper */
 .am-bts-swiper .swiper-wrapper {
     display: flex;
     align-items: center;
+    transition-timing-function: linear !important;
 }
 
 /* BTS Swiper Slides - FIXED WIDTH */
@@ -188,45 +190,6 @@
     }
 }
 
-/* Alternative: Pulsing spinner with dots */
-.am-bts-loading-dots {
-    display: flex;
-    gap: 8px;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.2s ease;
-}
-
-.am-bts-item.loading .am-bts-loading-dots {
-    opacity: 1;
-    visibility: visible;
-}
-
-.am-bts-loading-dots .dot {
-    width: 10px;
-    height: 10px;
-    background-color: var(--metallic-gold);
-    border-radius: 50%;
-    display: inline-block;
-    animation: amDotPulse 1.2s infinite ease-in-out;
-    box-shadow: 0 0 5px rgba(212, 175, 55, 0.5);
-}
-
-.am-bts-loading-dots .dot:nth-child(1) { animation-delay: 0s; }
-.am-bts-loading-dots .dot:nth-child(2) { animation-delay: 0.15s; }
-.am-bts-loading-dots .dot:nth-child(3) { animation-delay: 0.3s; }
-
-@keyframes amDotPulse {
-    0%, 60%, 100% {
-        transform: scale(0.6);
-        opacity: 0.4;
-    }
-    30% {
-        transform: scale(1.2);
-        opacity: 1;
-    }
-}
-
 /* Swiper Navigation Buttons */
 .am-bts-swiper-button-prev,
 .am-bts-swiper-button-next {
@@ -249,11 +212,11 @@
 }
 
 .am-bts-swiper-button-prev {
-    left: -24px;
+    left: 0;
 }
 
 .am-bts-swiper-button-next {
-    right: -24px;
+    right: 0;
 }
 
 .am-bts-swiper-button-prev:hover,
@@ -303,6 +266,12 @@
     opacity: 0.8;
 }
 
+/* Continuous scroll effect - creates seamless loop */
+.swiper-slide-duplicate {
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
 /* ===== RESPONSIVE ===== */
 @media (max-width: 1200px) {
     .am-bts-slide-content {
@@ -316,6 +285,9 @@
     }
     .am-bts-item {
         height: 160px;
+    }
+    .am-bts-swiper {
+        padding: 0 30px;
     }
 }
 
@@ -345,11 +317,8 @@
         width: 40px;
         height: 40px;
     }
-    .am-bts-swiper-button-prev {
-        left: -10px;
-    }
-    .am-bts-swiper-button-next {
-        right: -10px;
+    .am-bts-swiper {
+        padding: 0 20px;
     }
 }
 
@@ -379,11 +348,8 @@
         width: 32px;
         height: 32px;
     }
-    .am-bts-swiper-button-prev {
-        left: -5px;
-    }
-    .am-bts-swiper-button-next {
-        right: -5px;
+    .am-bts-swiper {
+        padding: 0 15px;
     }
 }
 
