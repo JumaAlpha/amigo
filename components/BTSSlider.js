@@ -30,8 +30,7 @@ const BTSSlider = {
                     <div class="am-bts-swiper-button-prev"></div>
                     <div class="am-bts-swiper-button-next"></div>
                     
-                    <!-- Pagination -->
-                    <div class="am-bts-pagination"></div>
+                    
                 </div>
             </section>
         `;
