@@ -1,34 +1,48 @@
 const BTSSlider = {
-    // Configuration
+    // Cache storage key
+    CACHE_KEY: 'bts_videos_cache',
+    
+    // Track active video instances for cleanup
+    activeVideos: new Map(),
+    thumbnailCache: new Map(),
+    
+    // Configuration for performance
     config: {
+        maxConcurrentLoads: 3,
+        thumbnailGenerationDelay: 500,
+        videoUnloadDelay: 10000,
+        preloadAheadDistance: 800,
         lowPowerMode: false
     },
     
-    // Get video path
-    getVideoPath(index) {
-        const videoNumber = String(index + 1).padStart(2, '0');
-        return `assets/bts/video${videoNumber}.mp4`;
-    },
-    
-    // Render HTML
     render() {
         return `
             <section class="section am-bts-section" id="am-bts-section">
                 <div class="am-bts-header">· behind the scenes</div>
+                
+                <!-- Swiper Container -->
                 <div class="swiper am-bts-swiper">
                     <div class="swiper-wrapper">
                         ${this.renderSlides()}
                     </div>
+                    
+                    <!-- Navigation -->
                     <div class="am-bts-swiper-button-prev"></div>
                     <div class="am-bts-swiper-button-next"></div>
+                    
                 </div>
-                <div class="am-bts-pagination"></div>
             </section>
         `;
     },
     
-    // Render slides with consistent dimensions
+    getVideoPath(index) {
+        // Videos stored as assets/bts/video01.mp4, video02.mp4, ...
+        const videoNumber = String(index + 1).padStart(2, '0');
+        return `assets/bts/video${videoNumber}.mp4`;
+    },
+    
     renderSlides() {
+        // Define slides - each slide now has 3 videos to make 3 rows
         const slides = [
             { width: 'normal', videos: [1, 2, 3] },
             { width: 'wide', videos: [4, 5, 6] },
@@ -48,18 +62,26 @@ const BTSSlider = {
                         const videoId = `bts_video_${videoCounter}`;
                         videoCounter++;
                         return `
-                            <div class="am-bts-item" data-video-src="${videoPath}" data-video-id="${videoId}">
-                                <video class="am-bts-video" muted loop playsinline preload="none">
-                                    <source src="${videoPath}" type="video/mp4">
+                            <div class="am-bts-item" 
+                                 data-rotation="${this.getRandomRotation()}"
+                                 data-video-src="${videoPath}"
+                                 data-video-id="${videoId}"
+                                 data-loaded="false">
+                                <video class="am-bts-video" 
+                                       data-src="${videoPath}"
+                                       muted
+                                       loop
+                                       playsinline
+                                       preload="metadata"
+                                       poster="">
+                                    Your browser does not support the video tag.
                                 </video>
+                                <div class="am-bts-pattern"></div>
                                 <div class="am-bts-play-hint">
                                     <i class="fas fa-play"></i>
                                 </div>
-                                <div class="am-bts-pattern"></div>
                                 <div class="am-bts-loading">
-                                    <div class="dot"></div>
-                                    <div class="dot"></div>
-                                    <div class="dot"></div>
+                                    <div class="am-bts-loading-spinner"></div>
                                 </div>
                             </div>
                         `;
@@ -69,42 +91,194 @@ const BTSSlider = {
         `).join('');
     },
     
-    // Setup video hover
-    setupVideo(video, item) {
-        let isPlaying = false;
-        
-        item.addEventListener('mouseenter', () => {
-            if (video.readyState >= 2) {
-                video.play().catch(e => console.log('Play error:', e));
-                isPlaying = true;
-            }
-        });
-        
-        item.addEventListener('mouseleave', () => {
-            if (isPlaying) {
-                video.pause();
-                isPlaying = false;
-            }
-        });
-        
-        // Load video on first hover
-        item.addEventListener('mouseenter', () => {
-            if (video.preload !== 'auto') {
-                video.preload = 'auto';
-                video.load();
-            }
-        }, { once: true });
+    getRandomRotation() {
+        const rotations = [-3, -1.5, 0, 1.5, 3];
+        return rotations[Math.floor(Math.random() * rotations.length)];
     },
     
-    // Initialize
+    // Performance detection
+    detectPerformanceMode() {
+        if ('getBattery' in navigator) {
+            navigator.getBattery().then(battery => {
+                if (battery.charging === false && battery.level < 0.2) {
+                    this.config.lowPowerMode = true;
+                    console.log('Low power mode detected');
+                }
+            }).catch(() => {});
+        }
+        if ('deviceMemory' in navigator && navigator.deviceMemory < 4) {
+            this.config.lowPowerMode = true;
+        }
+        if ('connection' in navigator && navigator.connection.saveData) {
+            this.config.lowPowerMode = true;
+        }
+    },
+    
+    async loadVideoFromCache(videoElement, videoUrl, videoId) {
+        if (videoElement.dataset.loaded === 'true' || videoElement.dataset.loading === 'true') {
+            return false;
+        }
+        
+        videoElement.dataset.loading = 'true';
+        const parent = videoElement.closest('.am-bts-item');
+        if (parent) parent.classList.add('loading');
+        
+        try {
+            // Generate thumbnail first
+            await this.loadThumbnailFromCache(videoElement, videoUrl, videoId);
+            
+            if (!('caches' in window)) {
+                this.setupVideoElement(videoElement, videoUrl, videoId);
+                return false;
+            }
+            
+            const cache = await caches.open('bts-videos-cache-v1');
+            const cachedResponse = await cache.match(videoUrl);
+            
+            if (cachedResponse) {
+                const blob = await cachedResponse.blob();
+                const blobUrl = URL.createObjectURL(blob);
+                this.setupVideoElement(videoElement, blobUrl, videoId, true);
+                return true;
+            } else {
+                this.setupVideoElement(videoElement, videoUrl, videoId);
+                // Background cache after load
+                videoElement.addEventListener('canplaythrough', () => {
+                    this.cacheVideoInBackground(videoUrl, videoId);
+                }, { once: true });
+                return false;
+            }
+        } catch (error) {
+            console.log(`Error loading video ${videoId}:`, error);
+            this.setupVideoElement(videoElement, videoUrl, videoId);
+            return false;
+        } finally {
+            videoElement.dataset.loading = 'false';
+            if (parent) {
+                setTimeout(() => parent.classList.remove('loading'), 300);
+            }
+        }
+    },
+    
+    async loadThumbnailFromCache(videoElement, videoUrl, videoId) {
+        if (this.thumbnailCache.has(videoUrl)) {
+            videoElement.poster = this.thumbnailCache.get(videoUrl);
+            return true;
+        }
+        
+        return new Promise((resolve) => {
+            setTimeout(async () => {
+                const thumbnail = await this.generateThumbnailEfficient(videoUrl, videoId);
+                if (thumbnail) {
+                    this.thumbnailCache.set(videoUrl, thumbnail);
+                    videoElement.poster = thumbnail;
+                    resolve(true);
+                }
+                resolve(false);
+            }, this.config.thumbnailGenerationDelay);
+        });
+    },
+    
+    generateThumbnailEfficient(videoUrl, videoId) {
+        return new Promise((resolve) => {
+            const tempVideo = document.createElement('video');
+            tempVideo.muted = true;
+            tempVideo.preload = 'metadata';
+            tempVideo.crossOrigin = 'Anonymous';
+            tempVideo.src = videoUrl;
+            
+            const timeoutId = setTimeout(() => {
+                tempVideo.remove();
+                resolve(null);
+            }, 3000);
+            
+            tempVideo.addEventListener('loadedmetadata', () => {
+                tempVideo.currentTime = Math.min(0.3, tempVideo.duration * 0.05);
+            });
+            
+            tempVideo.addEventListener('seeked', () => {
+                clearTimeout(timeoutId);
+                try {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const vw = tempVideo.videoWidth, vh = tempVideo.videoHeight;
+                    if (vw === 0 || vh === 0) { tempVideo.remove(); resolve(null); return; }
+                    const maxW = 200;
+                    let tw = vw, th = vh;
+                    if (tw > maxW) { const r = maxW / tw; tw = maxW; th = Math.floor(vh * r); }
+                    canvas.width = tw; canvas.height = th;
+                    ctx.drawImage(tempVideo, 0, 0, tw, th);
+                    const dataURL = canvas.toDataURL('image/jpeg', 0.5);
+                    resolve(dataURL);
+                } catch(e) { resolve(null); }
+                finally { tempVideo.remove(); }
+            });
+            tempVideo.addEventListener('error', () => { clearTimeout(timeoutId); tempVideo.remove(); resolve(null); });
+            tempVideo.load();
+        });
+    },
+    
+    setupVideoElement(videoElement, src, videoId, isCached = false) {
+        const parent = videoElement.closest('.am-bts-item');
+        videoElement.src = src;
+        videoElement.load();
+        videoElement.dataset.loaded = 'true';
+        
+        // Store current src for cleanup
+        videoElement.dataset.currentSrc = src;
+        
+        // Play on hover only when ready
+        parent.addEventListener('mouseenter', () => {
+            if (videoElement.readyState >= 2) {
+                videoElement.play().catch(e => console.log('play failed', e));
+            }
+        });
+        parent.addEventListener('mouseleave', () => {
+            if (!videoElement.paused) videoElement.pause();
+        });
+        
+        console.log(`Video ${videoId} ready (${isCached ? 'cached' : 'network'})`);
+    },
+    
+    async cacheVideoInBackground(videoUrl, videoId) {
+        if (!('caches' in window)) return;
+        try {
+            const cache = await caches.open('bts-videos-cache-v1');
+            const response = await fetch(videoUrl);
+            if (response.ok) {
+                await cache.put(videoUrl, response.clone());
+                console.log(`Cached ${videoId}`);
+            }
+        } catch(e) {}
+    },
+    
+    unloadVideo(videoElement, videoId) {
+        if (!videoElement || videoElement.dataset.loaded !== 'true') return;
+        if (!videoElement.paused) return;
+        videoElement.pause();
+        videoElement.src = '';
+        videoElement.load();
+        videoElement.dataset.loaded = 'false';
+        if (videoElement.dataset.currentSrc && videoElement.dataset.currentSrc.startsWith('blob:')) {
+            URL.revokeObjectURL(videoElement.dataset.currentSrc);
+        }
+    },
+    
     init() {
-        // Initialize Swiper
-        const swiper = new Swiper('.am-bts-swiper', {
+        this.detectPerformanceMode();
+        
+        // Initialize Swiper with settings that prevent parent scroll interference
+        const btsSwiper = new Swiper('.am-bts-swiper', {
             slidesPerView: 'auto',
-            spaceBetween: 20,
+            spaceBetween: this.config.lowPowerMode ? 15 : 25,
             centeredSlides: false,
             loop: true,
-            speed: 600,
+            speed: this.config.lowPowerMode ? 400 : 800,
+            autoplay: this.config.lowPowerMode ? false : {
+                delay: 4000,
+                disableOnInteraction: false,
+                pauseOnMouseEnter: true,
+            },
             navigation: {
                 nextEl: '.am-bts-swiper-button-next',
                 prevEl: '.am-bts-swiper-button-prev',
@@ -115,32 +289,185 @@ const BTSSlider = {
                 bulletClass: 'am-bts-pagination-bullet',
                 bulletActiveClass: 'am-bts-pagination-bullet-active',
             },
+            freeMode: { enabled: true, momentum: !this.config.lowPowerMode, momentumRatio: 0.5 },
             breakpoints: {
                 320: { spaceBetween: 10 },
                 768: { spaceBetween: 15 },
-                1024: { spaceBetween: 20 }
+                1024: { spaceBetween: this.config.lowPowerMode ? 20 : 25 }
             },
-            mousewheel: { forceToAxis: true },
-            keyboard: { enabled: true }
+            mousewheel: { forceToAxis: true, sensitivity: 1 },
+            keyboard: { enabled: true, onlyInViewport: true },
+            touchRatio: 1.5,
+            grabCursor: true,
+            // Prevent swipes from bubbling up to parent horizontal scroll
+            touchMoveStopPropagation: true,
+            on: {
+                init: () => {
+                    console.log('BTS Swiper ready');
+                    this.startLazyLoading();
+                },
+                slideChange: () => this.manageVideoQueue(),
+                resize: () => this.manageVideoQueue()
+            }
         });
         
-        // Setup videos
-        setTimeout(() => {
-            document.querySelectorAll('.am-bts-item').forEach(item => {
-                const video = item.querySelector('.am-bts-video');
-                if (video) {
-                    this.setupVideo(video, item);
+        window.BTSSliderInstance = this;
+        this.btsSwiper = btsSwiper;
+        this.setupVisibilityHandler();
+        this.setupMemoryCleanup();
+        
+        console.log('BTS Slider initialized with 3-row layout');
+    },
+    
+    startLazyLoading() {
+        this.loadQueue = [];
+        this.activeLoads = 0;
+        const items = document.querySelectorAll('.am-bts-item');
+        items.forEach(item => {
+            const video = item.querySelector('.am-bts-video');
+            const src = item.dataset.videoSrc;
+            const id = item.dataset.videoId;
+            if (video && src) {
+                this.loadQueue.push({ video, videoSrc: src, videoId: id, item });
+            }
+        });
+        for (let i = 0; i < this.config.maxConcurrentLoads && i < this.loadQueue.length; i++) {
+            this.processNextInQueue();
+        }
+    },
+    
+    processNextInQueue() {
+        if (this.loadQueue.length === 0 || this.activeLoads >= this.config.maxConcurrentLoads) return;
+        const next = this.loadQueue.shift();
+        if (!next) return;
+        this.activeLoads++;
+        const isNear = this.isElementNearViewport(next.item);
+        if (isNear || this.activeLoads <= 2) {
+            this.loadVideoFromCache(next.video, next.videoSrc, next.videoId)
+                .finally(() => { this.activeLoads--; this.processNextInQueue(); });
+        } else {
+            setTimeout(() => { this.activeLoads--; this.loadQueue.unshift(next); this.processNextInQueue(); }, 500);
+        }
+    },
+    
+    isElementNearViewport(element) {
+        if (!element) return false;
+        const container = document.querySelector('.am-bts-swiper');
+        if (!container) return true;
+        const cRect = container.getBoundingClientRect();
+        const eRect = element.getBoundingClientRect();
+        const distance = this.config.preloadAheadDistance;
+        return (eRect.right >= cRect.left - distance && eRect.left <= cRect.right + distance);
+    },
+    
+    manageVideoQueue() {
+        const videos = document.querySelectorAll('.am-bts-video');
+        const container = document.querySelector('.am-bts-swiper');
+        if (!container) return;
+        const cRect = container.getBoundingClientRect();
+        videos.forEach(video => {
+            const parent = video.closest('.am-bts-item');
+            if (!parent) return;
+            const eRect = parent.getBoundingClientRect();
+            const isFar = (eRect.right < cRect.left - 1500 || eRect.left > cRect.right + 1500);
+            const vidId = parent.dataset.videoId;
+            if (isFar && video.dataset.loaded === 'true' && video.paused) {
+                if (this.unloadTimeouts?.[vidId]) clearTimeout(this.unloadTimeouts[vidId]);
+                this.unloadTimeouts = this.unloadTimeouts || {};
+                this.unloadTimeouts[vidId] = setTimeout(() => this.unloadVideo(video, vidId), this.config.videoUnloadDelay);
+            } else if (!isFar && video.dataset.loaded !== 'true' && !video.dataset.loading) {
+                const src = parent.dataset.videoSrc;
+                if (src) this.loadVideoFromCache(video, src, vidId);
+            }
+        });
+    },
+    
+    setupVisibilityHandler() {
+        document.addEventListener('visibilitychange', () => {
+            const videos = document.querySelectorAll('.am-bts-video');
+            if (document.hidden) {
+                videos.forEach(v => { if (!v.paused) { v.pause(); v.dataset.wasPlaying = 'true'; } });
+            } else {
+                videos.forEach(v => {
+                    const parent = v.closest('.am-bts-item');
+                    if (parent && parent.matches(':hover') && v.dataset.wasPlaying === 'true') {
+                        v.play().catch(()=>{});
+                        delete v.dataset.wasPlaying;
+                    }
+                });
+            }
+        });
+    },
+    
+    setupMemoryCleanup() {
+        setInterval(() => {
+            const videos = document.querySelectorAll('.am-bts-video');
+            videos.forEach(video => {
+                const parent = video.closest('.am-bts-item');
+                if (parent && !this.isElementNearViewport(parent) && video.paused && video.dataset.loaded === 'true') {
+                    this.unloadVideo(video, parent.dataset.videoId);
                 }
             });
-        }, 100);
-        
-        console.log('BTS Slider initialized');
+        }, 30000);
+        window.addEventListener('beforeunload', () => {
+            document.querySelectorAll('.am-bts-video').forEach(v => {
+                if (v.src && v.src.startsWith('blob:')) URL.revokeObjectURL(v.src);
+            });
+        });
     }
 };
 
-// Initialize on load
+// Add spinner style if missing
+if (!document.getElementById('am-bts-spinner-style')) {
+    const style = document.createElement('style');
+    style.id = 'am-bts-spinner-style';
+    style.textContent = `
+        @keyframes amSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .am-bts-item {
+            transition: transform 0.3s ease;
+        }
+        .am-bts-video {
+            border-radius: 12px;
+        }
+        /* Spinner loading animation */
+        .am-bts-loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(212, 175, 55, 0.2);
+            border-top: 3px solid var(--metallic-gold);
+            border-right: 3px solid var(--metallic-gold);
+            border-radius: 50%;
+            animation: amSpin 0.8s linear infinite;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+        }
+        @media (max-width: 480px) {
+            .am-bts-loading-spinner {
+                width: 30px;
+                height: 30px;
+            }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .am-bts-loading-spinner {
+                animation: none;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+// Initialize when DOM is ready
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => BTSSlider.init());
+    document.addEventListener('DOMContentLoaded', () => {
+        BTSSlider.init();
+    });
 } else {
     BTSSlider.init();
+}
+
+// Export for use in other modules if needed
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = BTSSlider;
 }
