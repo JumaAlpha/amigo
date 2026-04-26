@@ -1,20 +1,18 @@
 /* ========== BTS SECTION - UNIQUE CLASS NAMES (NO CONFLICTS) ========== */
 
-/* Main BTS Section Container */
+/* Main BTS Section Container - PERFECTLY CENTERED */
 .am-bts-section {
     background: var(--pure-black);
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 2rem 0;
     position: relative;
-    overflow: hidden;
     width: 100%;
-    height: 100%;
-    min-height: 0;
+    min-height: 100vh;
     margin: 0 auto;
     box-sizing: border-box;
+    padding: 2rem;
 }
 
 /* BTS Section Header */
@@ -23,8 +21,9 @@
     font-size: 2.5rem;
     color: var(--metallic-gold);
     letter-spacing: 6px;
-    margin-bottom: 1.5rem;
-    padding-left: 2rem;
+    margin-bottom: 2rem;
+    margin-top: 0;
+    padding-left: 0;
     font-weight: 400;
     opacity: 0.9;
     align-self: flex-start;
@@ -37,114 +36,73 @@
 /* BTS Swiper Container */
 .am-bts-swiper {
     width: 100%;
-    flex: 1;
-    min-height: 0;
-    padding: 0.5rem 0 2rem 0;
-    position: relative;
+    max-width: 1400px;
     overflow: visible;
-    touch-action: pan-y pinch-zoom;
+    position: relative;
 }
 
 /* BTS Swiper Wrapper */
 .am-bts-swiper .swiper-wrapper {
     display: flex;
-    align-items: stretch;
-    height: 90%;
+    align-items: center;
 }
 
-/* BTS Swiper Slides */
+/* BTS Swiper Slides - FIXED WIDTH */
 .am-bts-swiper .swiper-slide {
-    width: auto;
-    height: auto;
-    opacity: 0.8;
-    transition: opacity 0.3s ease;
-    flex-shrink: 0;
+    width: auto !important;
+    height: auto !important;
 }
 
-.am-bts-swiper .swiper-slide-active {
-    opacity: 1;
-}
-
-/* BTS Slide Content Container */
+/* BTS Slide Content Container - FIXED DIMENSIONS */
 .am-bts-slide-content {
     display: flex;
     flex-direction: column;
-    gap: 1.2rem;
-    height: 100%;
-    min-width: 320px;
-    max-width: 360px;
-    padding: 0.5rem 0;
+    gap: 1rem;
+    width: 320px;
+    padding: 0;
 }
 
-/* Width variations */
 .am-bts-slide-content.wide {
-    min-width: 420px;
-    max-width: 480px;
+    width: 420px;
 }
 
 .am-bts-slide-content.narrow {
-    min-width: 280px;
-    max-width: 300px;
+    width: 280px;
 }
 
-/* BTS Individual Item */
+/* BTS Individual Item - UNIFORM SIZE */
 .am-bts-item {
     position: relative;
+    width: 100%;
+    height: 180px;
     border-radius: 12px;
     overflow: hidden;
     cursor: pointer;
-    transition: transform 0.4s cubic-bezier(0.2, 0.9, 0.3, 1), 
-                box-shadow 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(212, 175, 55, 0.1);
-    width: 100%;
-    flex: 1 1 auto;
-    min-height: 120px;
-    transform: rotate(0deg) scale(1);
-    will-change: transform;
     background: #1a1a1a;
+    flex-shrink: 0;
 }
 
-.am-bts-slide-content {
-    height: 88%;
-    display: flex;
-    flex-direction: column;
+.am-bts-item:hover {
+    transform: scale(1.02);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
 }
 
-.am-bts-slide-content .am-bts-item {
-    flex: 1;
-    min-height: 0;
-}
-
-.am-bts-item[data-h] {
-    min-height: 0;
-    flex: 1;
-}
-
-/* Video wrapper */
-.am-bts-video-wrapper {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background: #1a1a1a;
-}
-
+/* Video element - FILLS ITEM COMPLETELY */
 .am-bts-video {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: filter 0.4s cubic-bezier(0.2, 0.9, 0.3, 1),
-                transform 0.6s cubic-bezier(0.2, 0.9, 0.3, 1);
-    filter: grayscale(0.3) brightness(0.85);
-    will-change: transform;
-    background-color: #1a1a1a;
     display: block;
+    transition: filter 0.3s ease, transform 0.3s ease;
+    filter: grayscale(0.3) brightness(0.85);
 }
 
 .am-bts-item:hover .am-bts-video {
-    filter: grayscale(0) brightness(1.02);
-    transform: scale(1.02);
+    filter: grayscale(0) brightness(1);
+    transform: scale(1.05);
 }
 
 /* Video play hint overlay */
@@ -160,7 +118,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--pure-black);
+    color: #000;
     font-size: 1.3rem;
     opacity: 0;
     transition: opacity 0.3s ease, transform 0.3s ease;
@@ -185,7 +143,7 @@
     opacity: 0;
     pointer-events: none;
     z-index: 1;
-    transition: opacity 0.4s ease;
+    transition: opacity 0.3s ease;
 }
 
 .am-bts-item:hover .am-bts-pattern {
@@ -202,7 +160,7 @@
     gap: 8px;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.2s ease, visibility 0.2s ease;
+    transition: opacity 0.2s ease;
     z-index: 5;
     pointer-events: none;
 }
@@ -219,7 +177,6 @@
     border-radius: 50%;
     display: inline-block;
     animation: amDotPulse 1.2s infinite ease-in-out;
-    box-shadow: 0 0 5px rgba(212, 175, 55, 0.5);
 }
 
 .am-bts-loading .dot:nth-child(1) { animation-delay: 0s; }
@@ -235,28 +192,6 @@
         transform: scale(1.2);
         opacity: 1;
     }
-}
-
-/* Caption overlay */
-.am-bts-caption {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: linear-gradient(
-        to top,
-        rgba(0, 0, 0, 0.9) 0%,
-        rgba(0, 0, 0, 0.5) 50%,
-        transparent 100%
-    );
-    padding: 1rem;
-    opacity: 0;
-    transition: opacity 0.4s ease;
-    z-index: 2;
-}
-
-.am-bts-item:hover .am-bts-caption {
-    opacity: 1;
 }
 
 /* Swiper Navigation Buttons */
@@ -281,17 +216,17 @@
 }
 
 .am-bts-swiper-button-prev {
-    left: 10px;
+    left: -24px;
 }
 
 .am-bts-swiper-button-next {
-    right: 10px;
+    right: -24px;
 }
 
 .am-bts-swiper-button-prev:hover,
 .am-bts-swiper-button-next:hover {
     background: var(--metallic-gold);
-    color: var(--pure-black);
+    color: #000;
     transform: translateY(-50%) scale(1.1);
     border-color: var(--metallic-gold);
 }
@@ -310,12 +245,10 @@
 
 /* Pagination */
 .am-bts-pagination {
-    position: relative;
     display: flex;
     justify-content: center;
     gap: 8px;
-    margin-top: 1.5rem;
-    padding-bottom: 0.5rem;
+    margin-top: 2rem;
 }
 
 .am-bts-pagination-bullet {
@@ -340,211 +273,125 @@
 /* ===== RESPONSIVE ===== */
 @media (max-width: 1200px) {
     .am-bts-slide-content {
-        min-width: 280px;
-        max-width: 320px;
-        gap: 1rem;
+        width: 280px;
     }
     .am-bts-slide-content.wide {
-        min-width: 360px;
-        max-width: 400px;
+        width: 360px;
     }
     .am-bts-slide-content.narrow {
-        min-width: 240px;
-        max-width: 260px;
+        width: 240px;
+    }
+    .am-bts-item {
+        height: 160px;
     }
 }
 
 @media (max-width: 900px) {
+    .am-bts-section {
+        padding: 1.5rem;
+    }
     .am-bts-header {
         font-size: 2rem;
-        padding-left: 1.5rem;
+        margin-bottom: 1.5rem;
     }
     .am-bts-slide-content {
-        min-width: 260px;
-        max-width: 280px;
-        gap: 0.9rem;
+        width: 260px;
+        gap: 0.8rem;
     }
     .am-bts-slide-content.wide {
-        min-width: 320px;
-        max-width: 340px;
+        width: 320px;
     }
     .am-bts-slide-content.narrow {
-        min-width: 200px;
-        max-width: 220px;
+        width: 220px;
+    }
+    .am-bts-item {
+        height: 150px;
     }
     .am-bts-swiper-button-prev,
     .am-bts-swiper-button-next {
         width: 40px;
         height: 40px;
     }
-    .am-bts-play-hint {
-        width: 40px;
-        height: 40px;
-        font-size: 1.1rem;
+    .am-bts-swiper-button-prev {
+        left: -10px;
+    }
+    .am-bts-swiper-button-next {
+        right: -10px;
     }
 }
 
 @media (max-width: 600px) {
+    .am-bts-section {
+        padding: 1rem;
+    }
     .am-bts-header {
         font-size: 1.6rem;
-        padding-left: 1rem;
+        margin-bottom: 1rem;
     }
     .am-bts-slide-content {
-        min-width: 220px;
-        max-width: 240px;
-        gap: 0.8rem;
+        width: 220px;
+        gap: 0.7rem;
     }
     .am-bts-slide-content.wide {
-        min-width: 260px;
-        max-width: 280px;
+        width: 260px;
     }
     .am-bts-slide-content.narrow {
-        min-width: 180px;
-        max-width: 200px;
+        width: 190px;
+    }
+    .am-bts-item {
+        height: 130px;
     }
     .am-bts-swiper-button-prev,
     .am-bts-swiper-button-next {
-        width: 36px;
-        height: 36px;
+        width: 32px;
+        height: 32px;
     }
-    .am-bts-play-hint {
-        width: 36px;
-        height: 36px;
-        font-size: 1rem;
+    .am-bts-swiper-button-prev {
+        left: -5px;
     }
-    .am-bts-pagination-bullet {
-        width: 20px;
-        height: 2px;
-    }
-    .am-bts-pagination-bullet-active {
-        width: 30px;
+    .am-bts-swiper-button-next {
+        right: -5px;
     }
 }
 
 @media (max-width: 480px) {
     .am-bts-header {
         font-size: 1.4rem;
-        padding-left: 0.8rem;
     }
     .am-bts-slide-content {
-        min-width: 190px;
-        max-width: 210px;
-        gap: 0.7rem;
+        width: 190px;
+        gap: 0.6rem;
     }
     .am-bts-slide-content.wide {
-        min-width: 220px;
-        max-width: 240px;
+        width: 220px;
     }
     .am-bts-slide-content.narrow {
-        min-width: 160px;
-        max-width: 170px;
+        width: 170px;
     }
-    .am-bts-swiper-button-prev,
-    .am-bts-swiper-button-next {
-        width: 32px;
-        height: 32px;
-    }
-    .am-bts-play-hint {
-        width: 32px;
-        height: 32px;
-        font-size: 0.9rem;
+    .am-bts-item {
+        height: 110px;
     }
 }
 
 /* Height adjustments */
 @media (max-height: 700px) {
-    .am-bts-section {
-        padding: 1rem 0;
+    .am-bts-item {
+        height: 140px;
     }
     .am-bts-header {
-        margin-bottom: 0.8rem;
+        margin-bottom: 1rem;
+    }
+    .am-bts-pagination {
+        margin-top: 1rem;
     }
 }
 
 @media (max-height: 600px) {
-    .am-bts-header {
-        font-size: 1.5rem;
-        margin-bottom: 0.5rem;
-    }
-    .am-bts-slide-content {
-        gap: 0.6rem;
-    }
-}
-
-@media (max-height: 500px) and (orientation: landscape) {
-    .am-bts-header {
-        font-size: 1.2rem;
-        margin-bottom: 0.3rem;
+    .am-bts-item {
+        height: 120px;
     }
     .am-bts-slide-content {
         gap: 0.5rem;
-        min-width: 180px;
-        max-width: 200px;
-    }
-    .am-bts-play-hint {
-        width: 28px;
-        height: 28px;
-        font-size: 0.8rem;
-    }
-    .am-bts-swiper-button-prev,
-    .am-bts-swiper-button-next {
-        width: 28px;
-        height: 28px;
-    }
-}
-
-/* Mobile-specific fixes for BTS section */
-@media (max-width: 768px) {
-    .am-bts-section {
-        padding: 1rem 0;
-        justify-content: flex-start;
-        overflow-y: auto;
-    }
-    
-    .am-bts-header {
-        margin-bottom: 0.5rem;
-        margin-top: 0.5rem;
-    }
-    
-    .am-bts-swiper {
-        flex: none;
-        height: auto;
-        min-height: 60vh;
-        padding: 0.5rem 0 1rem 0;
-    }
-    
-    .am-bts-pagination {
-        margin-top: 0.75rem;
-        margin-bottom: 0.5rem;
-    }
-    
-    .am-bts-swiper {
-        touch-action: pan-y pinch-zoom;
-    }
-}
-
-@media (max-width: 480px) {
-    .am-bts-swiper {
-        min-height: 50vh;
-        padding: 0.3rem 0 0.8rem 0;
-    }
-    
-    .am-bts-side-scroll {
-        padding-left: 10px;
-        padding-right: 10px;
-    }
-}
-
-/* Ensure main content can scroll horizontally on mobile */
-@media (max-width: 768px) {
-    .main-content {
-        scroll-snap-type: x mandatory;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-    
-    .section {
-        scroll-snap-align: start;
     }
 }
 
@@ -552,28 +399,10 @@
 @media (prefers-reduced-motion: reduce) {
     .am-bts-item,
     .am-bts-video,
-    .am-bts-caption,
-    .am-bts-pattern,
-    .am-bts-swiper-button-prev,
-    .am-bts-swiper-button-next,
-    .am-bts-pagination-bullet,
-    .am-bts-play-hint {
-        transition: none !important;
-        animation: none !important;
-    }
-    .am-bts-loading .dot {
-        animation: none !important;
-    }
-}
-
-/* High contrast */
-@media (prefers-contrast: high) {
-    .am-bts-item {
-        border: 2px solid var(--metallic-gold);
-    }
+    .am-bts-play-hint,
     .am-bts-swiper-button-prev,
     .am-bts-swiper-button-next {
-        border: 2px solid var(--metallic-gold);
-        background: var(--pure-black);
+        transition: none !important;
+        animation: none !important;
     }
 }
