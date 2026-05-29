@@ -6,9 +6,19 @@ const AboutGear = {
                     <div class="bw-photo">
                         <img src="assets/images/amigo.jpg" 
                              alt="Amigo Johnson B&W portrait">
+                        <div class="about-photo-caption">
+                            <span>Director</span>
+                            <strong>Nairobi · Dar es Salaam</strong>
+                        </div>
                     </div>
                     <div class="bio-gear">
+                        <div class="about-eyebrow">· about</div>
                         <h2 class="typing-name"></h2>
+                        <div class="about-summary">
+                            <span>Gospel music video director</span>
+                            <span>Live recording specialist</span>
+                            <span>East Africa</span>
+                        </div>
                         
                         <!-- Tab Navigation -->
                         <div class="tab-container">
@@ -48,6 +58,21 @@ const AboutGear = {
                                         <li>DJI Inspire 3</li>
                                     </ul>
                                 </div>
+                            </div>
+                        </div>
+
+                        <div class="about-metrics">
+                            <div>
+                                <strong>15+</strong>
+                                <span>Years</span>
+                            </div>
+                            <div>
+                                <strong>200+</strong>
+                                <span>Productions</span>
+                            </div>
+                            <div>
+                                <strong>8</strong>
+                                <span>Countries</span>
                             </div>
                         </div>
                     </div>
