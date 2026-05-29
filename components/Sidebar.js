@@ -12,7 +12,7 @@ const Sidebar = {
                 <!-- Navigation Menu -->
                 <ul class="nav-menu" id="navMenu">
                     <li><a href="#" class="nav-link active" data-section="hero">HOME</a></li>
-                    <li><a href="#" class="nav-link" data-section="work">WORK</a></li>
+                    <li><a href="#" class="nav-link" data-section="work">FEATURED CLIPS</a></li>
                     <li><a href="#" class="nav-link" data-section="recording">RECORDINGS</a></li>
                     <li><a href="#" class="nav-link" data-section="bts">BTS</a></li>
                     <li><a href="#" class="nav-link" data-section="about">ABOUT</a></li>
@@ -124,6 +124,28 @@ const Sidebar = {
             }
         };
 
+        const realignCurrentSection = (index = getSectionIndex(), delay = 0) => {
+            if (!mainContent || sections.length === 0) return;
+            const targetIndex = Math.max(0, Math.min(index, sections.length - 1));
+            const align = () => {
+                const target = sections[targetIndex];
+                if (!target) return;
+                mainContent.scrollTo({
+                    left: target.offsetLeft,
+                    behavior: 'auto'
+                });
+                activeSectionIndex = targetIndex;
+                setSectionNavState();
+                if (typeof AOS !== 'undefined') AOS.refresh();
+            };
+
+            if (delay > 0) {
+                setTimeout(align, delay);
+            } else {
+                requestAnimationFrame(align);
+            }
+        };
+
         const navigateSection = (direction) => {
             const currentIndex = getSectionIndex();
             scrollToSection(currentIndex + direction);
@@ -207,9 +229,11 @@ const Sidebar = {
                 }
             } else {
                 // On desktop, toggle expanded state
+                const currentIndex = getSectionIndex();
                 sidebar.classList.toggle('expanded');
                 mainContent.classList.toggle('sidebar-expanded');
                 updateDrawerPosition();
+                realignCurrentSection(currentIndex, 320);
                 
                 // Close social drawer when collapsing
                 if (!sidebar.classList.contains('expanded')) {
@@ -385,6 +409,7 @@ const Sidebar = {
         
         // Window resize handling
         window.addEventListener('resize', () => {
+            const currentIndex = getSectionIndex();
             if (window.innerWidth > 768) {
                 // Switch to desktop mode
                 sidebar.classList.remove('mobile-visible');
@@ -410,6 +435,7 @@ const Sidebar = {
             }
             updateDrawerPosition();
             closeSocialDrawer(); // Close any open drawer on resize
+            realignCurrentSection(currentIndex, 120);
         });
         
         // Escape key: close social drawer and/or mobile sidebar

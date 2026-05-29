@@ -55,7 +55,7 @@ body {
     scroll-behavior: smooth;
     background-color: var(--pure-black);
     flex: 1;
-    transition: margin-left 0.3s ease;
+    transition: margin-left 0.3s ease, width 0.3s ease;
     height: 100%;
     height: calc(var(--vh, 1vh) * 100);
     

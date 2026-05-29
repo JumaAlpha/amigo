@@ -33,7 +33,8 @@ const RecordingSection = {
     // formatDescription removed – no descriptions needed
 
     render() {
-        const embedUrl = `https://www.youtube.com/embed/videoseries?list=${this.playlistId}&rel=0&modestbranding=1`;
+        const origin = encodeURIComponent(window.location.origin);
+        const embedUrl = `https://www.youtube.com/embed/videoseries?list=${this.playlistId}&rel=0&modestbranding=1&enablejsapi=1&playsinline=1&origin=${origin}`;
         const playlistUrl = `https://www.youtube.com/playlist?list=${this.playlistId}`;
         const fallbackVideos = this.normalizeVideos(this.videos);
 
@@ -49,7 +50,18 @@ const RecordingSection = {
                         </a>
                     </div>
 
-                    <div class="recording-player-wrap">
+                    <div class="recording-player-wrap" id="recording-player-wrap">
+                        <div class="recording-pip-bar" data-pip-drag-handle>
+                            <span>Now playing</span>
+                            <div class="recording-pip-actions">
+                                <button type="button" data-pip-return aria-label="Return to recordings">
+                                    <i class="fas fa-up-right-and-down-left-from-center" aria-hidden="true"></i>
+                                </button>
+                                <button type="button" data-pip-close aria-label="Close mini player">
+                                    <i class="fas fa-xmark" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
                         <iframe
                             class="recording-player"
                             id="recording-player"
@@ -63,7 +75,7 @@ const RecordingSection = {
 
                     <div class="recording-description-panel" aria-live="polite">
                         <div class="recording-description-header">
-                            <span>Songs</span>
+                            <span>Latest Videos</span>
                             <span id="recording-feed-count">${fallbackVideos.length}</span>
                         </div>
                         <div class="recording-description-list" id="recording-description-list">
@@ -110,6 +122,12 @@ const RecordingSection = {
 
     // parseFeed, readCache, writeCache removed – no external fetching
 
+    buildVideoEmbedUrl(videoId, autoplay = true) {
+        const origin = encodeURIComponent(window.location.origin);
+        const autoplayParam = autoplay ? '&autoplay=1' : '';
+        return `https://www.youtube.com/embed/${videoId}?list=${this.playlistId}&rel=0&modestbranding=1&enablejsapi=1&playsinline=1&origin=${origin}${autoplayParam}`;
+    },
+
     bindSongList() {
         const player = document.getElementById('recording-player');
         if (!player) return;
@@ -128,7 +146,12 @@ const RecordingSection = {
                 const videoId = button.dataset.videoId;
                 if (!videoId) return;
 
-                player.src = `https://www.youtube.com/embed/${videoId}?list=${this.playlistId}&rel=0&modestbranding=1&autoplay=1`;
+                if (this._ytPlayer?.loadVideoById) {
+                    this._ytPlayer.loadVideoById(videoId);
+                } else {
+                    player.src = this.buildVideoEmbedUrl(videoId);
+                }
+                this._isPlaying = true;
                 freshButtons.forEach(item => item.classList.remove('active'));
                 button.classList.add('active');
             });
@@ -146,16 +169,237 @@ const RecordingSection = {
     },
 
     _initialized: false,
+    _ytPlayer: null,
+    _isPlaying: false,
+    _isSectionVisible: true,
+    _pipVisible: false,
+    _pipDragState: null,
+    _handlePipDragMove: null,
+    _handlePipDragEnd: null,
+
+    loadYouTubeApi() {
+        if (window.YT?.Player) return Promise.resolve();
+        if (window.__recordingYouTubeApiPromise) return window.__recordingYouTubeApiPromise;
+
+        window.__recordingYouTubeApiPromise = new Promise((resolve) => {
+            const previousReady = window.onYouTubeIframeAPIReady;
+            window.onYouTubeIframeAPIReady = () => {
+                if (typeof previousReady === 'function') previousReady();
+                resolve();
+            };
+
+            if (!document.querySelector('script[src="https://www.youtube.com/iframe_api"]')) {
+                const script = document.createElement('script');
+                script.src = 'https://www.youtube.com/iframe_api';
+                document.head.appendChild(script);
+            }
+        });
+
+        return window.__recordingYouTubeApiPromise;
+    },
+
+    setupYouTubePlayer() {
+        const iframe = document.getElementById('recording-player');
+        if (!iframe) return;
+
+        this.loadYouTubeApi().then(() => {
+            if (!window.YT?.Player || this._ytPlayer) return;
+
+            this._ytPlayer = new YT.Player(iframe, {
+                events: {
+                    onStateChange: (event) => {
+                        this._isPlaying = event.data === YT.PlayerState.PLAYING || event.data === YT.PlayerState.BUFFERING;
+                        this.evaluatePipState();
+                    }
+                }
+            });
+        }).catch((error) => {
+            console.warn('Could not initialize YouTube iframe API:', error);
+        });
+    },
+
+    setupPip() {
+        const pip = document.getElementById('recording-player-wrap');
+        if (!pip) return;
+
+        pip.querySelector('[data-pip-close]')?.addEventListener('click', () => {
+            if (this._ytPlayer?.pauseVideo) this._ytPlayer.pauseVideo();
+            this._isPlaying = false;
+            this.hidePip(false);
+        });
+
+        pip.querySelector('[data-pip-return]')?.addEventListener('click', () => {
+            document.getElementById('recording-section')?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+                inline: 'start'
+            });
+            this.restorePlayer();
+        });
+
+        pip.querySelector('[data-pip-drag-handle]')?.addEventListener('pointerdown', (event) => this.startPipDrag(event));
+    },
+
+    startPipDrag(event) {
+        const pip = document.getElementById('recording-player-wrap');
+        if (!pip || event.button !== 0) return;
+
+        const rect = pip.getBoundingClientRect();
+        pip.style.left = `${rect.left}px`;
+        pip.style.top = `${rect.top}px`;
+        pip.style.right = 'auto';
+        pip.style.bottom = 'auto';
+
+        this._pipDragState = {
+            pointerId: event.pointerId,
+            offsetX: event.clientX - rect.left,
+            offsetY: event.clientY - rect.top
+        };
+
+        pip.setPointerCapture(event.pointerId);
+        pip.classList.add('dragging');
+        pip.addEventListener('pointermove', this._handlePipDragMove);
+        pip.addEventListener('pointerup', this._handlePipDragEnd);
+        pip.addEventListener('pointercancel', this._handlePipDragEnd);
+    },
+
+    movePip(event) {
+        const pip = document.getElementById('recording-player-wrap');
+        if (!pip || !this._pipDragState) return;
+
+        const maxLeft = window.innerWidth - pip.offsetWidth - 8;
+        const maxTop = window.innerHeight - pip.offsetHeight - 8;
+        const nextLeft = Math.max(8, Math.min(event.clientX - this._pipDragState.offsetX, maxLeft));
+        const nextTop = Math.max(8, Math.min(event.clientY - this._pipDragState.offsetY, maxTop));
+
+        pip.style.left = `${nextLeft}px`;
+        pip.style.top = `${nextTop}px`;
+    },
+
+    endPipDrag() {
+        const pip = document.getElementById('recording-player-wrap');
+        if (!pip || !this._pipDragState) return;
+
+        pip.releasePointerCapture(this._pipDragState.pointerId);
+        pip.classList.remove('dragging');
+        pip.removeEventListener('pointermove', this._handlePipDragMove);
+        pip.removeEventListener('pointerup', this._handlePipDragEnd);
+        pip.removeEventListener('pointercancel', this._handlePipDragEnd);
+        this._pipDragState = null;
+    },
+
+    showPip() {
+        if (this._pipVisible) return;
+
+        const pip = document.getElementById('recording-player-wrap');
+        if (!pip) return;
+
+        document.body.classList.add('recording-pip-mode');
+        document.getElementById('recording-section')?.classList.add('recording-pip-host');
+        pip.classList.add('recording-pip-active');
+        this._pipVisible = true;
+    },
+
+    evaluatePipState() {
+        this.updateSectionVisibility();
+
+        if (this._isPlaying && !this._isSectionVisible) {
+            this.showPip();
+            return;
+        }
+
+        if (this._pipVisible) {
+            this.restorePlayer();
+        }
+    },
+
+    updateSectionVisibility() {
+        const section = document.getElementById('recording-section');
+        const mainContent = document.getElementById('main-content');
+        if (!section) {
+            this._isSectionVisible = false;
+            return false;
+        }
+
+        const sectionRect = section.getBoundingClientRect();
+        const rootRect = mainContent ? mainContent.getBoundingClientRect() : {
+            left: 0,
+            right: window.innerWidth,
+            top: 0,
+            bottom: window.innerHeight
+        };
+
+        const visibleWidth = Math.min(sectionRect.right, rootRect.right) - Math.max(sectionRect.left, rootRect.left);
+        const visibleHeight = Math.min(sectionRect.bottom, rootRect.bottom) - Math.max(sectionRect.top, rootRect.top);
+        const isVisible = visibleWidth > sectionRect.width * 0.45 && visibleHeight > sectionRect.height * 0.45;
+
+        this._isSectionVisible = isVisible;
+        return isVisible;
+    },
+
+    restorePlayer() {
+        const wrap = document.getElementById('recording-player-wrap');
+        if (wrap) {
+            wrap.classList.remove('recording-pip-active', 'dragging');
+            wrap.style.left = '';
+            wrap.style.top = '';
+            wrap.style.right = '';
+            wrap.style.bottom = '';
+        }
+        document.body.classList.remove('recording-pip-mode');
+        document.getElementById('recording-section')?.classList.remove('recording-pip-host');
+        this._pipVisible = false;
+    },
+
+    hidePip(restore = true) {
+        if (restore) {
+            this.restorePlayer();
+            return;
+        }
+
+        const pip = document.getElementById('recording-player-wrap');
+        if (pip) pip.classList.remove('recording-pip-active', 'dragging');
+        document.body.classList.remove('recording-pip-mode');
+        document.getElementById('recording-section')?.classList.remove('recording-pip-host');
+        this._pipVisible = false;
+    },
+
+    setupSectionObserver() {
+        const section = document.getElementById('recording-section');
+        const mainContent = document.getElementById('main-content');
+        if (!section) return;
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                this._isSectionVisible = entry.isIntersecting;
+                this.evaluatePipState();
+            });
+        }, {
+            root: mainContent || null,
+            threshold: 0.35
+        });
+
+        observer.observe(section);
+
+        const recheck = () => window.requestAnimationFrame(() => this.evaluatePipState());
+        mainContent?.addEventListener('scroll', recheck, { passive: true });
+        window.addEventListener('resize', recheck);
+    },
 
     async init() {
         if (this._initialized) return;
         this._initialized = true;
+        this._handlePipDragMove = (event) => this.movePip(event);
+        this._handlePipDragEnd = () => this.endPipDrag();
 
         const list = document.getElementById('recording-description-list');
         if (!list) return;
 
         // Directly render the static fallback videos – no network, no descriptions
         this.renderSongData(this.videos);
+        this.setupPip();
+        this.setupYouTubePlayer();
+        this.setupSectionObserver();
     }
 };
 
