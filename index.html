@@ -48,34 +48,49 @@
             pointer-events: none;
         }
 
-        .loading-spinner {
-            width: 60px;
-            height: 60px;
-            border: 4px solid rgba(212, 175, 55, 0.2);
-            border-top: 4px solid #d4af37;
-            border-right: 4px solid #d4af37;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin-bottom: 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
+        /* Simple loading text with animated dots */
         .loading-text {
             color: #d4af37;
-            font-size: 1rem;
+            font-size: 1.2rem;
             letter-spacing: 2px;
             text-transform: uppercase;
             font-weight: 300;
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
         }
 
-        .loading-progress {
-            margin-top: 15px;
-            font-size: 0.85rem;
-            color: rgba(212, 175, 55, 0.7);
+        .dot-animation {
+            display: inline-flex;
+            gap: 4px;
+        }
+
+        .dot-animation span {
+            animation: dotPulse 1.4s infinite ease-in-out;
+            animation-fill-mode: both;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .dot-animation span:nth-child(1) {
+            animation-delay: 0s;
+        }
+        .dot-animation span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .dot-animation span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes dotPulse {
+            0%, 60%, 100% {
+                opacity: 0.2;
+                transform: translateY(0);
+            }
+            30% {
+                opacity: 1;
+                transform: translateY(-6px);
+            }
         }
 
         /* Initially hide main content until loading is done */
@@ -101,9 +116,12 @@
 <body>
     <!-- Loading Screen Overlay -->
     <div id="loading-overlay" class="loading-overlay">
-        <div class="loading-spinner"></div>
-        <div class="loading-text">Loading cinematic experience</div>
-        <div class="loading-progress" id="loading-progress">0%</div>
+        <div class="loading-text">
+            Loading
+            <div class="dot-animation">
+                <span>.</span><span>.</span><span>.</span>
+            </div>
+        </div>
     </div>
 
     <!-- Viewport height fix for mobile browsers -->
@@ -275,15 +293,10 @@
                             return;
                         }
 
-
                         let loadedCount = 0;
-                        const progressElement = document.getElementById('loading-progress');
                         const overlay = document.getElementById('loading-overlay');
 
                         function updateProgress() {
-                            const percent = Math.floor((loadedCount / totalUnique) * 100);
-                            if (progressElement) progressElement.textContent = `${percent}%`;
-
                             // Threshold = 30%
                             if (loadedCount / totalUnique >= 0.3) {
                                 if (overlay) overlay.classList.add('hidden');
