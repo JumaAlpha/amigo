@@ -1,7 +1,7 @@
 const WorkGallery = {
     render() {
         return `
-            <section class="section work-section">
+            <section class="section work-section" data-aos="fade-up" data-aos-duration="700">
                 <div class="section-header">· featured videos</div>
                 
                 <!-- Swiper Container -->

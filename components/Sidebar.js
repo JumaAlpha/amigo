@@ -13,6 +13,7 @@ const Sidebar = {
                 <ul class="nav-menu" id="navMenu">
                     <li><a href="#" class="nav-link active" data-section="hero">HOME</a></li>
                     <li><a href="#" class="nav-link" data-section="work">WORK</a></li>
+                    <li><a href="#" class="nav-link" data-section="recording">RECORDINGS</a></li>
                     <li><a href="#" class="nav-link" data-section="bts">BTS</a></li>
                     <li><a href="#" class="nav-link" data-section="about">ABOUT</a></li>
                     <li><a href="#" class="nav-link" data-section="values">VALUES</a></li>
@@ -45,6 +46,10 @@ const Sidebar = {
         const navLinks = document.querySelectorAll('.nav-link');
         const mainContent = document.querySelector('.main-content');
         const sections = document.querySelectorAll('.section');
+        const sectionNavControls = document.createElement('div');
+        let sectionScrollLock = false;
+        let wheelDeltaBuffer = 0;
+        let activeSectionIndex = 0;
         
         // Helper functions for screen size detection
         const isMobile = () => window.innerWidth <= 768;
@@ -84,6 +89,78 @@ const Sidebar = {
                 arrow.style.transform = `translateX(${arrowOffset}px)`;
             }
         };
+
+        const getSectionIndex = () => {
+            if (!mainContent || sections.length === 0) return 0;
+            const currentLeft = mainContent.scrollLeft;
+            let closestIndex = 0;
+            let closestDistance = Infinity;
+
+            sections.forEach((section, index) => {
+                const distance = Math.abs(section.offsetLeft - currentLeft);
+                if (distance < closestDistance) {
+                    closestDistance = distance;
+                    closestIndex = index;
+                }
+            });
+
+            return closestIndex;
+        };
+
+        const scrollToSection = (index) => {
+            if (!mainContent || sections.length === 0) return;
+            const nextIndex = Math.max(0, Math.min(index, sections.length - 1));
+            const target = sections[nextIndex];
+            if (!target) return;
+
+            activeSectionIndex = nextIndex;
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'nearest',
+                inline: 'start'
+            });
+            if (typeof AOS !== 'undefined') {
+                setTimeout(() => AOS.refresh(), 350);
+            }
+        };
+
+        const navigateSection = (direction) => {
+            const currentIndex = getSectionIndex();
+            scrollToSection(currentIndex + direction);
+        };
+
+        const isInteractiveScrollTarget = (target) => {
+            return Boolean(target.closest(
+                '.work-swiper, .bts-custom-swiper, .bts-custom-carousel-wrapper, .recording-description-panel, .recording-description-list, input, textarea, select, button, a'
+            ));
+        };
+
+        const setSectionNavState = () => {
+            const currentIndex = getSectionIndex();
+            activeSectionIndex = currentIndex;
+            sectionNavControls.querySelector('[data-section-nav="prev"]')?.toggleAttribute('disabled', currentIndex <= 0);
+            sectionNavControls.querySelector('[data-section-nav="next"]')?.toggleAttribute('disabled', currentIndex >= sections.length - 1);
+        };
+
+        if (mainContent && sections.length > 1 && !document.querySelector('.section-nav-controls')) {
+            sectionNavControls.className = 'section-nav-controls';
+            sectionNavControls.setAttribute('aria-label', 'Section navigation');
+            sectionNavControls.innerHTML = `
+                <button class="section-nav-button section-nav-prev" type="button" data-section-nav="prev" aria-label="Previous section">
+                    <i class="fas fa-chevron-left" aria-hidden="true"></i>
+                </button>
+                <button class="section-nav-button section-nav-next" type="button" data-section-nav="next" aria-label="Next section">
+                    <i class="fas fa-chevron-right" aria-hidden="true"></i>
+                </button>
+            `;
+            document.body.appendChild(sectionNavControls);
+
+            sectionNavControls.addEventListener('click', (e) => {
+                const button = e.target.closest('[data-section-nav]');
+                if (!button) return;
+                navigateSection(button.dataset.sectionNav === 'next' ? 1 : -1);
+            });
+        }
         
         // Open sidebar on mobile (show it)
         const openMobileSidebar = () => {
@@ -206,19 +283,16 @@ const Sidebar = {
                 const sectionMap = {
                     'hero': 0,
                     'work': 1,
-                    'bts': 2,
-                    'about': 3,
-                    'values': 4,
-                    'booking': 5
+                    'recording': 2,
+                    'bts': 3,
+                    'about': 4,
+                    'values': 5,
+                    'booking': 6
                 };
                 const targetIndex = sectionMap[sectionId];
                 
                 if (targetIndex !== undefined && sections[targetIndex]) {
-                    sections[targetIndex].scrollIntoView({ 
-                        behavior: 'smooth', 
-                        block: 'nearest', 
-                        inline: 'start' 
-                    });
+                    scrollToSection(targetIndex);
                 }
                 
                 // On mobile, close sidebar after navigation
@@ -247,6 +321,8 @@ const Sidebar = {
                         sectionId = 'hero';
                     } else if (section.classList.contains('work-section')) {
                         sectionId = 'work';
+                    } else if (section.classList.contains('recording-section')) {
+                        sectionId = 'recording';
                     } else if (section.classList.contains('bts-section')) {
                         sectionId = 'bts';
                     } else if (section.querySelector('.about-split')) {
@@ -268,6 +344,8 @@ const Sidebar = {
                     }
                     
                     if (sectionId) {
+                        activeSectionIndex = Array.from(sections).indexOf(section);
+                        setSectionNavState();
                         navLinks.forEach(link => {
                             link.classList.remove('active');
                             if (link.dataset.section === sectionId) {
@@ -280,6 +358,30 @@ const Sidebar = {
         }, observerOptions);
         
         sections.forEach(section => observer.observe(section));
+
+        mainContent?.addEventListener('wheel', (e) => {
+            if (isInteractiveScrollTarget(e.target)) return;
+
+            const dominantDelta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+            if (Math.abs(dominantDelta) < 8) return;
+
+            e.preventDefault();
+            wheelDeltaBuffer += dominantDelta;
+
+            if (sectionScrollLock || Math.abs(wheelDeltaBuffer) < 70) return;
+
+            sectionScrollLock = true;
+            navigateSection(wheelDeltaBuffer > 0 ? 1 : -1);
+            wheelDeltaBuffer = 0;
+
+            setTimeout(() => {
+                sectionScrollLock = false;
+            }, 700);
+        }, { passive: false });
+
+        mainContent?.addEventListener('scroll', () => {
+            window.requestAnimationFrame(setSectionNavState);
+        }, { passive: true });
         
         // Window resize handling
         window.addEventListener('resize', () => {
@@ -319,6 +421,29 @@ const Sidebar = {
                 if (isMobile() && sidebar.classList.contains('mobile-visible')) {
                     closeMobileSidebar();
                 }
+            }
+
+            if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+            if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) return;
+
+            const keyMap = {
+                ArrowRight: 1,
+                ArrowDown: 1,
+                PageDown: 1,
+                ArrowLeft: -1,
+                ArrowUp: -1,
+                PageUp: -1
+            };
+
+            if (keyMap[e.key]) {
+                e.preventDefault();
+                navigateSection(keyMap[e.key]);
+            } else if (e.key === 'Home') {
+                e.preventDefault();
+                scrollToSection(0);
+            } else if (e.key === 'End') {
+                e.preventDefault();
+                scrollToSection(sections.length - 1);
             }
         });
         
@@ -371,6 +496,7 @@ const Sidebar = {
         
         // Initial drawer position
         updateDrawerPosition();
+        setSectionNavState();
         
         // Initial arrow position
         const arrow = socialToggle.querySelector('.arrow-symbol');

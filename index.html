@@ -1,84 +1,149 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Amijoji · Amigo Johnson — cinematic gospel director</title>
-    
+    <title>Amijoji · Amigo Johnson — video director</title>
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:opsz@14..32&family=Caveat:wght@400;700&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:opsz@14..32&family=Caveat:wght@400;700&display=swap"
+        rel="stylesheet">
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    
-    <!-- Swiper CSS -->
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
-    
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
+
     <!-- Main CSS -->
     <link rel="stylesheet" href="styles/main.css">
+
+    <!-- Loading Screen Styles -->
+    <style>
+        /* Loading overlay – covers everything initially */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a0a;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #000000 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            z-index: 9999;
+            transition: opacity 0.6s ease-out, visibility 0.6s ease-out;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .loading-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(212, 175, 55, 0.2);
+            border-top: 4px solid #d4af37;
+            border-right: 4px solid #d4af37;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #d4af37;
+            font-size: 1rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 300;
+        }
+
+        .loading-progress {
+            margin-top: 15px;
+            font-size: 0.85rem;
+            color: rgba(212, 175, 55, 0.7);
+        }
+
+        /* Initially hide main content until loading is done */
+        .app, #fog-marquee-container, .site-logo {
+            opacity: 0;
+            transition: opacity 0.8s ease-out;
+        }
+
+        .content-visible .app,
+        .content-visible #fog-marquee-container,
+        .content-visible .site-logo {
+            opacity: 1;
+        }
+
+        /* Ensure the loading overlay sits on top */
+        body {
+            margin: 0;
+            background: #000;
+        }
+    </style>
 </head>
+
 <body>
+    <!-- Loading Screen Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Loading cinematic experience</div>
+        <div class="loading-progress" id="loading-progress">0%</div>
+    </div>
+
     <!-- Viewport height fix for mobile browsers -->
     <script>
-        // Fix for 100vh on mobile browsers (address bar issue)
-        (function() {
+        (function () {
             function setVH() {
                 let vh = window.innerHeight * 0.01;
                 document.documentElement.style.setProperty('--vh', `${vh}px`);
-                
-                // Also set a custom property for the full height
                 document.documentElement.style.setProperty('--full-vh', `${window.innerHeight}px`);
             }
-            
-            // Initial set
             setVH();
-            
-            // Update on resize and orientation change
             window.addEventListener('resize', setVH);
-            window.addEventListener('orientationchange', function() {
-                setTimeout(setVH, 100); // Slight delay for orientation change
-            });
-            
-            // Additional fix for iOS Safari
+            window.addEventListener('orientationchange', function () { setTimeout(setVH, 100); });
             if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
                 window.addEventListener('load', setVH);
                 window.addEventListener('pageshow', setVH);
-                
-                // Fix for iOS home screen apps
-                if (window.navigator.standalone) {
-                    document.addEventListener('scroll', setVH);
-                }
+                if (window.navigator.standalone) document.addEventListener('scroll', setVH);
             }
-            
-            // Listen for keyboard open/close on mobile
             if ('visualViewport' in window) {
-                window.visualViewport.addEventListener('resize', function() {
-                    // Don't update when keyboard opens (height decreases)
-                    // Only update when visual viewport height is close to window inner height
-                    if (window.visualViewport.height > window.innerHeight * 0.7) {
-                        setVH();
-                    }
+                window.visualViewport.addEventListener('resize', function () {
+                    if (window.visualViewport.height > window.innerHeight * 0.7) setVH();
                 });
             }
         })();
     </script>
-    
+
     <!-- Fog Overlay Container -->
     <div id="fog-marquee-container"></div>
-    
+
     <!-- Handwriting Logo -->
     <div class="site-logo">
         <span class="amigo">Amigo</span>
         <span class="johnson">Johnson</span>
     </div>
-    
+
     <!-- Main App Container -->
     <div class="app">
         <!-- Sidebar Component -->
         <div id="sidebar-container"></div>
-        
+
         <!-- Main Content with Horizontal Scroll -->
         <main class="main-content" id="main-content"></main>
     </div>
@@ -87,206 +152,214 @@
     <script src="components/Sidebar.js"></script>
     <script src="components/HeroSection.js"></script>
     <script src="components/WorkGallery.js"></script>
+    <script src="components/RecordingSection.js"></script>
     <script src="components/BTSSlider.js"></script>
     <script src="components/AboutGear.js"></script>
     <script src="components/AboutValues.js"></script>
     <script src="components/BookingForm.js"></script>
     <script src="components/FogMarquee.js"></script>
-    
+
     <!-- Swiper JS -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    
-    <!-- Main Initialization Script -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <!-- Main Initialization Script + Loading Screen Monitor -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            console.log('DOM loaded, starting initialization...');
-            
-            // Load component CSS dynamically
+            // Helper to load CSS dynamically
             function loadComponentCSS(href) {
                 return new Promise((resolve, reject) => {
                     const link = document.createElement('link');
                     link.rel = 'stylesheet';
                     link.href = href;
-                    link.onload = () => {
-                        console.log(`CSS loaded: ${href}`);
-                        resolve();
-                    };
-                    link.onerror = (error) => {
-                        console.error(`Error loading CSS: ${href}`, error);
-                        reject(error);
-                    };
+                    link.onload = () => { console.log(`CSS loaded: ${href}`); resolve(); };
+                    link.onerror = (error) => { console.error(`Error loading CSS: ${href}`, error); reject(error); };
                     document.head.appendChild(link);
                 });
             }
 
-            // Load all component CSS files
-            Promise.all([
-                loadComponentCSS('styles/sidebar.css'),
-                loadComponentCSS('styles/hero.css'),
-                loadComponentCSS('styles/work-gallery.css'),
-                loadComponentCSS('styles/bts-slider.css'),
-                loadComponentCSS('styles/about-gear.css'),
-                loadComponentCSS('styles/about-values.css'),
-                loadComponentCSS('styles/booking-form.css'),
-                loadComponentCSS('styles/fog-marquee.css')
-            ]).then(() => {
-                console.log('All CSS loaded successfully');
-                
-                // Check if FogMarquee component exists
-                if (typeof FogMarquee === 'undefined') {
-                    console.error('FogMarquee component not found!');
-                    return;
-                }
-                
-                // Render Fog Marquee first
-                const fogContainer = document.getElementById('fog-marquee-container');
-                if (fogContainer) {
-                    console.log('Rendering fog overlay...');
-                    fogContainer.innerHTML = FogMarquee.render();
-                } else {
-                    console.error('Fog container not found!');
-                }
-                
-                // Check if Sidebar component exists
-                if (typeof Sidebar === 'undefined') {
-                    console.error('Sidebar component not found!');
-                    return;
-                }
-                
-                // Load Sidebar
-                const sidebarContainer = document.getElementById('sidebar-container');
-                if (sidebarContainer) {
-                    console.log('Rendering sidebar...');
-                    sidebarContainer.innerHTML = Sidebar.render();
-                } else {
-                    console.error('Sidebar container not found!');
-                }
-                
-                // Check if all section components exist
-                const components = {
-                    HeroSection, WorkGallery, BTSSlider, AboutGear, AboutValues, BookingForm
-                };
-                
-                for (const [name, component] of Object.entries(components)) {
-                    if (typeof component === 'undefined') {
-                        console.error(`${name} component not found!`);
+            // All component CSS files
+            const cssFiles = [
+                'styles/sidebar.css',
+                'styles/hero.css',
+                'styles/work-gallery.css',
+                'styles/recording-section.css',
+                'styles/bts-slider.css',
+                'styles/about-gear.css',
+                'styles/about-values.css',
+                'styles/booking-form.css',
+                'styles/fog-marquee.css'
+            ];
+
+            Promise.all(cssFiles.map(loadComponentCSS))
+                .then(() => {
+                    // Check required components
+                    if (typeof FogMarquee === 'undefined' || typeof Sidebar === 'undefined') {
+                        console.error('Missing required components');
                         return;
                     }
-                }
-                
-                // Load Main Content Sections
-                const mainContent = document.getElementById('main-content');
-                if (mainContent) {
-                    console.log('Rendering main content sections...');
-                    mainContent.innerHTML = `
-                        ${HeroSection.render()}
-                        ${WorkGallery.render()}
-                        ${BTSSlider.render()}
-                        ${AboutGear.render()}
-                        ${AboutValues.render()}
-                        ${BookingForm.render()}
-                    `;
-                } else {
-                    console.error('Main content container not found!');
-                }
-                
-                // Initialize all components
-                console.log('Initializing components...');
-                
-                try {
-                    if (typeof FogMarquee.init === 'function') {
-                        FogMarquee.init();
-                        console.log('FogMarquee initialized');
+
+                    // Render fog and sidebar
+                    const fogContainer = document.getElementById('fog-marquee-container');
+                    if (fogContainer) fogContainer.innerHTML = FogMarquee.render();
+
+                    const sidebarContainer = document.getElementById('sidebar-container');
+                    if (sidebarContainer) sidebarContainer.innerHTML = Sidebar.render();
+
+                    // Render main content sections
+                    const mainContent = document.getElementById('main-content');
+                    if (mainContent) {
+                        mainContent.innerHTML = `
+                            ${HeroSection.render()}
+                            ${WorkGallery.render()}
+                            ${RecordingSection.render()}
+                            ${BTSSlider.render()}
+                            ${AboutGear.render()}
+                            ${AboutValues.render()}
+                            ${BookingForm.render()}
+                        `;
                     }
-                    
-                    if (typeof Sidebar.init === 'function') {
-                        Sidebar.init();
-                        console.log('Sidebar initialized');
+
+                    // Initialize all components except BTSSlider's loading will be monitored separately
+                    if (typeof FogMarquee.init === 'function') FogMarquee.init();
+                    if (typeof Sidebar.init === 'function') Sidebar.init();
+                    if (typeof HeroSection.init === 'function') HeroSection.init();
+                    if (typeof WorkGallery.init === 'function') WorkGallery.init();
+                    if (typeof RecordingSection.init === 'function') RecordingSection.init();
+                    if (typeof AboutGear.init === 'function') AboutGear.init();
+                    if (typeof AboutValues.init === 'function') AboutValues.init();
+                    if (typeof BookingForm.init === 'function') BookingForm.init();
+
+                    if (typeof AOS !== 'undefined') {
+                        AOS.init({
+                            duration: 700,
+                            easing: 'ease-out-cubic',
+                            once: false,
+                            mirror: true,
+                            offset: 80,
+                            anchorPlacement: 'top-center'
+                        });
                     }
-                    
-                    if (typeof HeroSection.init === 'function') {
-                        HeroSection.init();
-                        console.log('HeroSection initialized');
-                    }
-                    
-                    if (typeof WorkGallery.init === 'function') {
-                        WorkGallery.init();
-                        console.log('WorkGallery initialized');
-                    }
-                    
+
+                    // Initialize BTSSlider – this will start loading videos
                     if (typeof BTSSlider.init === 'function') {
                         BTSSlider.init();
-                        console.log('BTSSlider initialized');
                     }
-                    
-                    if (typeof AboutGear.init === 'function') {
-                        AboutGear.init();
-                        console.log('AboutGear initialized');
-                    }
-                    
-                    if (typeof AboutValues.init === 'function') {
-                        AboutValues.init();
-                        console.log('AboutValues initialized');
-                    }
-                    
-                    if (typeof BookingForm.init === 'function') {
-                        BookingForm.init();
-                        console.log('BookingForm initialized');
-                    }
-                    
-                    console.log('All components initialized successfully!');
-                } catch (error) {
-                    console.error('Error initializing components:', error);
-                }
-                
-            }).catch(error => {
-                console.error('Error loading component CSS:', error);
-                
-                // Fallback: try to render without CSS
-                console.log('Attempting to render without CSS...');
-                
-                // Still try to render components even if CSS fails
-                const fogContainer = document.getElementById('fog-marquee-container');
-                if (fogContainer && typeof FogMarquee !== 'undefined') {
-                    fogContainer.innerHTML = FogMarquee.render();
-                }
-                
-                const sidebarContainer = document.getElementById('sidebar-container');
-                if (sidebarContainer && typeof Sidebar !== 'undefined') {
-                    sidebarContainer.innerHTML = Sidebar.render();
-                }
-                
-                const mainContent = document.getElementById('main-content');
-                if (mainContent) {
-                    mainContent.innerHTML = `
-                        ${HeroSection?.render() || ''}
-                        ${WorkGallery?.render() || ''}
-                        ${BTSSlider?.render() || ''}
-                        ${AboutGear?.render() || ''}
-                        ${AboutValues?.render() || ''}
-                        ${BookingForm?.render() || ''}
-                    `;
-                }
-                
-                // Try to initialize
-                if (typeof FogMarquee?.init === 'function') FogMarquee.init();
-                if (typeof Sidebar?.init === 'function') Sidebar.init();
-                if (typeof HeroSection?.init === 'function') HeroSection.init();
-                if (typeof WorkGallery?.init === 'function') WorkGallery.init();
-                if (typeof BTSSlider?.init === 'function') BTSSlider.init();
-                if (typeof AboutGear?.init === 'function') AboutGear.init();
-                if (typeof AboutValues?.init === 'function') AboutValues.init();
-                if (typeof BookingForm?.init === 'function') BookingForm.init();
-            });
-            
-            // Check if fog image exists
+
+                    // ---- Loading Screen Monitor for BTS Videos ----
+                    // Wait a short moment for BTSSlider to render DOM elements
+                    setTimeout(() => {
+                        // Gather all unique video URLs from the BTS slider items
+                        const videoItems = document.querySelectorAll('.bts-custom-item');
+                        const uniqueUrls = new Map(); // url -> { loaded: bool, videoElement: element }
+
+                        for (let item of videoItems) {
+                            const url = item.dataset.videoSrc;
+                            if (url && !uniqueUrls.has(url)) {
+                                const videoElem = item.querySelector('.bts-custom-video');
+                                if (videoElem) {
+                                    uniqueUrls.set(url, {
+                                        loaded: false,
+                                        videoElement: videoElem,
+                                        readyState: videoElem.readyState
+                                    });
+                                }
+                            }
+                        }
+
+                        const totalUnique = uniqueUrls.size;
+                        if (totalUnique === 0) {
+                            console.warn('No unique videos found – hiding loading screen immediately');
+                            document.getElementById('loading-overlay')?.classList.add('hidden');
+                            document.body.classList.add('content-visible');
+                            return;
+                        }
+
+
+                        let loadedCount = 0;
+                        const progressElement = document.getElementById('loading-progress');
+                        const overlay = document.getElementById('loading-overlay');
+
+                        function updateProgress() {
+                            const percent = Math.floor((loadedCount / totalUnique) * 100);
+                            if (progressElement) progressElement.textContent = `${percent}%`;
+
+                            // Threshold = 30%
+                            if (loadedCount / totalUnique >= 0.3) {
+                                if (overlay) overlay.classList.add('hidden');
+                                document.body.classList.add('content-visible');
+                                // Clean up event listeners to avoid memory leaks
+                                for (let [url, data] of uniqueUrls.entries()) {
+                                    if (data.videoElement && data._canPlayHandler) {
+                                        data.videoElement.removeEventListener('canplay', data._canPlayHandler);
+                                    }
+                                }
+                            }
+                        }
+
+                        // For each video, listen for 'canplay' event (enough data to play first few seconds)
+                        for (let [url, data] of uniqueUrls.entries()) {
+                            const video = data.videoElement;
+                            if (!video) continue;
+
+                            // If already ready enough, count it immediately
+                            if (video.readyState >= 2) {
+                                if (!data.loaded) {
+                                    data.loaded = true;
+                                    loadedCount++;
+                                    updateProgress();
+                                }
+                            }
+
+                            // Add event listener for future readiness
+                            const handler = () => {
+                                if (!data.loaded && video.readyState >= 2) {
+                                    data.loaded = true;
+                                    loadedCount++;
+                                    updateProgress();
+                                }
+                            };
+                            video.addEventListener('canplay', handler);
+                            data._canPlayHandler = handler;
+                        }
+
+                        // Fallback timeout: force hide loading screen after 10 seconds even if not 30% loaded
+                        setTimeout(() => {
+                            if (overlay && !overlay.classList.contains('hidden')) {
+                                console.warn('Loading timeout (10s) – forcing content visible');
+                                overlay.classList.add('hidden');
+                                document.body.classList.add('content-visible');
+                            }
+                        }, 10000);
+
+                        // Also if BTSSlider fails to load any video, ensure content shows eventually
+                        setTimeout(() => {
+                            if (loadedCount === 0 && totalUnique > 0) {
+                                console.warn('No videos loaded after 5 seconds – forcing content visible');
+                                if (overlay && !overlay.classList.contains('hidden')) {
+                                    overlay.classList.add('hidden');
+                                    document.body.classList.add('content-visible');
+                                }
+                            }
+                        }, 5000);
+
+                    }, 500); // slight delay to ensure DOM is ready
+                })
+                .catch(error => {
+                    console.error('Error loading component CSS:', error);
+                    // Fallback: show content anyway
+                    const overlay = document.getElementById('loading-overlay');
+                    if (overlay) overlay.classList.add('hidden');
+                    document.body.classList.add('content-visible');
+                });
+
             setTimeout(() => {
                 const img = new Image();
-                img.onload = () => console.log('✅ Fog image loaded successfully from assets/images/fog2.ecb15114.webp');
-                img.onerror = () => console.warn('⚠️ Fog image not found at: assets/images/fog2.ecb15114.webp. Please make sure the file exists in the assets/images/ folder.');
+                img.onerror = () => console.warn('⚠️ Fog image not found');
                 img.src = 'assets/images/fog2.ecb15114.webp';
             }, 1000);
         });
     </script>
 </body>
+
 </html>

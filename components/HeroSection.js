@@ -1,7 +1,7 @@
 const HeroSection = {
     render() {
         return `
-            <section class="section hero-section" id="hero-section">
+            <section class="section hero-section" id="hero-section" data-aos="fade" data-aos-duration="800">
                 <!-- Video with higher quality - single source -->
                 <video class="hero-video-bg" autoplay muted loop playsinline poster="assets/hero-poster.jpg">
                     <source src="assets/hero-video.mp4" type="video/mp4">

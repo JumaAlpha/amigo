@@ -1,7 +1,7 @@
 const AboutValues = {
     render() {
         return `
-            <section class="section values-section" id="values-section">
+            <section class="section values-section" id="values-section" data-aos="fade-up" data-aos-duration="700">
                 <div class="values-container">
                     <div class="values-header">
                         <h2>Amijoji Company</h2>

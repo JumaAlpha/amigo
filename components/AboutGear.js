@@ -1,7 +1,7 @@
 const AboutGear = {
     render() {
         return `
-            <section class="section about-gear-section">
+            <section class="section about-gear-section" data-aos="fade-up" data-aos-duration="700">
                 <div class="about-split">
                     <div class="bw-photo">
                         <img src="assets/images/amigo.jpg" 

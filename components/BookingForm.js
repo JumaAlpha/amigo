@@ -1,7 +1,7 @@
 const BookingForm = {
     render() {
         return `
-            <section class="section booking-section">
+            <section class="section booking-section" data-aos="fade-up" data-aos-duration="700">
                 <div class="gold-form">
                     <h2>BOOKING</h2>
                     <form id="bookingForm">

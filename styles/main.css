@@ -47,6 +47,7 @@ body {
     width: calc(100% - var(--sidebar-width-collapsed));
     margin-left: var(--sidebar-width-collapsed);
     display: flex;
+    flex: 0 0 auto;
     overflow-x: auto;
     overflow-y: hidden;
     scroll-snap-type: x mandatory;
@@ -69,6 +70,7 @@ body {
 
 .main-content.sidebar-expanded {
     margin-left: var(--sidebar-width-expanded);
+    width: calc(100% - var(--sidebar-width-expanded));
 }
 
 .section {
@@ -115,6 +117,47 @@ body {
     letter-spacing: 4px;
     margin-bottom: 2rem;
     padding-left: 1rem;
+}
+
+/* ========== SECTION NAVIGATION CONTROLS ========== */
+.section-nav-controls {
+    position: fixed;
+    right: 2rem;
+    bottom: 2rem;
+    z-index: 1200;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    pointer-events: auto;
+}
+
+.section-nav-button {
+    width: 46px;
+    height: 46px;
+    border: 1px solid rgba(212, 175, 55, 0.45);
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.62);
+    color: var(--metallic-gold);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1rem;
+    backdrop-filter: blur(8px);
+    transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+}
+
+.section-nav-button:hover:not(:disabled),
+.section-nav-button:focus-visible {
+    background: rgba(212, 175, 55, 0.22);
+    border-color: var(--metallic-gold);
+    transform: translateY(-2px);
+    outline: none;
+}
+
+.section-nav-button:disabled {
+    opacity: 0.35;
+    cursor: default;
 }
 
 /* ========== HANDWRITING LOGO ========== */
@@ -221,6 +264,18 @@ body {
         font-size: 0.8rem;
         margin-top: 0.5rem;
     }
+
+    .section-nav-controls {
+        right: 1rem;
+        bottom: 1rem;
+        gap: 0.5rem;
+    }
+
+    .section-nav-button {
+        width: 40px;
+        height: 40px;
+        font-size: 0.85rem;
+    }
 }
 
 /* Large phones (481px to 768px) */
@@ -248,6 +303,11 @@ body {
     .section-header {
         font-size: 2.2rem;
         letter-spacing: 3px;
+    }
+
+    .section-nav-controls {
+        right: 1.25rem;
+        bottom: 1.25rem;
     }
 }
 
@@ -291,6 +351,11 @@ body {
     .section > * {
         padding: 0;
     }
+
+    .section-nav-controls {
+        right: 1rem;
+        bottom: 0.75rem;
+    }
 }
 
 /* High resolution screens (1920px and up) */
@@ -317,6 +382,11 @@ body {
 /* ===== MOBILE SIDEBAR OVERRIDES ===== */
 @media (max-width: 768px) {
     .main-content {
+        width: 100%;
+        margin-left: 0;
+    }
+    
+    .main-content.sidebar-expanded {
         width: 100%;
         margin-left: 0;
     }

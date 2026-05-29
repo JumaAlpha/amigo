@@ -1,0 +1,247 @@
+.recording-section {
+    background:
+        linear-gradient(90deg, rgba(0, 0, 0, 0.92) 0%, rgba(18, 18, 18, 0.76) 46%, rgba(0, 0, 0, 0.96) 100%),
+        radial-gradient(circle at 82% 28%, rgba(212, 175, 55, 0.18), transparent 34%);
+    padding: clamp(1.5rem, 4vw, 4rem);
+}
+
+.recording-shell {
+    width: min(1180px, 100%);
+    height: min(720px, calc(100% - 3rem));
+    display: grid;
+    grid-template-columns: minmax(190px, 0.58fr) minmax(360px, 1.35fr) minmax(260px, 0.75fr);
+    align-items: center;
+    gap: clamp(1rem, 2.8vw, 2.5rem);
+}
+
+.recording-copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.recording-copy .section-header {
+    margin-bottom: 0;
+    padding-left: 0;
+}
+
+.recording-kicker {
+    max-width: 26rem;
+    color: rgba(245, 245, 245, 0.78);
+    font-size: clamp(0.95rem, 1.6vw, 1.15rem);
+}
+
+.recording-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    color: var(--pure-black);
+    background: var(--metallic-gold);
+    border: 1px solid var(--metallic-gold);
+    border-radius: 999px;
+    padding: 0.75rem 1rem;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0;
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.recording-link:hover,
+.recording-link:focus-visible {
+    transform: translateY(-2px);
+    background: #e5c158;
+    outline: none;
+}
+
+.recording-player-wrap {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    min-height: 280px;
+    border: 1px solid rgba(212, 175, 55, 0.32);
+    background: #050505;
+    box-shadow: 0 28px 70px rgba(0, 0, 0, 0.45);
+    overflow: hidden;
+}
+
+.recording-player {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+.recording-description-panel {
+    width: 100%;
+    max-height: min(560px, 78vh);
+    border-left: 1px solid rgba(212, 175, 55, 0.24);
+    padding-left: clamp(1rem, 2vw, 1.5rem);
+    overflow: hidden;
+}
+
+.recording-description-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.85rem;
+    color: rgba(212, 175, 55, 0.8);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.recording-description-list {
+    max-height: min(500px, 70vh);
+    overflow-y: auto;
+    padding-right: 0.35rem;
+}
+
+.recording-description-item {
+    width: 100%;
+    border: 1px solid rgba(245, 245, 245, 0.1);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.035);
+    color: var(--off-white);
+    padding: 0.8rem;
+}
+
+.recording-description-item + .recording-description-item {
+    margin-top: 0.7rem;
+}
+
+.recording-description-item:hover {
+    background: rgba(212, 175, 55, 0.13);
+    border-color: rgba(212, 175, 55, 0.5);
+}
+
+.recording-index {
+    color: rgba(212, 175, 55, 0.76);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.15rem;
+    line-height: 1.1;
+}
+
+.recording-song-button {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    min-width: 0;
+    display: grid;
+    grid-template-columns: 2rem 1fr;
+    align-items: start;
+    gap: 0.75rem;
+    margin-bottom: 0.65rem;
+    padding: 0;
+    text-align: left;
+    cursor: pointer;
+}
+
+.recording-song-button h3 {
+    display: -webkit-box;
+    color: var(--off-white);
+    font-size: 0.82rem;
+    line-height: 1.25;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.recording-song-button p {
+    color: rgba(245, 245, 245, 0.56);
+    font-size: 0.72rem;
+    margin-top: 0.25rem;
+}
+
+.recording-song-button:hover h3,
+.recording-song-button:focus-visible h3,
+.recording-song-button.active h3 {
+    color: var(--metallic-gold);
+}
+
+.recording-song-button:focus-visible {
+    outline: none;
+}
+
+.recording-description-text {
+    display: -webkit-box;
+    color: rgba(245, 245, 245, 0.7);
+    font-size: 0.76rem;
+    line-height: 1.45;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 6;
+}
+
+.recording-description-item a {
+    display: inline-flex;
+    margin-top: 0.65rem;
+    color: var(--metallic-gold);
+    font-size: 0.72rem;
+    text-decoration: none;
+}
+
+.recording-description-item a:hover,
+.recording-description-item a:focus-visible {
+    text-decoration: underline;
+    outline: none;
+}
+
+.recording-description-empty {
+    border: 1px solid rgba(245, 245, 245, 0.1);
+    border-radius: 8px;
+    padding: 1rem;
+    color: rgba(245, 245, 245, 0.7);
+    font-size: 0.82rem;
+    line-height: 1.5;
+    background: rgba(255, 255, 255, 0.035);
+}
+
+@media (max-width: 900px) {
+    .recording-shell {
+        height: auto;
+        grid-template-columns: 1fr;
+        align-content: center;
+        gap: 1.5rem;
+    }
+
+    .recording-copy {
+        gap: 0.75rem;
+    }
+
+    .recording-player-wrap {
+        min-height: 220px;
+    }
+
+    .recording-description-panel {
+        max-height: 240px;
+        border-left: 0;
+        border-top: 1px solid rgba(212, 175, 55, 0.24);
+        padding-left: 0;
+        padding-top: 1rem;
+    }
+
+    .recording-description-list {
+        max-height: 180px;
+    }
+}
+
+@media (max-width: 520px) {
+    .recording-section {
+        padding: 1rem;
+    }
+
+    .recording-shell {
+        gap: 1rem;
+    }
+
+    .recording-link {
+        padding: 0.65rem 0.85rem;
+    }
+
+    .recording-player-wrap {
+        min-height: 180px;
+    }
+}

@@ -1,91 +1,91 @@
+// ========== BTS SLIDER - INFINITE LOOP (FAST NAVIGATION) ==========
 const BTSSlider = {
-    // Cache storage key
     CACHE_KEY: 'bts_videos_cache',
-    
-    // Track active video instances for cleanup
     activeVideos: new Map(),
     thumbnailCache: new Map(),
-    
-    // Configuration for performance
     config: {
-        maxConcurrentLoads: 3,
-        thumbnailGenerationDelay: 500,
+        maxConcurrentLoads: 6,
+        thumbnailGenerationDelay: 300,
         videoUnloadDelay: 10000,
-        preloadAheadDistance: 800,
-        lowPowerMode: false
+        preloadAheadDistance: 1200,
+        lowPowerMode: false,
+        previewDuration: 3,
+        maxConcurrentPreviews: 4,
+        thumbnailMaxWidth: 200,
+        thumbnailConcurrency: 1
     },
-    
+
+    _thumbnailQueue: [],
+    _activeThumbnails: 0,
+    _previewInterval: null,
+    _previewVideos: new Set(),
+    _clonedItems: new WeakSet(), // avoid repeated cloning
+
     render() {
         return `
-            <section class="section am-bts-section" id="am-bts-section">
-                <div class="am-bts-header">· behind the scenes</div>
-                
-                <!-- Swiper Container -->
-                <div class="swiper am-bts-swiper">
-                    <div class="swiper-wrapper">
-                        ${this.renderSlides()}
+            <section class="section bts-section bts-custom-section" id="bts-custom-section" data-aos="fade-up" data-aos-duration="700">
+                <div class="bts-custom-header">· behind the scenes</div>
+                <div class="bts-custom-viewport">
+                    <div class="bts-custom-carousel-wrapper" aria-label="Behind the scenes video carousel">
+                        <div class="bts-custom-fade bts-custom-fade-left"></div>
+                        <div class="swiper bts-custom-swiper" role="region" aria-roledescription="carousel">
+                            <div class="swiper-wrapper bts-custom-loop-track">
+                                ${this.renderSlides()}
+                            </div>
+                            <div class="bts-custom-button-prev" aria-label="Previous slide">
+                                <i class="fas fa-chevron-left"></i>
+                            </div>
+                            <div class="bts-custom-button-next" aria-label="Next slide">
+                                <i class="fas fa-chevron-right"></i>
+                            </div>
+                        </div>
+                        <div class="bts-custom-fade bts-custom-fade-right"></div>
                     </div>
-                    
-                    <!-- Navigation -->
-                    <div class="am-bts-swiper-button-prev"></div>
-                    <div class="am-bts-swiper-button-next"></div>
-                    
+                    <div class="bts-custom-hint">Tap / hover to view</div>
                 </div>
-                
-                <!-- Pagination -->
-                <div class="am-bts-pagination"></div>
             </section>
         `;
     },
-    
+
     getVideoPath(index) {
-        // Videos stored as assets/bts/video01.mp4, video02.mp4, ...
         const videoNumber = String(index + 1).padStart(2, '0');
         return `assets/bts/video${videoNumber}.mp4`;
     },
-    
+
     renderSlides() {
-        // Define slides - each slide now has 3 videos to make 3 rows
-        const slides = [
+        const slideGroups = [
             { width: 'normal', videos: [1, 2, 3] },
             { width: 'wide', videos: [4, 5, 6] },
             { width: 'normal', videos: [7, 8, 9] },
             { width: 'narrow', videos: [10, 11, 12] },
             { width: 'normal', videos: [13, 14, 15] },
-            { width: 'wide', videos: [16, 17, 18] }
+            { width: 'wide', videos: [16, 1, 2] }
         ];
-        
-        let videoCounter = 0;
-        
-        return slides.map((slide) => `
+
+        const repeatedGroups = Array.from({ length: 12 }, () => slideGroups).flat();
+
+        return repeatedGroups.map((slide, slideIndex) => `
             <div class="swiper-slide">
-                <div class="am-bts-slide-content ${slide.width}">
-                    ${slide.videos.map(() => {
-                        const videoPath = this.getVideoPath(videoCounter);
-                        const videoId = `bts_video_${videoCounter}`;
-                        videoCounter++;
+                <div class="bts-custom-slide-content ${slide.width}">
+                    ${slide.videos.map((videoNumber, itemIndex) => {
+                        const videoPath = this.getVideoPath(videoNumber - 1);
+                        const videoId = `bts_video_${slideIndex}_${itemIndex}_${videoNumber}`;
                         return `
-                            <div class="am-bts-item" 
+                            <div class="bts-custom-item" 
                                  data-rotation="${this.getRandomRotation()}"
                                  data-video-src="${videoPath}"
                                  data-video-id="${videoId}"
                                  data-loaded="false">
-                                <video class="am-bts-video" 
+                                <video class="bts-custom-video" 
                                        data-src="${videoPath}"
-                                       muted
-                                       loop
-                                       playsinline
-                                       preload="metadata"
-                                       poster="">
+                                       data-previewing="false"
+                                       data-full-play="false"
+                                       muted loop playsinline preload="auto" poster="">
                                     Your browser does not support the video tag.
                                 </video>
-                                <div class="am-bts-pattern"></div>
-                                <div class="am-bts-play-hint">
-                                    <i class="fas fa-play"></i>
-                                </div>
-                                <div class="am-bts-loading">
-                                    <div class="am-bts-loading-spinner"></div>
-                                </div>
+                                <div class="bts-custom-pattern"></div>
+                                <div class="bts-custom-play-hint"><i class="fas fa-play"></i></div>
+                                <div class="bts-custom-loading"><div class="bts-custom-loading-spinner"></div></div>
                             </div>
                         `;
                     }).join('')}
@@ -93,95 +93,145 @@ const BTSSlider = {
             </div>
         `).join('');
     },
-    
+
     getRandomRotation() {
         const rotations = [-3, -1.5, 0, 1.5, 3];
         return rotations[Math.floor(Math.random() * rotations.length)];
     },
-    
-    // Performance detection
+
     detectPerformanceMode() {
         if ('getBattery' in navigator) {
             navigator.getBattery().then(battery => {
-                if (battery.charging === false && battery.level < 0.2) {
+                if (!battery.charging && battery.level < 0.2) {
                     this.config.lowPowerMode = true;
-                    console.log('Low power mode detected');
+                    this._applyLowPowerSettings();
                 }
-            }).catch(() => {});
+            }).catch(()=>{});
         }
         if ('deviceMemory' in navigator && navigator.deviceMemory < 4) {
             this.config.lowPowerMode = true;
+            this._applyLowPowerSettings();
         }
         if ('connection' in navigator && navigator.connection.saveData) {
             this.config.lowPowerMode = true;
+            this._applyLowPowerSettings();
         }
     },
-    
+
+    _applyLowPowerSettings() {
+        this.config.maxConcurrentLoads = 2;
+        this.config.preloadAheadDistance = 600;
+        this.config.thumbnailMaxWidth = 80;
+        this.config.thumbnailGenerationDelay = 800;
+        this.config.maxConcurrentPreviews = 2;
+    },
+
     async loadVideoFromCache(videoElement, videoUrl, videoId) {
-        if (videoElement.dataset.loaded === 'true' || videoElement.dataset.loading === 'true') {
-            return false;
-        }
-        
+        if (videoElement.dataset.loaded === 'true' || videoElement.dataset.loading === 'true') return false;
         videoElement.dataset.loading = 'true';
-        const parent = videoElement.closest('.am-bts-item');
+        const parent = videoElement.closest('.bts-custom-item');
         if (parent) parent.classList.add('loading');
-        
         try {
-            // Generate thumbnail first
             await this.loadThumbnailFromCache(videoElement, videoUrl, videoId);
-            
-            if (!('caches' in window)) {
-                this.setupVideoElement(videoElement, videoUrl, videoId);
-                return false;
-            }
-            
-            const cache = await caches.open('bts-videos-cache-v1');
-            const cachedResponse = await cache.match(videoUrl);
-            
-            if (cachedResponse) {
-                const blob = await cachedResponse.blob();
-                const blobUrl = URL.createObjectURL(blob);
-                this.setupVideoElement(videoElement, blobUrl, videoId, true);
-                return true;
-            } else {
-                this.setupVideoElement(videoElement, videoUrl, videoId);
-                // Background cache after load
-                videoElement.addEventListener('canplaythrough', () => {
-                    this.cacheVideoInBackground(videoUrl, videoId);
-                }, { once: true });
-                return false;
-            }
+            this.setupVideoElement(videoElement, videoUrl, videoId, false);
+            this._cacheFullVideoInBackground(videoUrl, videoId);
+            await new Promise((resolve) => {
+                if (videoElement.readyState >= 2) {
+                    resolve();
+                } else {
+                    const onCanPlay = () => {
+                        videoElement.removeEventListener('canplay', onCanPlay);
+                        resolve();
+                    };
+                    videoElement.addEventListener('canplay', onCanPlay, { once: true });
+                    setTimeout(resolve, 2000);
+                }
+            });
+            if (parent) parent.classList.remove('loading');
+            videoElement.dataset.loaded = 'true';
+            return true;
         } catch (error) {
             console.log(`Error loading video ${videoId}:`, error);
-            this.setupVideoElement(videoElement, videoUrl, videoId);
+            this.setupVideoElement(videoElement, videoUrl, videoId, false);
+            if (parent) parent.classList.remove('loading');
             return false;
         } finally {
             videoElement.dataset.loading = 'false';
-            if (parent) {
-                setTimeout(() => parent.classList.remove('loading'), 300);
-            }
         }
     },
-    
+
+    async _cacheFullVideoInBackground(videoUrl, videoId) {
+        if (!('caches' in window)) return;
+        try {
+            const cache = await caches.open('bts-videos-cache-v1');
+            const cachedResponse = await cache.match(videoUrl);
+            if (!cachedResponse) {
+                const response = await fetch(videoUrl);
+                if (response.ok) await cache.put(videoUrl, response.clone());
+            }
+        } catch(e) {}
+    },
+
+    _prioritizeFullVideoForInteraction(videoElement, videoUrl, videoId) {
+        if (!('caches' in window)) return;
+        caches.open('bts-videos-cache-v1').then(cache => {
+            cache.match(videoUrl).then(cached => {
+                if (!cached) {
+                    fetch(videoUrl).then(response => {
+                        if (response.ok) cache.put(videoUrl, response);
+                    }).catch(e => console.log('Urgent fetch failed', e));
+                }
+            });
+        });
+    },
+
     async loadThumbnailFromCache(videoElement, videoUrl, videoId) {
         if (this.thumbnailCache.has(videoUrl)) {
             videoElement.poster = this.thumbnailCache.get(videoUrl);
             return true;
         }
-        
+        const parent = videoElement.closest('.bts-custom-item');
+        if (parent && !this.isElementNearViewport(parent) && this.config.lowPowerMode) {
+            return false;
+        }
         return new Promise((resolve) => {
-            setTimeout(async () => {
-                const thumbnail = await this.generateThumbnailEfficient(videoUrl, videoId);
-                if (thumbnail) {
-                    this.thumbnailCache.set(videoUrl, thumbnail);
-                    videoElement.poster = thumbnail;
-                    resolve(true);
-                }
-                resolve(false);
-            }, this.config.thumbnailGenerationDelay);
+            this._thumbnailQueue.push({
+                videoUrl, videoId, videoElement, resolve
+            });
+            this._processThumbnailQueue();
         });
     },
-    
+
+    _processThumbnailQueue() {
+        if (this._thumbnailQueue.length === 0) return;
+        if (this._activeThumbnails >= this.config.thumbnailConcurrency) return;
+
+        const task = this._thumbnailQueue.shift();
+        if (!task) return;
+        this._activeThumbnails++;
+
+        const doGenerate = () => {
+            setTimeout(async () => {
+                const thumbnail = await this.generateThumbnailEfficient(task.videoUrl, task.videoId);
+                if (thumbnail) {
+                    this.thumbnailCache.set(task.videoUrl, thumbnail);
+                    task.videoElement.poster = thumbnail;
+                    task.resolve(true);
+                } else {
+                    task.resolve(false);
+                }
+                this._activeThumbnails--;
+                this._processThumbnailQueue();
+            }, this.config.thumbnailGenerationDelay);
+        };
+
+        if (typeof requestIdleCallback !== 'undefined') {
+            requestIdleCallback(doGenerate, { timeout: 2000 });
+        } else {
+            doGenerate();
+        }
+    },
+
     generateThumbnailEfficient(videoUrl, videoId) {
         return new Promise((resolve) => {
             const tempVideo = document.createElement('video');
@@ -189,75 +239,213 @@ const BTSSlider = {
             tempVideo.preload = 'metadata';
             tempVideo.crossOrigin = 'Anonymous';
             tempVideo.src = videoUrl;
-            
+
             const timeoutId = setTimeout(() => {
                 tempVideo.remove();
                 resolve(null);
             }, 3000);
-            
+
             tempVideo.addEventListener('loadedmetadata', () => {
-                tempVideo.currentTime = Math.min(0.3, tempVideo.duration * 0.05);
+                const seekTime = Math.min(0.1, tempVideo.duration * 0.02);
+                tempVideo.currentTime = seekTime;
             });
-            
+
             tempVideo.addEventListener('seeked', () => {
                 clearTimeout(timeoutId);
                 try {
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
                     const vw = tempVideo.videoWidth, vh = tempVideo.videoHeight;
-                    if (vw === 0 || vh === 0) { tempVideo.remove(); resolve(null); return; }
-                    const maxW = 200;
+                    if (vw === 0 || vh === 0) {
+                        tempVideo.remove();
+                        resolve(null);
+                        return;
+                    }
+                    const maxWidth = this.config.thumbnailMaxWidth;
                     let tw = vw, th = vh;
-                    if (tw > maxW) { const r = maxW / tw; tw = maxW; th = Math.floor(vh * r); }
-                    canvas.width = tw; canvas.height = th;
+                    if (tw > maxWidth) {
+                        const ratio = maxWidth / tw;
+                        tw = maxWidth;
+                        th = Math.floor(vh * ratio);
+                    }
+                    canvas.width = tw;
+                    canvas.height = th;
                     ctx.drawImage(tempVideo, 0, 0, tw, th);
-                    const dataURL = canvas.toDataURL('image/jpeg', 0.5);
+                    const dataURL = canvas.toDataURL('image/jpeg', 0.4);
                     resolve(dataURL);
-                } catch(e) { resolve(null); }
-                finally { tempVideo.remove(); }
+                } catch(e) {
+                    resolve(null);
+                } finally {
+                    tempVideo.remove();
+                }
             });
-            tempVideo.addEventListener('error', () => { clearTimeout(timeoutId); tempVideo.remove(); resolve(null); });
+
+            tempVideo.addEventListener('error', () => {
+                clearTimeout(timeoutId);
+                tempVideo.remove();
+                resolve(null);
+            });
+
             tempVideo.load();
         });
     },
-    
-    setupVideoElement(videoElement, src, videoId, isCached = false) {
-        const parent = videoElement.closest('.am-bts-item');
-        videoElement.src = src;
-        videoElement.load();
-        videoElement.dataset.loaded = 'true';
-        
-        // Store current src for cleanup
-        videoElement.dataset.currentSrc = src;
-        
-        // Play on hover only when ready
-        parent.addEventListener('mouseenter', () => {
-            if (videoElement.readyState >= 2) {
-                videoElement.play().catch(e => console.log('play failed', e));
+
+    _startPreview(video) {
+        if (!video || video.dataset.fullPlay === 'true') return;
+        if (video.dataset.previewing === 'true') return;
+        if (video.readyState < 2) return;
+        video.dataset.previewing = 'true';
+        video.muted = true;
+        video.currentTime = 0;
+        video.play().catch(e => console.log('Preview play failed', e));
+        const stopTimeout = setTimeout(() => {
+            if (video && video.dataset.previewing === 'true' && video.dataset.fullPlay !== 'true') {
+                this._stopPreview(video);
             }
-        });
-        parent.addEventListener('mouseleave', () => {
-            if (!videoElement.paused) videoElement.pause();
-        });
-        
-        console.log(`Video ${videoId} ready (${isCached ? 'cached' : 'network'})`);
+        }, this.config.previewDuration * 1000);
+        video._previewTimeout = stopTimeout;
+        const onEnded = () => {
+            if (video.dataset.previewing === 'true') this._stopPreview(video);
+        };
+        video.addEventListener('ended', onEnded, { once: true });
+        video._previewEndHandler = onEnded;
     },
-    
+
+    _stopPreview(video) {
+        if (!video) return;
+        if (video._previewTimeout) {
+            clearTimeout(video._previewTimeout);
+            delete video._previewTimeout;
+        }
+        if (video._previewEndHandler) {
+            video.removeEventListener('ended', video._previewEndHandler);
+            delete video._previewEndHandler;
+        }
+        if (video.dataset.previewing === 'true') {
+            video.pause();
+            video.currentTime = 0;
+            video.dataset.previewing = 'false';
+        }
+    },
+
+    _updateVisiblePreviews() {
+        const container = document.querySelector('.bts-custom-carousel-wrapper');
+        if (!container) return;
+        const cRect = container.getBoundingClientRect();
+        const allVideos = Array.from(document.querySelectorAll('.bts-custom-video'))
+            .filter(v => v.dataset.loaded === 'true' && !v.dataset.fullPlay);
+        const videosWithDistance = allVideos.map(v => {
+            const parent = v.closest('.bts-custom-item');
+            const rect = parent ? parent.getBoundingClientRect() : null;
+            let distance = Infinity;
+            if (rect) {
+                const center = (rect.left + rect.right) / 2;
+                const viewportCenter = (cRect.left + cRect.right) / 2;
+                distance = Math.abs(center - viewportCenter);
+            }
+            return { video: v, distance };
+        }).sort((a,b) => a.distance - b.distance);
+        let previewCount = 0;
+        for (let {video} of videosWithDistance) {
+            const parent = video.closest('.bts-custom-item');
+            if (!parent) continue;
+            const rect = parent.getBoundingClientRect();
+            const isVisible = (rect.right >= cRect.left && rect.left <= cRect.right);
+            if (isVisible && video.dataset.previewing !== 'true' && previewCount < this.config.maxConcurrentPreviews) {
+                this._startPreview(video);
+                previewCount++;
+            } else if (!isVisible && video.dataset.previewing === 'true') {
+                this._stopPreview(video);
+            }
+        }
+    },
+
+    setupVideoElement(videoElement, src, videoId, isCached = false) {
+        const parent = videoElement.closest('.bts-custom-item');
+        if (!parent) return;
+        
+        // Avoid cloning if already set up
+        if (this._clonedItems.has(parent)) {
+            const video = parent.querySelector('.bts-custom-video');
+            if (video && video.src !== src) {
+                video.src = src;
+                video.load();
+            }
+            return;
+        }
+
+        // Clone once to attach fresh listeners
+        const newParent = parent.cloneNode(true);
+        parent.parentNode.replaceChild(newParent, parent);
+        this._clonedItems.add(newParent);
+        const newVideo = newParent.querySelector('.bts-custom-video');
+        newVideo.src = src;
+        newVideo.load();
+        newVideo.dataset.loaded = 'false';
+        newVideo.dataset.currentSrc = src;
+
+        const onCanPlay = () => {
+            const loadingParent = newVideo.closest('.bts-custom-item');
+            if (loadingParent) loadingParent.classList.remove('loading');
+            newVideo.dataset.loaded = 'true';
+            newVideo.removeEventListener('canplay', onCanPlay);
+        };
+        newVideo.addEventListener('canplay', onCanPlay, { once: true });
+
+        newParent.addEventListener('mouseenter', () => {
+            if (newVideo.dataset.previewing === 'true') this._stopPreview(newVideo);
+            newVideo.dataset.fullPlay = 'true';
+            newVideo.muted = false;
+            const fullSrc = newParent.dataset.videoSrc;
+            if (fullSrc) this._prioritizeFullVideoForInteraction(newVideo, fullSrc, videoId);
+            newVideo.play().catch(e => console.log('Full play failed', e));
+        });
+        newParent.addEventListener('mouseleave', () => {
+            if (!newVideo.paused) newVideo.pause();
+            newVideo.dataset.fullPlay = 'false';
+            newVideo.muted = true;
+            setTimeout(() => {
+                if (newVideo.dataset.fullPlay !== 'true' && this.isElementNearViewport(newParent)) {
+                    this._startPreview(newVideo);
+                }
+            }, 200);
+        });
+        console.log(`Video ${videoId} ready for preview (${isCached ? 'cached' : 'network'})`);
+        this._updateVisiblePreviews();
+    },
+
     async cacheVideoInBackground(videoUrl, videoId) {
         if (!('caches' in window)) return;
         try {
             const cache = await caches.open('bts-videos-cache-v1');
             const response = await fetch(videoUrl);
-            if (response.ok) {
-                await cache.put(videoUrl, response.clone());
-                console.log(`Cached ${videoId}`);
-            }
+            if (response.ok) await cache.put(videoUrl, response.clone());
         } catch(e) {}
     },
-    
+
+    async precacheAllVideos() {
+        if (!('caches' in window)) return;
+        const uniqueUrls = new Set();
+        document.querySelectorAll('.bts-custom-item').forEach(item => {
+            const url = item.dataset.videoSrc;
+            if (url) uniqueUrls.add(url);
+        });
+        const cache = await caches.open('bts-videos-cache-v1');
+        for (let url of uniqueUrls) {
+            try {
+                const cached = await cache.match(url);
+                if (!cached) {
+                    const response = await fetch(url);
+                    if (response.ok) await cache.put(url, response);
+                }
+            } catch(e) {}
+        }
+    },
+
     unloadVideo(videoElement, videoId) {
         if (!videoElement || videoElement.dataset.loaded !== 'true') return;
         if (!videoElement.paused) return;
+        this._stopPreview(videoElement);
         videoElement.pause();
         videoElement.src = '';
         videoElement.load();
@@ -266,174 +454,135 @@ const BTSSlider = {
             URL.revokeObjectURL(videoElement.dataset.currentSrc);
         }
     },
-    
+
+    mount(container = document.body) {
+        if (document.getElementById('bts-custom-section')) return;
+        container.insertAdjacentHTML('beforeend', this.render());
+        this.init();
+    },
+
     init() {
         this.detectPerformanceMode();
-        
-        // Initialize Swiper with carousel animation
-        const btsSwiper = new Swiper('.am-bts-swiper', {
+        if (typeof Swiper === 'undefined') {
+            console.error('Swiper library not loaded.');
+            return;
+        }
+
+        const btsSwiper = new Swiper('.bts-custom-swiper', {
             slidesPerView: 'auto',
             spaceBetween: this.config.lowPowerMode ? 15 : 25,
             centeredSlides: false,
             loop: true,
-            loopAdditionalSlides: 3,
-            speed: this.config.lowPowerMode ? 800 : 1200,
-            autoplay: this.config.lowPowerMode ? false : {
-                delay: 0,
+            loopedSlides: 24,
+            loopAdditionalSlides: 24,
+            speed: this.config.lowPowerMode ? 4000 : 8000,
+            autoplay: {
+                delay: this.config.lowPowerMode ? 3000 : 4000,
                 disableOnInteraction: false,
-                pauseOnMouseEnter: true,
+                pauseOnMouseEnter: false,
                 stopOnLastSlide: false,
-                waitForTransition: false
+                waitForTransition: true
             },
-            navigation: {
-                nextEl: '.am-bts-swiper-button-next',
-                prevEl: '.am-bts-swiper-button-prev',
-            },
-            pagination: {
-                el: '.am-bts-pagination',
-                clickable: true,
-                bulletClass: 'am-bts-pagination-bullet',
-                bulletActiveClass: 'am-bts-pagination-bullet-active',
-            },
-            freeMode: {
-                enabled: false
-            },
-            effect: 'slide',
+            freeMode: false,
             slidesPerGroup: 1,
             simulateTouch: true,
             allowTouchMove: true,
-            breakpoints: {
-                320: { spaceBetween: 10 },
-                768: { spaceBetween: 15 },
-                1024: { spaceBetween: this.config.lowPowerMode ? 20 : 25 }
-            },
             mousewheel: { forceToAxis: true, sensitivity: 1 },
             keyboard: { enabled: true, onlyInViewport: true },
             touchRatio: 1.5,
             grabCursor: true,
-            touchMoveStopPropagation: true,
+            touchStartPreventDefault: false,
+            passiveListeners: true,
+            resistance: true,
+            resistanceRatio: 0.85,
+            shortSwipes: true,
+            longSwipes: false,
+            navigation: {
+                nextEl: '.bts-custom-button-next',
+                prevEl: '.bts-custom-button-prev',
+            },
             on: {
                 init: () => {
-                    console.log('BTS Swiper ready - Full width carousel mode');
+                    console.log('BTS carousel ready – fast navigation enabled');
                     this.startLazyLoading();
-                    
-                    // Add CSS for smooth infinite scroll
-                    const style = document.createElement('style');
-                    style.textContent = `
-                        .am-bts-swiper .swiper-wrapper {
-                            transition-timing-function: linear !important;
-                        }
-                        .am-bts-swiper .swiper-slide {
-                            transition: all 0.3s ease;
-                        }
-                    `;
-                    document.head.appendChild(style);
+                    this._previewInterval = setInterval(() => this._updateVisiblePreviews(), 1200);
+                    if ('requestIdleCallback' in window) {
+                        requestIdleCallback(() => this.precacheAllVideos(), { timeout: 5000 });
+                    } else {
+                        setTimeout(() => this.precacheAllVideos(), 3000);
+                    }
                 },
-                slideChange: () => this.manageVideoQueue(),
-                resize: () => this.manageVideoQueue()
+                touchEnd: (swiper) => {
+                    if (swiper.autoplay?.running === false) swiper.autoplay.start();
+                },
+                slideChange: () => {
+                    requestAnimationFrame(() => {
+                        this.manageVideoQueue();
+                        this._updateVisiblePreviews();
+                    });
+                },
+                resize: () => {
+                    requestAnimationFrame(() => {
+                        this.manageVideoQueue();
+                        this._updateVisiblePreviews();
+                    });
+                }
             }
         });
-        
-        // Create continuous smooth carousel animation
-        if (!this.config.lowPowerMode) {
-            let isPlaying = true;
-            let animationFrame;
-            let lastTimestamp = 0;
-            const slideSpeed = 0.5; // Pixels per frame for smooth movement
-            
-            const animateCarousel = () => {
-                if (!isPlaying || !btsSwiper) return;
-                
-                // Get current translate value and slide incrementally
-                const currentTranslate = btsSwiper.translate;
-                const containerWidth = btsSwiper.width;
-                const slidesWidth = btsSwiper.slidesGrid.reduce((a, b) => a + b, 0);
-                
-                // Move to next slide when necessary
-                if (Math.abs(currentTranslate) >= slidesWidth - containerWidth - 100) {
-                    btsSwiper.slideNext();
-                }
-                
-                animationFrame = requestAnimationFrame(animateCarousel);
-            };
-            
-            // Start animation on hover out
-            const swiperContainer = document.querySelector('.am-bts-swiper');
-            if (swiperContainer) {
-                swiperContainer.addEventListener('mouseenter', () => {
-                    isPlaying = false;
-                    if (animationFrame) cancelAnimationFrame(animationFrame);
-                });
-                
-                swiperContainer.addEventListener('mouseleave', () => {
-                    isPlaying = true;
-                    animateCarousel();
-                });
-            }
-            
-            // Start the smooth carousel
-            animateCarousel();
-            
-            // Store for cleanup
-            this.carouselAnimation = { animateCarousel, swiperContainer };
-        }
-        
+
         window.BTSSliderInstance = this;
         this.btsSwiper = btsSwiper;
         this.setupVisibilityHandler();
         this.setupMemoryCleanup();
-        
-        console.log('BTS Slider initialized with full width carousel animation');
+        console.log('BTS Slider mounted – navigation buttons responsive');
     },
-    
+
     startLazyLoading() {
         this.loadQueue = [];
         this.activeLoads = 0;
-        const items = document.querySelectorAll('.am-bts-item');
+        const items = document.querySelectorAll('.bts-custom-item');
         items.forEach(item => {
-            const video = item.querySelector('.am-bts-video');
+            const video = item.querySelector('.bts-custom-video');
             const src = item.dataset.videoSrc;
             const id = item.dataset.videoId;
-            if (video && src) {
+            if (video && src && video.dataset.loaded !== 'true') {
                 this.loadQueue.push({ video, videoSrc: src, videoId: id, item });
             }
         });
-        for (let i = 0; i < this.config.maxConcurrentLoads && i < this.loadQueue.length; i++) {
+        for (let i = 0; i < this.config.maxConcurrentLoads; i++) {
             this.processNextInQueue();
         }
     },
-    
+
     processNextInQueue() {
         if (this.loadQueue.length === 0 || this.activeLoads >= this.config.maxConcurrentLoads) return;
         const next = this.loadQueue.shift();
         if (!next) return;
         this.activeLoads++;
-        const isNear = this.isElementNearViewport(next.item);
-        if (isNear || this.activeLoads <= 2) {
-            this.loadVideoFromCache(next.video, next.videoSrc, next.videoId)
-                .finally(() => { this.activeLoads--; this.processNextInQueue(); });
-        } else {
-            setTimeout(() => { this.activeLoads--; this.loadQueue.unshift(next); this.processNextInQueue(); }, 500);
-        }
+        this.loadVideoFromCache(next.video, next.videoSrc, next.videoId)
+            .finally(() => {
+                this.activeLoads--;
+                this.processNextInQueue();
+            });
     },
-    
+
     isElementNearViewport(element) {
         if (!element) return false;
-        const container = document.querySelector('.am-bts-swiper');
+        const container = document.querySelector('.bts-custom-carousel-wrapper');
         if (!container) return true;
         const cRect = container.getBoundingClientRect();
         const eRect = element.getBoundingClientRect();
         const distance = this.config.preloadAheadDistance;
         return (eRect.right >= cRect.left - distance && eRect.left <= cRect.right + distance);
     },
-    
+
     manageVideoQueue() {
-        const videos = document.querySelectorAll('.am-bts-video');
-        const container = document.querySelector('.am-bts-swiper');
+        const videos = document.querySelectorAll('.bts-custom-video');
+        const container = document.querySelector('.bts-custom-carousel-wrapper');
         if (!container) return;
         const cRect = container.getBoundingClientRect();
         videos.forEach(video => {
-            const parent = video.closest('.am-bts-item');
+            const parent = video.closest('.bts-custom-item');
             if (!parent) return;
             const eRect = parent.getBoundingClientRect();
             const isFar = (eRect.right < cRect.left - 1500 || eRect.left > cRect.right + 1500);
@@ -448,116 +597,117 @@ const BTSSlider = {
             }
         });
     },
-    
+
     setupVisibilityHandler() {
         document.addEventListener('visibilitychange', () => {
-            const videos = document.querySelectorAll('.am-bts-video');
+            const videos = document.querySelectorAll('.bts-custom-video');
             if (document.hidden) {
-                videos.forEach(v => { if (!v.paused) { v.pause(); v.dataset.wasPlaying = 'true'; } });
-                // Pause carousel animation when tab is hidden
-                if (this.carouselAnimation && this.carouselAnimation.animateCarousel) {
-                    this.carouselAnimation.isPlaying = false;
-                    if (this.carouselAnimation.animationFrame) {
-                        cancelAnimationFrame(this.carouselAnimation.animationFrame);
-                    }
-                }
+                videos.forEach(v => {
+                    if (!v.paused) { v.pause(); v.dataset.wasPlaying = 'true'; }
+                    this._stopPreview(v);
+                });
+                if (this.btsSwiper?.autoplay?.stop) this.btsSwiper.autoplay.stop();
             } else {
                 videos.forEach(v => {
-                    const parent = v.closest('.am-bts-item');
+                    const parent = v.closest('.bts-custom-item');
                     if (parent && parent.matches(':hover') && v.dataset.wasPlaying === 'true') {
                         v.play().catch(()=>{});
                         delete v.dataset.wasPlaying;
                     }
                 });
-                // Resume carousel animation when tab is visible
-                if (this.carouselAnimation && this.carouselAnimation.animateCarousel && !this.config.lowPowerMode) {
-                    this.carouselAnimation.isPlaying = true;
-                    this.carouselAnimation.animateCarousel();
-                }
+                if (this.btsSwiper?.autoplay?.start) this.btsSwiper.autoplay.start();
+                this._updateVisiblePreviews();
             }
         });
     },
-    
+
     setupMemoryCleanup() {
         setInterval(() => {
-            const videos = document.querySelectorAll('.am-bts-video');
+            const videos = document.querySelectorAll('.bts-custom-video');
             videos.forEach(video => {
-                const parent = video.closest('.am-bts-item');
+                const parent = video.closest('.bts-custom-item');
                 if (parent && !this.isElementNearViewport(parent) && video.paused && video.dataset.loaded === 'true') {
                     this.unloadVideo(video, parent.dataset.videoId);
                 }
             });
         }, 30000);
         window.addEventListener('beforeunload', () => {
-            document.querySelectorAll('.am-bts-video').forEach(v => {
+            if (this._previewInterval) clearInterval(this._previewInterval);
+            document.querySelectorAll('.bts-custom-video').forEach(v => {
                 if (v.src && v.src.startsWith('blob:')) URL.revokeObjectURL(v.src);
             });
-            // Clean up carousel animation
-            if (this.carouselAnimation && this.carouselAnimation.animationFrame) {
-                cancelAnimationFrame(this.carouselAnimation.animationFrame);
-            }
         });
     }
 };
 
-// Add spinner style if missing
-if (!document.getElementById('am-bts-spinner-style')) {
+// ========== INJECT STYLES (unchanged) ==========
+if (!document.getElementById('bts-custom-spinner-style')) {
     const style = document.createElement('style');
-    style.id = 'am-bts-spinner-style';
+    style.id = 'bts-custom-spinner-style';
     style.textContent = `
-        @keyframes amSpin {
+        @keyframes btsCustomSpin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        .am-bts-item {
-            transition: transform 0.3s ease;
-        }
-        .am-bts-video {
-            border-radius: 12px;
-        }
-        /* Spinner loading animation */
-        .am-bts-loading-spinner {
+        .bts-custom-loading-spinner {
             width: 40px;
             height: 40px;
-            border: 3px solid rgba(212, 175, 55, 0.2);
-            border-top: 3px solid var(--metallic-gold);
-            border-right: 3px solid var(--metallic-gold);
+            border: 3px solid rgba(212,175,55,0.2);
+            border-top: 3px solid var(--metallic-gold, #d4af37);
+            border-right: 3px solid var(--metallic-gold, #d4af37);
             border-radius: 50%;
-            animation: amSpin 0.8s linear infinite;
-            box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+            animation: btsCustomSpin 0.8s linear infinite;
         }
-        /* Full width carousel styles */
-        .am-bts-swiper {
-            overflow: visible !important;
+        .bts-custom-button-prev,
+        .bts-custom-button-next {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 20;
+            transition: all 0.3s ease;
+            color: var(--metallic-gold, #d4af37);
+            font-size: 24px;
+            border: 1px solid rgba(212,175,55,0.5);
+            pointer-events: auto;
         }
-        .am-bts-swiper .swiper-slide {
-            transition: transform 0.3s ease, opacity 0.3s ease;
+        .bts-custom-button-prev { left: 20px; }
+        .bts-custom-button-next { right: 20px; }
+        .bts-custom-button-prev:hover,
+        .bts-custom-button-next:hover {
+            background: rgba(212,175,55,0.3);
+            transform: translateY(-50%) scale(1.1);
+            border-color: var(--metallic-gold, #d4af37);
         }
-        @media (max-width: 480px) {
-            .am-bts-loading-spinner {
-                width: 30px;
-                height: 30px;
+        .bts-custom-hint {
+            text-align: center;
+            font-size: 0.85rem;
+            color: rgba(212,175,55,0.7);
+            margin-top: 12px;
+            letter-spacing: 0.5px;
+            font-weight: 400;
+        }
+        @media (max-width: 768px) {
+            .bts-custom-button-prev,
+            .bts-custom-button-next {
+                width: 35px;
+                height: 35px;
+                font-size: 18px;
             }
-        }
-        @media (prefers-reduced-motion: reduce) {
-            .am-bts-loading-spinner {
-                animation: none;
-            }
+            .bts-custom-button-prev { left: 10px; }
+            .bts-custom-button-next { right: 10px; }
+            .bts-custom-hint { font-size: 0.7rem; margin-top: 8px; }
         }
     `;
     document.head.appendChild(style);
 }
 
-// Initialize when DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        BTSSlider.init();
-    });
-} else {
-    BTSSlider.init();
-}
-
-// Export for use in other modules if needed
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = BTSSlider;
-}
+if (typeof module !== 'undefined' && module.exports) module.exports = BTSSlider;

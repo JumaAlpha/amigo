@@ -32,14 +32,14 @@
 }
 
 /* Swiper Slides */
-.swiper-slide {
+.work-swiper .swiper-slide {
     width: auto;
     height: auto;
     opacity: 0.7;
     transition: opacity 0.3s ease;
 }
 
-.swiper-slide-active {
+.work-swiper .swiper-slide-active {
     opacity: 1;
 }
 
