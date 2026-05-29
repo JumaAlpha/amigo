@@ -106,7 +106,7 @@
 /* Desktop left alignment for title */
 @media (min-width: 1024px) {
     .hero-title {
-        margin-left: 4rem; /* Space from sidebar */
+        margin-left: 4rem; /* Space from sb */
         margin-right: 0; /* Remove right margin */
         max-width: 700px; /* Limit width for better readability */
         padding-left: 2rem;

@@ -1,4 +1,4 @@
-const AboutGear = {
+const ag = {
     render() {
         return `
             <section class="section about-gear-section" data-aos="fade-up" data-aos-duration="700">

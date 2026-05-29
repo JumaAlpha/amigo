@@ -1,10 +1,10 @@
-const BookingForm = {
+const bf = {
     render() {
         return `
             <section class="section booking-section" data-aos="fade-up" data-aos-duration="700">
                 <div class="gold-form">
                     <h2>BOOKING</h2>
-                    <form id="bookingForm">
+                    <form id="bf">
                         <input type="text" placeholder="Full name" class="input-line" required>
                         <input type="email" placeholder="Email / country" class="input-line" required>
                         <input type="text" placeholder="Project details + dates" class="input-line" required>
@@ -17,7 +17,7 @@ const BookingForm = {
     },
     
     init() {
-        const form = document.getElementById('bookingForm');
+        const form = document.getElementById('bf');
         if (form) {
             form.addEventListener('submit', (e) => {
                 e.preventDefault();

@@ -1,4 +1,4 @@
-const FogMarquee = {
+const fm = {
     render() {
         return `
             <div class="fog-overlay-container">
@@ -12,7 +12,7 @@ const FogMarquee = {
     },
     
     init() {
-        console.log('FogMarquee initializing...');
+        console.log('fm initializing...');
         
         const fogImages = document.querySelectorAll('.fog-layer img');
         
@@ -22,7 +22,7 @@ const FogMarquee = {
                 const delay = Math.random() * 5;
                 img.style.animationDelay = `-${delay}s`;
             });
-            console.log('FogMarquee initialized with', fogImages.length, 'images');
+            console.log('fm initialized with', fogImages.length, 'images');
         }
     }
 };

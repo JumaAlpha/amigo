@@ -141,23 +141,23 @@
 
     <!-- Main App Container -->
     <div class="app">
-        <!-- Sidebar Component -->
-        <div id="sidebar-container"></div>
+        <!-- sb Component -->
+        <div id="sb-container"></div>
 
         <!-- Main Content with Horizontal Scroll -->
         <main class="main-content" id="main-content"></main>
     </div>
 
     <!-- Component Scripts -->
-    <script src="components/Sidebar.js"></script>
-    <script src="components/HeroSection.js"></script>
-    <script src="components/WorkGallery.js"></script>
-    <script src="components/RecordingSection.js"></script>
-    <script src="components/BTSSlider.js"></script>
-    <script src="components/AboutGear.js"></script>
-    <script src="components/AboutValues.js"></script>
-    <script src="components/BookingForm.js"></script>
-    <script src="components/FogMarquee.js"></script>
+    <script src="components/sb.js"></script>
+    <script src="components/hs.js"></script>
+    <script src="components/wg.js"></script>
+    <script src="components/rs.js"></script>
+    <script src="components/bts.js"></script>
+    <script src="components/ag.js"></script>
+    <script src="components/av.js"></script>
+    <script src="components/bf.js"></script>
+    <script src="components/fm.js"></script>
 
     <!-- Swiper JS -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
@@ -180,55 +180,55 @@
 
             // All component CSS files
             const cssFiles = [
-                'styles/sidebar.css',
+                'styles/sb.css',
                 'styles/hero.css',
-                'styles/work-gallery.css',
-                'styles/recording-section.css',
-                'styles/bts-slider.css',
-                'styles/about-gear.css',
-                'styles/about-values.css',
-                'styles/booking-form.css',
-                'styles/fog-marquee.css'
+                'styles/wg.css',
+                'styles/rs.css',
+                'styles/bts.css',
+                'styles/ag.css',
+                'styles/av.css',
+                'styles/bf.css',
+                'styles/fm.css'
             ];
 
             Promise.all(cssFiles.map(loadComponentCSS))
                 .then(() => {
                     // Check required components
-                    if (typeof FogMarquee === 'undefined' || typeof Sidebar === 'undefined') {
+                    if (typeof fm === 'undefined' || typeof sb === 'undefined') {
                         console.error('Missing required components');
                         return;
                     }
 
-                    // Render fog and sidebar
+                    // Render fog and sb
                     const fogContainer = document.getElementById('fog-marquee-container');
-                    if (fogContainer) fogContainer.innerHTML = FogMarquee.render();
+                    if (fogContainer) fogContainer.innerHTML = fm.render();
 
-                    const sidebarContainer = document.getElementById('sidebar-container');
-                    if (sidebarContainer) sidebarContainer.innerHTML = Sidebar.render();
+                    const sbContainer = document.getElementById('sb-container');
+                    if (sbContainer) sbContainer.innerHTML = sb.render();
 
                     // Render main content sections
                     const mainContent = document.getElementById('main-content');
                     if (mainContent) {
                         mainContent.innerHTML = `
-                            ${HeroSection.render()}
-                            ${WorkGallery.render()}
-                            ${RecordingSection.render()}
-                            ${BTSSlider.render()}
-                            ${AboutGear.render()}
-                            ${AboutValues.render()}
-                            ${BookingForm.render()}
+                            ${hs.render()}
+                            ${wg.render()}
+                            ${rs.render()}
+                            ${bts.render()}
+                            ${ag.render()}
+                            ${av.render()}
+                            ${bf.render()}
                         `;
                     }
 
-                    // Initialize all components except BTSSlider's loading will be monitored separately
-                    if (typeof FogMarquee.init === 'function') FogMarquee.init();
-                    if (typeof Sidebar.init === 'function') Sidebar.init();
-                    if (typeof HeroSection.init === 'function') HeroSection.init();
-                    if (typeof WorkGallery.init === 'function') WorkGallery.init();
-                    if (typeof RecordingSection.init === 'function') RecordingSection.init();
-                    if (typeof AboutGear.init === 'function') AboutGear.init();
-                    if (typeof AboutValues.init === 'function') AboutValues.init();
-                    if (typeof BookingForm.init === 'function') BookingForm.init();
+                    // Initialize all components except bts's loading will be monitored separately
+                    if (typeof fm.init === 'function') fm.init();
+                    if (typeof sb.init === 'function') sb.init();
+                    if (typeof hs.init === 'function') hs.init();
+                    if (typeof wg.init === 'function') wg.init();
+                    if (typeof rs.init === 'function') rs.init();
+                    if (typeof ag.init === 'function') ag.init();
+                    if (typeof av.init === 'function') av.init();
+                    if (typeof bf.init === 'function') bf.init();
 
                     if (typeof AOS !== 'undefined') {
                         AOS.init({
@@ -241,13 +241,13 @@
                         });
                     }
 
-                    // Initialize BTSSlider – this will start loading videos
-                    if (typeof BTSSlider.init === 'function') {
-                        BTSSlider.init();
+                    // Initialize bts – this will start loading videos
+                    if (typeof bts.init === 'function') {
+                        bts.init();
                     }
 
                     // ---- Loading Screen Monitor for BTS Videos ----
-                    // Wait a short moment for BTSSlider to render DOM elements
+                    // Wait a short moment for bts to render DOM elements
                     setTimeout(() => {
                         // Gather all unique video URLs from the BTS slider items
                         const videoItems = document.querySelectorAll('.bts-custom-item');
@@ -332,7 +332,7 @@
                             }
                         }, 10000);
 
-                        // Also if BTSSlider fails to load any video, ensure content shows eventually
+                        // Also if bts fails to load any video, ensure content shows eventually
                         setTimeout(() => {
                             if (loadedCount === 0 && totalUnique > 0) {
                                 console.warn('No videos loaded after 5 seconds – forcing content visible');

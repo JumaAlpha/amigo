@@ -26,10 +26,10 @@ body {
     --pure-black: #000000;
     --off-white: #F5F5F5;
     
-    /* Sidebar width variables - default for desktop */
-    --sidebar-width-collapsed: 80px;
-    --sidebar-width-expanded: 250px;
-    --sidebar-width-mobile-expanded: 200px;
+    /* sb width variables - default for desktop */
+    --sb-width-collapsed: 80px;
+    --sb-width-expanded: 250px;
+    --sb-width-mobile-expanded: 200px;
 }
 
 /* ========== LAYOUT STRUCTURE ========== */
@@ -44,8 +44,8 @@ body {
 }
 
 .main-content {
-    width: calc(100% - var(--sidebar-width-collapsed));
-    margin-left: var(--sidebar-width-collapsed);
+    width: calc(100% - var(--sb-width-collapsed));
+    margin-left: var(--sb-width-collapsed);
     display: flex;
     flex: 0 0 auto;
     overflow-x: auto;
@@ -68,9 +68,9 @@ body {
     display: none;
 }
 
-.main-content.sidebar-expanded {
-    margin-left: var(--sidebar-width-expanded);
-    width: calc(100% - var(--sidebar-width-expanded));
+.main-content.sb-expanded {
+    margin-left: var(--sb-width-expanded);
+    width: calc(100% - var(--sb-width-expanded));
 }
 
 .section {
@@ -234,9 +234,9 @@ body {
 /* Small phones (up to 480px) */
 @media (max-width: 480px) {
     :root {
-        --sidebar-width-collapsed: 0px;
-        --sidebar-width-expanded: 200px;
-        --sidebar-width-mobile-expanded: 220px; /* Wider for better readability */
+        --sb-width-collapsed: 0px;
+        --sb-width-expanded: 200px;
+        --sb-width-mobile-expanded: 220px; /* Wider for better readability */
     }
 
     .site-logo {
@@ -281,9 +281,9 @@ body {
 /* Large phones (481px to 768px) */
 @media (min-width: 481px) and (max-width: 768px) {
     :root {
-        --sidebar-width-collapsed: 0px;
-        --sidebar-width-expanded: 220px;
-        --sidebar-width-mobile-expanded: 240px;
+        --sb-width-collapsed: 0px;
+        --sb-width-expanded: 220px;
+        --sb-width-mobile-expanded: 240px;
     }
 
     .site-logo {
@@ -314,8 +314,8 @@ body {
 /* Tablets (769px to 1024px) */
 @media (min-width: 769px) and (max-width: 1024px) {
     :root {
-        --sidebar-width-collapsed: 80px;
-        --sidebar-width-expanded: 230px;
+        --sb-width-collapsed: 80px;
+        --sb-width-expanded: 230px;
     }
 
     .site-logo .amigo {
@@ -361,8 +361,8 @@ body {
 /* High resolution screens (1920px and up) */
 @media (min-width: 1920px) {
     :root {
-        --sidebar-width-collapsed: 100px;
-        --sidebar-width-expanded: 300px;
+        --sb-width-collapsed: 100px;
+        --sb-width-expanded: 300px;
     }
 
     .site-logo .amigo {
@@ -379,14 +379,14 @@ body {
     }
 }
 
-/* ===== MOBILE SIDEBAR OVERRIDES ===== */
+/* ===== MOBILE sb OVERRIDES ===== */
 @media (max-width: 768px) {
     .main-content {
         width: 100%;
         margin-left: 0;
     }
     
-    .main-content.sidebar-expanded {
+    .main-content.sb-expanded {
         width: 100%;
         margin-left: 0;
     }
@@ -432,7 +432,7 @@ body {
         left: max(1rem, env(safe-area-inset-left));
     }
     
-    .sidebar {
+    .sb {
         padding-top: max(1rem, env(safe-area-inset-top));
         padding-bottom: max(1rem, env(safe-area-inset-bottom));
     }
@@ -442,7 +442,7 @@ body {
 @media (prefers-reduced-motion: reduce) {
     .main-content,
     .site-logo,
-    .sidebar,
+    .sb,
     .hamburger-strip,
     .nav-menu,
     .nav-menu li,
@@ -457,7 +457,7 @@ body {
     .scroll-arrow,
     .rotating-artist.fade-out,
     .rotating-artist.fade-in,
-    body.sidebar-open::after {
+    body.sb-open::after {
         transition: none !important;
         animation: none !important;
     }
@@ -475,11 +475,11 @@ body {
 
 /* ===== PRINT STYLES ===== */
 @media print {
-    .sidebar,
+    .sb,
     .site-logo,
     .mobile-menu-toggle,
     .fog-overlay-container,
-    body.sidebar-open::after {
+    body.sb-open::after {
         display: none !important;
     }
     

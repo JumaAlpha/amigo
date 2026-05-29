@@ -1,4 +1,4 @@
-const AboutValues = {
+const av = {
     render() {
         return `
             <section class="section values-section" id="values-section" data-aos="fade-up" data-aos-duration="700">

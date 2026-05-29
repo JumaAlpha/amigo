@@ -1,4 +1,4 @@
-const WorkGallery = {
+const wg = {
     render() {
         return `
             <section class="section work-section" data-aos="fade-up" data-aos-duration="700">
@@ -29,7 +29,7 @@ const WorkGallery = {
             { artist: 'Essence of Worship', song: 'Wimbo wa sifa', video: 'assets/work/Essence_Of_worship_Wimbo_wa_sifa.mp4' },
             { artist: 'Rhema Feast 2025', song: 'live recording', video: 'assets/work/rf.mp4' },
             { artist: 'Neema Gospel Choir', song: 'Umenipendelea', video: 'assets/work/umenipendelea_launch.mp4' },
-            { artist: 'Jackline Medza', song: 'Only You', video: 'assets/work/OnlyYou.mp4' }
+            { artist: 'Jackline Medza', song: 'Only You', video: 'assets/work/wakati_launch.mp4' }
         ];
         
         return thumbnails.map(thumb => `

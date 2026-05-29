@@ -1,4 +1,4 @@
-const RecordingSection = {
+const rs = {
     playlistId: 'PLD7Kg_fa7aSxaOhKDm0NYe-869_1zysI1',
     // Cache properties kept but no longer used (safe to leave)
     cacheKey: 'amigo_recording_playlist_cache_v1',
@@ -403,4 +403,4 @@ const RecordingSection = {
     }
 };
 
-if (typeof module !== 'undefined' && module.exports) module.exports = RecordingSection;
+if (typeof module !== 'undefined' && module.exports) module.exports = rs;

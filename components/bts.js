@@ -1,5 +1,5 @@
 // ========== BTS SLIDER - INFINITE LOOP (FAST NAVIGATION) ==========
-const BTSSlider = {
+const bts = {
     CACHE_KEY: 'bts_videos_cache',
     activeVideos: new Map(),
     thumbnailCache: new Map(),
@@ -530,7 +530,7 @@ const BTSSlider = {
             }
         });
 
-        window.BTSSliderInstance = this;
+        window.btsInstance = this;
         this.btsSwiper = btsSwiper;
         this.setupVisibilityHandler();
         this.setupMemoryCleanup();
@@ -710,4 +710,4 @@ if (!document.getElementById('bts-custom-spinner-style')) {
     document.head.appendChild(style);
 }
 
-if (typeof module !== 'undefined' && module.exports) module.exports = BTSSlider;
+if (typeof module !== 'undefined' && module.exports) module.exports = bts;

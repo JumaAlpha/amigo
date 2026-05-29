@@ -1,7 +1,7 @@
-const Sidebar = {
+const sb = {
     render() {
         return `
-            <aside class="sidebar" id="mainSidebar">
+            <aside class="sb" id="mainsb">
                 <!-- Hamburger Menu (Three Strips) -->
                 <div class="hamburger-menu" id="hamburgerMenu">
                     <div class="hamburger-strip"></div>
@@ -39,7 +39,7 @@ const Sidebar = {
     
     init() {
         // Cache DOM elements
-        const sidebar = document.getElementById('mainSidebar');
+        const sb = document.getElementById('mainsb');
         const hamburger = document.getElementById('hamburgerMenu');
         const socialToggle = document.getElementById('socialToggle');
         const socialDrawer = document.getElementById('socialDrawer');
@@ -55,22 +55,22 @@ const Sidebar = {
         const isMobile = () => window.innerWidth <= 768;
         const isSmallMobile = () => window.innerWidth <= 480;
         
-        // Get sidebar width based on current state and screen size
-        const getSidebarWidth = () => {
+        // Get sb width based on current state and screen size
+        const getsbWidth = () => {
             if (isMobile()) {
-                // When mobile and sidebar is visible, it's expanded width, otherwise 0
-                return sidebar.classList.contains('mobile-visible') ? 
+                // When mobile and sb is visible, it's expanded width, otherwise 0
+                return sb.classList.contains('mobile-visible') ? 
                     (isSmallMobile() ? 280 : 300) : 0;
             } else {
-                return sidebar.classList.contains('expanded') ? 
+                return sb.classList.contains('expanded') ? 
                     (isSmallMobile() ? 200 : 250) : (isSmallMobile() ? 60 : 80);
             }
         };
         
-        // Update social drawer position based on sidebar width
+        // Update social drawer position based on sb width
         const updateDrawerPosition = () => {
-            const sidebarWidth = getSidebarWidth();
-            socialDrawer.style.left = sidebarWidth + 'px';
+            const sbWidth = getsbWidth();
+            socialDrawer.style.left = sbWidth + 'px';
         };
         
         // Close social drawer and reset arrow
@@ -83,7 +83,7 @@ const Sidebar = {
             const arrowOffset = isSmallMobile() ? 3 : (isMobile() ? 5 : 8);
             const expandedOffset = isSmallMobile() ? 3 : (isMobile() ? 5 : 5);
             
-            if (sidebar.classList.contains('expanded') || sidebar.classList.contains('mobile-visible')) {
+            if (sb.classList.contains('expanded') || sb.classList.contains('mobile-visible')) {
                 arrow.style.transform = `translateX(${expandedOffset}px)`;
             } else {
                 arrow.style.transform = `translateX(${arrowOffset}px)`;
@@ -184,20 +184,20 @@ const Sidebar = {
             });
         }
         
-        // Open sidebar on mobile (show it)
-        const openMobileSidebar = () => {
-            sidebar.classList.add('mobile-visible');
-            document.body.classList.add('sidebar-open'); // Add class to body for overlay
+        // Open sb on mobile (show it)
+        const openMobilesb = () => {
+            sb.classList.add('mobile-visible');
+            document.body.classList.add('sb-open'); // Add class to body for overlay
             // Hide floating toggle
             const mobileToggle = document.querySelector('.mobile-menu-toggle');
             if (mobileToggle) mobileToggle.classList.add('hidden');
             updateDrawerPosition();
         };
         
-        // Close sidebar on mobile (hide it)
-        const closeMobileSidebar = () => {
-            sidebar.classList.remove('mobile-visible');
-            document.body.classList.remove('sidebar-open'); // Remove class from body
+        // Close sb on mobile (hide it)
+        const closeMobilesb = () => {
+            sb.classList.remove('mobile-visible');
+            document.body.classList.remove('sb-open'); // Remove class from body
             // Show floating toggle
             const mobileToggle = document.querySelector('.mobile-menu-toggle');
             if (mobileToggle) mobileToggle.classList.remove('hidden');
@@ -214,7 +214,7 @@ const Sidebar = {
             
             toggle.addEventListener('click', (e) => {
                 e.stopPropagation();
-                openMobileSidebar();
+                openMobilesb();
             });
         }
         
@@ -223,20 +223,20 @@ const Sidebar = {
             e.stopPropagation();
             
             if (isMobile()) {
-                // On mobile, hamburger is inside sidebar: clicking it closes the sidebar
-                if (sidebar.classList.contains('mobile-visible')) {
-                    closeMobileSidebar();
+                // On mobile, hamburger is inside sb: clicking it closes the sb
+                if (sb.classList.contains('mobile-visible')) {
+                    closeMobilesb();
                 }
             } else {
                 // On desktop, toggle expanded state
                 const currentIndex = getSectionIndex();
-                sidebar.classList.toggle('expanded');
-                mainContent.classList.toggle('sidebar-expanded');
+                sb.classList.toggle('expanded');
+                mainContent.classList.toggle('sb-expanded');
                 updateDrawerPosition();
                 realignCurrentSection(currentIndex, 320);
                 
                 // Close social drawer when collapsing
-                if (!sidebar.classList.contains('expanded')) {
+                if (!sb.classList.contains('expanded')) {
                     closeSocialDrawer();
                 }
             }
@@ -262,13 +262,13 @@ const Sidebar = {
             const expandedOffset = isSmallMobile() ? 3 : (isMobile() ? 5 : 5);
             
             if (socialDrawer.classList.contains('open')) {
-                if (sidebar.classList.contains('expanded') || sidebar.classList.contains('mobile-visible')) {
+                if (sb.classList.contains('expanded') || sb.classList.contains('mobile-visible')) {
                     arrow.style.transform = `translateX(${expandedOffset}px) rotate(180deg)`;
                 } else {
                     arrow.style.transform = `translateX(${arrowOffset}px) rotate(180deg)`;
                 }
             } else {
-                if (sidebar.classList.contains('expanded') || sidebar.classList.contains('mobile-visible')) {
+                if (sb.classList.contains('expanded') || sb.classList.contains('mobile-visible')) {
                     arrow.style.transform = `translateX(${expandedOffset}px)`;
                 } else {
                     arrow.style.transform = `translateX(${arrowOffset}px)`;
@@ -286,11 +286,11 @@ const Sidebar = {
         // Prevent closing when clicking inside drawer
         socialDrawer.addEventListener('click', (e) => e.stopPropagation());
         
-        // Close mobile sidebar when clicking on overlay
+        // Close mobile sb when clicking on overlay
         document.addEventListener('click', (e) => {
-            if (isMobile() && document.body.classList.contains('sidebar-open') && 
-                !sidebar.contains(e.target) && !e.target.classList.contains('mobile-menu-toggle')) {
-                closeMobileSidebar();
+            if (isMobile() && document.body.classList.contains('sb-open') && 
+                !sb.contains(e.target) && !e.target.classList.contains('mobile-menu-toggle')) {
+                closeMobilesb();
             }
         });
         
@@ -319,9 +319,9 @@ const Sidebar = {
                     scrollToSection(targetIndex);
                 }
                 
-                // On mobile, close sidebar after navigation
+                // On mobile, close sb after navigation
                 if (isMobile()) {
-                    closeMobileSidebar();
+                    closeMobilesb();
                 }
             });
         });
@@ -412,16 +412,16 @@ const Sidebar = {
             const currentIndex = getSectionIndex();
             if (window.innerWidth > 768) {
                 // Switch to desktop mode
-                sidebar.classList.remove('mobile-visible');
-                document.body.classList.remove('sidebar-open');
-                mainContent.classList.remove('sidebar-expanded');
+                sb.classList.remove('mobile-visible');
+                document.body.classList.remove('sb-open');
+                mainContent.classList.remove('sb-expanded');
                 const mobileToggle = document.querySelector('.mobile-menu-toggle');
                 if (mobileToggle) mobileToggle.remove(); // Remove floating toggle on desktop
             } else {
-                // Switch to mobile mode: ensure sidebar is hidden initially, and create toggle if needed
-                sidebar.classList.remove('mobile-visible', 'expanded');
-                document.body.classList.remove('sidebar-open');
-                mainContent.classList.remove('sidebar-expanded');
+                // Switch to mobile mode: ensure sb is hidden initially, and create toggle if needed
+                sb.classList.remove('mobile-visible', 'expanded');
+                document.body.classList.remove('sb-open');
+                mainContent.classList.remove('sb-expanded');
                 if (!document.querySelector('.mobile-menu-toggle')) {
                     const toggle = document.createElement('div');
                     toggle.className = 'mobile-menu-toggle';
@@ -429,7 +429,7 @@ const Sidebar = {
                     document.body.appendChild(toggle);
                     toggle.addEventListener('click', (e) => {
                         e.stopPropagation();
-                        openMobileSidebar();
+                        openMobilesb();
                     });
                 }
             }
@@ -438,14 +438,14 @@ const Sidebar = {
             realignCurrentSection(currentIndex, 120);
         });
         
-        // Escape key: close social drawer and/or mobile sidebar
+        // Escape key: close social drawer and/or mobile sb
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 if (socialDrawer.classList.contains('open')) {
                     closeSocialDrawer();
                 }
-                if (isMobile() && sidebar.classList.contains('mobile-visible')) {
-                    closeMobileSidebar();
+                if (isMobile() && sb.classList.contains('mobile-visible')) {
+                    closeMobilesb();
                 }
             }
 
@@ -473,7 +473,7 @@ const Sidebar = {
             }
         });
         
-        // Swipe to open sidebar on mobile (from left edge)
+        // Swipe to open sb on mobile (from left edge)
         if (isMobile()) {
             let touchStartX = 0;
             let touchStartY = 0;
@@ -489,19 +489,19 @@ const Sidebar = {
                 const swipeDistanceX = touchEndX - touchStartX;
                 const swipeDistanceY = Math.abs(touchEndY - touchStartY);
                 
-                // If swiped from left edge (touchStartX near 0) and distance > 50px, and not scrolling vertically, open sidebar
-                if (touchStartX < 50 && swipeDistanceX > 50 && swipeDistanceY < 30 && !sidebar.classList.contains('mobile-visible')) {
-                    openMobileSidebar();
+                // If swiped from left edge (touchStartX near 0) and distance > 50px, and not scrolling vertically, open sb
+                if (touchStartX < 50 && swipeDistanceX > 50 && swipeDistanceY < 30 && !sb.classList.contains('mobile-visible')) {
+                    openMobilesb();
                 }
             }, { passive: true });
         }
         
         // Initial setup
         if (isMobile()) {
-            // Ensure sidebar is hidden on mobile start
-            sidebar.classList.remove('mobile-visible', 'expanded');
-            document.body.classList.remove('sidebar-open');
-            mainContent.classList.remove('sidebar-expanded');
+            // Ensure sb is hidden on mobile start
+            sb.classList.remove('mobile-visible', 'expanded');
+            document.body.classList.remove('sb-open');
+            mainContent.classList.remove('sb-expanded');
             // Create toggle if not exists
             if (!document.querySelector('.mobile-menu-toggle')) {
                 const toggle = document.createElement('div');
@@ -510,14 +510,14 @@ const Sidebar = {
                 document.body.appendChild(toggle);
                 toggle.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    openMobileSidebar();
+                    openMobilesb();
                 });
             }
         } else {
             // Desktop: initial collapsed state
-            sidebar.classList.remove('mobile-visible', 'expanded');
-            document.body.classList.remove('sidebar-open');
-            mainContent.classList.remove('sidebar-expanded');
+            sb.classList.remove('mobile-visible', 'expanded');
+            document.body.classList.remove('sb-open');
+            mainContent.classList.remove('sb-expanded');
         }
         
         // Initial drawer position
@@ -529,12 +529,12 @@ const Sidebar = {
         const arrowOffset = isSmallMobile() ? 3 : (isMobile() ? 5 : 8);
         const expandedOffset = isSmallMobile() ? 3 : (isMobile() ? 5 : 5);
         
-        if (sidebar.classList.contains('expanded') || sidebar.classList.contains('mobile-visible')) {
+        if (sb.classList.contains('expanded') || sb.classList.contains('mobile-visible')) {
             arrow.style.transform = `translateX(${expandedOffset}px)`;
         } else {
             arrow.style.transform = `translateX(${arrowOffset}px)`;
         }
         
-        console.log('Sidebar initialized with VALUES navigation item');
+        console.log('sb initialized with VALUES navigation item');
     }
 };

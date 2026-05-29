@@ -1,4 +1,4 @@
-const HeroSection = {
+const hs = {
     render() {
         return `
             <section class="section hero-section" id="hero-section" data-aos="fade" data-aos-duration="800">
@@ -170,8 +170,8 @@ const HeroSection = {
     },
     
     initCountingAnimation() {
-        const heroSection = document.getElementById('hero-section');
-        if (!heroSection) return;
+        const hs = document.getElementById('hero-section');
+        if (!hs) return;
         
         // Options for the observer
         const observerOptions = {
@@ -192,7 +192,7 @@ const HeroSection = {
         };
         
         const observer = new IntersectionObserver(observerCallback, observerOptions);
-        observer.observe(heroSection);
+        observer.observe(hs);
     },
     
     startCounting() {
